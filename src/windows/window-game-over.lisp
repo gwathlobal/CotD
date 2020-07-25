@@ -65,31 +65,37 @@
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
                      (declare (ignore mod unicode))
-                     (cond
-                       ;; escape - high scores
-                       ((sdl:key= key :sdl-key-escape) 
-                        (setf *current-window* (make-instance 'highscores-window :highscores-place (highscores-place win)))
-                        (make-output *current-window*)
-                        (run-window *current-window*)
-                        (case (game-manager/game-state *game-manager*)
-                          (:game-state-campaign-scenario (progn
-                                                           (game-state-campaign-scenario->post-scenario)
-                                                           (go-to-start-game)))
-                          (:game-state-custom-scenario (progn
-                                                         (game-state-custom-scenario->menu)
-                                                         (go-to-start-game))))
-                        )
-                       ;; m - return to main menu/campaign map
-                       ((sdl:key= key :sdl-key-m)
-                        (case (game-manager/game-state *game-manager*)
-                          (:game-state-campaign-scenario (progn
-                                                           (game-state-campaign-scenario->post-scenario)
-                                                           (go-to-start-game)))
-                          (:game-state-custom-scenario (progn
-                                                         (game-state-custom-scenario->menu)
-                                                         (go-to-start-game))))
-                        )
-                       )
-                     )
+                     (flet ((exit-func ()
+                              (case (game-manager/game-state *game-manager*)
+                                (:game-state-campaign-scenario (progn
+                                                                 (game-state-campaign-scenario->post-scenario)
+                                                                 (go-to-start-game)))
+                                (:game-state-custom-scenario (progn
+                                                               (when (game-manager/game-slot-id *game-manager*)
+                                                                 (let* ((final-save-name (format nil "~A~A" *save-final-base-dirname* (game-manager/game-slot-id *game-manager*)))
+                                                                        (dir-pathname (merge-pathnames (make-pathname :directory `(:relative ,final-save-name)) (find-save-game-path :save-game-scenario)))
+                                                                        (descr-pathname (merge-pathnames (make-pathname :name *save-descr-filename*) dir-pathname))
+                                                                        (dir-to-delete (make-pathname :host (pathname-host descr-pathname)
+                                                                                                      :device (pathname-device descr-pathname)
+                                                                                                      :directory (pathname-directory descr-pathname)))
+                                                                        (result))
+                                                                   (setf result (delete-dir-from-disk dir-to-delete))
+                                                                   (when (not result)
+                                                                     (setf *current-window* (make-instance 'display-msg-window
+                                                                                                           :msg-line "An error has occured while the system tried to remove the game!"))
+                                                                     (make-output *current-window*)
+                                                                     (run-window *current-window*))))
+                                                               (game-state-custom-scenario->menu)
+                                                               (go-to-start-game))))))
+                       (cond
+                         ;; escape - high scores
+                         ((sdl:key= key :sdl-key-escape) 
+                          (setf *current-window* (make-instance 'highscores-window :highscores-place (highscores-place win)))
+                          (make-output *current-window*)
+                          (run-window *current-window*)
+                          (exit-func))
+                         ;; m - return to main menu/campaign map
+                         ((sdl:key= key :sdl-key-m)
+                          (exit-func)))))
     (:video-expose-event () (make-output *current-window*))))
 

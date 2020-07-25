@@ -80,7 +80,7 @@
       (:key-down-event (:key key :mod mod :unicode unicode)
 
                        (when display-str-list
-                         (setf cur-sel (run-selection-list key mod unicode cur-sel :start-page (truncate cur-sel (length display-str-list)) :max-str-per-page (length display-str-list)))
+                         (setf cur-sel (run-selection-list key mod unicode cur-sel :start-page (truncate cur-sel (length display-str-list)) :max-str-per-page (length display-str-list) :use-letters nil))
                          (setf cur-sel (adjust-selection-list cur-sel (length display-str-list))))
                        
                        (cond
@@ -94,7 +94,6 @@
                               (eq unicode +cotd-unicode-latin-d-small+))
                           (when (and game-pathname-list (nth cur-sel game-pathname-list)
                                      descr-pathname-list (nth cur-sel descr-pathname-list))
-
                             (setf *current-window* (make-instance 'select-obj-window 
                                                                   :return-to *current-window*
                                                                   :header-line "Are you sure you want to delete this game?"

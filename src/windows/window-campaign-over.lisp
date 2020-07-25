@@ -67,6 +67,20 @@
                      (cond
                        ;; escape - return to main menu
                        ((sdl:key= key :sdl-key-escape)
+                        (when (game-manager/game-slot-id *game-manager*)
+                          (let* ((final-save-name (format nil "~A~A" *save-final-base-dirname* (game-manager/game-slot-id *game-manager*)))
+                                 (dir-pathname (merge-pathnames (make-pathname :directory `(:relative ,final-save-name)) (find-save-game-path :save-game-campaign)))
+                                 (descr-pathname (merge-pathnames (make-pathname :name *save-descr-filename*) dir-pathname))
+                                 (dir-to-delete (make-pathname :host (pathname-host descr-pathname)
+                                                               :device (pathname-device descr-pathname)
+                                                               :directory (pathname-directory descr-pathname)))
+                                 (result))
+                            (setf result (delete-dir-from-disk dir-to-delete))
+                            (when (not result)
+                              (setf *current-window* (make-instance 'display-msg-window
+                                                                    :msg-line "An error has occured while the system tried to remove the game!"))
+                              (make-output *current-window*)
+                              (run-window *current-window*))))
                         (game-state-post-scenario->menu)
                         (go-to-start-game)
                         )
