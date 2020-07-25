@@ -12,7 +12,7 @@
                                        :glyph-idx 32 :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 20 :max-fp 0
                                        :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 1 3 +normal-ap+ 100 ()) nil) :base-dodge 25
-                                       :abil-see-all t :abil-open-close-door t))
+                                       :abil-see-all t :abil-open-close-door t :abil-nameless t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-human+ 
                                        :name "human"
@@ -20,7 +20,7 @@
                                        :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t 
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t :abil-nameless t
                                        :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t :ai-swim-up t))
 
@@ -31,7 +31,7 @@
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t :abil-nameless t
                                        :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t :ai-swim-up t))
@@ -43,7 +43,7 @@
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t :abil-nameless t
                                        :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t  :ai-swim-up t))
@@ -55,7 +55,7 @@
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 0 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 3
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t :abil-nameless t
                                        :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t :ai-swim-up t))
 
@@ -66,7 +66,7 @@
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t :abil-nameless t
                                        :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 10 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-follow-leader t :ai-swim-up t))
@@ -78,7 +78,7 @@
                                        :weapon (list "Knife" (list +weapon-dmg-iron+ 0 2 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t :abil-nameless t
                                        :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :init-items (list (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t :ai-avoid-possession t :ai-swim-up t
@@ -91,7 +91,7 @@
                                        :weapon (list "Police baton" (list +weapon-dmg-iron+ 0 2 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 4
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t :abil-nameless t
                                        :abil-toggle-light t :abil-open-close-door t :abil-civilian t
                                        :init-items (list (list +item-type-coin+ #'(lambda () (+ 5 (random 10)))) (list +item-type-clothing+ #'(lambda () (random 2))))
                                        :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t :ai-avoid-possession t :ai-swim-up t
@@ -154,7 +154,7 @@
                                        :weapon (list "Knife" (list +weapon-dmg-iron+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 30
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t :abil-independent t :abil-soul t
+                                       :abil-human t :abil-death-from-above t :abil-climbing t :abil-possessable t :abil-can-be-blessed t :abil-independent t :abil-soul t :abil-nameless t
                                        :abil-toggle-light t :abil-open-close-door t :abil-open-close-window t :abil-sprint t :abil-jump t :abil-make-disguise t :abil-remove-disguise t
                                        :init-items (list (list +item-type-smoke-bomb+ #'(lambda () 3)))
                                        :ai-kleptomaniac t :ai-takes-valuable-items t :ai-cautious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-avoid-possession t :ai-swim-up t
@@ -170,7 +170,7 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 4 +normal-ap+ 1 1 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t :abil-nameless t
                                        :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                                        :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t :ai-avoid-possession t
@@ -183,7 +183,7 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-soul t :abil-nameless t
                                        :abil-keen-senses t :abil-horseback-riding t :abil-dismount t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                                        :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t :ai-avoid-possession t
@@ -196,7 +196,7 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
-                                       :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t :abil-detect-good t :abil-detect-evil t
+                                       :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t :abil-detect-good t :abil-detect-evil t :abil-nameless t
                                        :abil-prayer-reveal t :abil-prayer-shield t :abil-military-follow-me t :abil-horseback-riding t :abil-dismount t :abil-independent t :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                                        :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-avoid-melee t :ai-swim-up t
@@ -208,7 +208,7 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Light machine gun" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 6 70 "shoots" ())) :base-dodge 25
                                        :strength 1
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t :abil-nameless t
                                        :abil-toggle-light t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)))
                                        :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-follow-leader t :ai-avoid-possession t
@@ -221,7 +221,7 @@
                                        :faction +faction-type-military+
                                        :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 4 6 +normal-ap+ 1 1 1 120 "shoots" ())) :base-dodge 25
                                        :strength 1
-                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t :abil-independent t :abil-starts-with-horse t :abil-detect-good t :abil-detect-evil t
+                                       :abil-possessable t :abil-can-be-blessed t :abil-human t :abil-keen-senses t :abil-soul t :abil-independent t :abil-starts-with-horse t :abil-detect-good t :abil-detect-evil t :abil-nameless t
                                        :abil-horseback-riding t :abil-dismount t :abil-eagle-eye t :abil-open-close-door t
                                        :init-items (list (list +item-type-medkit+ #'(lambda () 3)) (list +item-type-signal-flare+ #'(lambda () 2)))
                                        :ai-curious t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-reload-ranged-weapon t :ai-shoot-enemy t :ai-avoid-possession t :ai-avoid-melee t
@@ -236,7 +236,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 50) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-mind+ 0 100))
                                        :strength 0
                                        :base-light-radius 0
-                                       :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-no-corpse t
+                                       :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-no-corpse t :abil-nameless t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-military-bomb-2+ 
@@ -247,7 +247,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 50) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-mind+ 0 100))
                                        :strength 0
                                        :base-light-radius 0
-                                       :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-no-corpse t
+                                       :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-no-corpse t :abil-nameless t
                              ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-military-bomb-3+ 
@@ -258,7 +258,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 50) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-mind+ 0 100))
                                        :strength 0
                                        :base-light-radius 0
-                                       :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-no-corpse t
+                                       :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-no-corpse t :abil-nameless t
                              ))
 
 ;;--------------------
@@ -395,7 +395,7 @@
                                        :weapon (list "Illusory fire" nil nil) :base-dodge 35
                                        :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-fire+ 0 100))
                                        :strength 0
-                                       :abil-angel t :abil-soul t :abil-no-breathe t :abil-restore-soul t :abil-no-corpse t
+                                       :abil-angel t :abil-soul t :abil-no-breathe t :abil-restore-soul t :abil-no-corpse t :abil-nameless t
                                        :ai-split-soul t :ai-use-ability t))
 
 ;;--------------------
@@ -410,7 +410,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
-                                       :abil-can-possess 1 :abil-unholy t :abil-demon t :abil-loves-infighting t
+                                       :abil-can-possess 1 :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-nameless t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t
                                        :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-can-possess-toggle t :abil-sacrifice-host t :abil-bend-space t 
                                        :ai-horde t :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
@@ -423,7 +423,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 3
                                        :base-light-radius 0
-                                       :abil-can-possess 2 :abil-unholy t :abil-demon t :abil-loves-infighting t
+                                       :abil-can-possess 2 :abil-unholy t :abil-demon t :abil-loves-infighting t 
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 3 :abil-no-breathe t :abil-toggle-light t
                                        :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-can-possess-toggle t :abil-sacrifice-host t :abil-bend-space t 
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
@@ -450,7 +450,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-unholy t :abil-demon t :abil-loves-infighting t
+                                       :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-nameless t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t
                                        :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t :abil-cast-shadow t
                                        :ai-horde t :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
@@ -504,7 +504,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 50) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 100) (list +weapon-dmg-mind+ 0 100))
                                        :strength 0
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-no-corpse t
+                                       :abil-unholy t :abil-demon t :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-no-corpse t :abil-nameless t
                                        :abil-free-call t
                                        :ai-use-ability t
                              ))
@@ -517,7 +517,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 50) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 100) (list +weapon-dmg-mind+ 0 100))
                                        :strength 0
                                        :base-light-radius 0
-                                       :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-no-corpse t
+                                       :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-no-corpse t :abil-nameless t
                              ))
 
 ;;--------------------
@@ -532,7 +532,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
+                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t :abil-nameless t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -544,7 +544,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
+                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t :abil-nameless t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -556,7 +556,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
+                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t :abil-nameless t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -568,7 +568,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
+                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t :abil-nameless t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t
                              ))
 
@@ -580,7 +580,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 2
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t
+                                       :abil-unholy t :abil-demon t :abil-detect-good t :abil-no-breathe t :abil-answer-the-call t :abil-undead t :abil-nameless t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-follow-leader t
                                        ))
 
@@ -596,7 +596,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
                                        :strength 2
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-constriction t
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-constriction t :abil-nameless t
                                        :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-create-parasites t :abil-mutate-acid-spit t :abil-adrenal-gland t :abil-mutate-corrosive-bile t :abil-mutate-clawed-tentacle t
                                        :abil-mutate-chitinous-plating t :abil-mutate-metabolic-boost t :abil-mutate-retracting-spines t :abil-mutate-spawn-locusts t :abil-mutate-ovipositor t :abil-mutate-acid-locusts t
                                        :abil-mutate-fast-scarabs t :abil-mutate-oviposit-more-eggs t :abil-mutate-tougher-locusts t :abil-cure-mutation t :abil-mutate-thick-carapace t :abil-mutate-acidic-tips t :abil-mutate-jump t
@@ -612,7 +612,7 @@
                                        :armor ()
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-nameless t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-acid-locust+
@@ -623,7 +623,7 @@
                                        :armor ()
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-nameless t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-scarab+
@@ -634,7 +634,7 @@
                                        :armor ()
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-acid-explosion t
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-acid-explosion t :abil-nameless t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-approach-target t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-fast-scarab+
@@ -645,7 +645,7 @@
                                        :armor ()
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-acid-explosion t
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-acid-explosion t :abil-nameless t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-approach-target t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-seeker-larva+
@@ -656,7 +656,7 @@
                                        :armor ()
                                        :strength 0
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-no-breathe t :abil-primordial t :abil-cannibalize t
+                                       :abil-no-breathe t :abil-primordial t :abil-cannibalize t :abil-nameless t
                                        :ai-coward t :ai-search-corpses t :ai-use-ability t :ai-find-random-location t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-spore-colony+
@@ -668,7 +668,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 2 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-mind+ 0 100) (list +weapon-dmg-acid+ 1 0))
                                        :strength 2
                                        :base-light-radius 3 
-                                       :abil-no-breathe t :abil-primordial t :abil-constriction t :abil-immobile t :abil-immovable t :abil-piercing-needles t
+                                       :abil-no-breathe t :abil-primordial t :abil-constriction t :abil-immobile t :abil-immovable t :abil-piercing-needles t :abil-nameless t
                                        :ai-shoot-enemy t
                                        ))
 
@@ -684,7 +684,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
                                        :strength 2
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-nameless t
                                        :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-skinchange-to-flyer t :abil-skinchange-to-ranged t
                                        :abil-mutate-charge t 
                                        :ai-curious t :ai-search-corpses t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t))
@@ -698,7 +698,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
                                        :strength 2
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-primordial t :abil-nameless t
                                        :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-skinchange-to-melee t :abil-skinchange-to-flyer t
                                        :abil-mutate-skin-ranged-to-turret t
                                        :ai-curious t :ai-search-corpses t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t :ai-shoot-enemy t :ai-avoid-melee t))
@@ -711,7 +711,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
                                        :strength 2
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-nameless t
                                        :abil-open-close-door t :abil-cannibalize t :abil-sprint t :abil-flying t :abil-skinchange-to-melee t :abil-skinchange-to-ranged t
                                        :abil-mutate-explosive-glands t :abil-mutate-poisoning-glands t
                                        :ai-curious t :ai-search-corpses t :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t))
@@ -725,7 +725,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 2 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-acid+ 1 0))
                                        :strength 3
                                        :base-light-radius 0
-                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t
+                                       :abil-detect-good t :abil-detect-evil t :abil-no-breathe t :abil-nameless t
                                        :abil-no-breathe t :abil-primordial t :abil-immobile t :abil-immovable t :abil-skinchange-to-melee t :abil-skinchange-to-ranged t :abil-skinchange-to-flyer t
                                        :ai-shoot-enemy t
                                        ))
@@ -744,7 +744,8 @@
                                        :strength 1 :base-stealth 10
                                        :base-light-radius 0 
                                        :abil-no-breathe t :abil-undead t :abil-float t :abil-soul t :abil-ghost-possess t :abil-no-corpse t :abil-invisibility t :abil-passwall t :abil-ghost-release t :abil-detect-unnatural t
-                                       :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t
+                                       :abil-nameless t
+                                       :ai-use-ability t :ai-use-item t :ai-find-random-location t :ai-attack-nearest-enemy t 
                                        ))
 
 ;;--------------------
@@ -758,7 +759,7 @@
                                        :weapon (list "Hooves" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 0
-                                       :abil-animal t :abil-momentum 2 :abil-horse-can-be-ridden t :abil-soul t
+                                       :abil-animal t :abil-momentum 2 :abil-horse-can-be-ridden t :abil-soul t :abil-nameless t
                                        :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-swim-up t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-sheep+ 
@@ -768,7 +769,7 @@
                                        :weapon (list "Hooves" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
                                        :base-light-radius 0
-                                       :abil-animal t :abil-soul t
+                                       :abil-animal t :abil-soul t :abil-nameless t
                                        :ai-coward t :ai-use-ability t :ai-find-random-location t :ai-swim-up t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-tree+ 
@@ -779,7 +780,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-fire+ -1 0) (list +weapon-dmg-iron+ 0 50) (list +weapon-dmg-mind+ 0 100) (list +weapon-dmg-radiation+ 0 100))
                                        :strength 0
                                        :base-light-radius 0
-                                       :abil-no-breathe t :abil-immobile t :abil-immovable t
+                                       :abil-no-breathe t :abil-immobile t :abil-immovable t :abil-nameless t
                                        ))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-fiend+ 
@@ -790,7 +791,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 2
                                        :base-light-radius 0
-                                       :abil-animal t :abil-demon t :abil-unholy t :abil-detect-good t :abil-lifesteal t :abil-momentum 2 :abil-fiend-can-be-ridden t :abil-loves-infighting t :abil-no-breathe t
+                                       :abil-animal t :abil-demon t :abil-unholy t :abil-detect-good t :abil-lifesteal t :abil-momentum 2 :abil-fiend-can-be-ridden t :abil-loves-infighting t :abil-no-breathe t :abil-nameless t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gargantaur+ 
@@ -801,7 +802,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 4 0) (list +weapon-dmg-iron+ 2 0) (list +weapon-dmg-vorpal+ 4 0) (list +weapon-dmg-fire+ 4 0))
                                        :strength 8 :base-sight 7
                                        :map-size 3
-                                       :abil-animal t :abil-angel t :abil-facing t :abil-immovable t :abil-loves-infighting t  :abil-soul t
+                                       :abil-animal t :abil-angel t :abil-facing t :abil-immovable t :abil-loves-infighting t  :abil-soul t :abil-nameless t
                                        :abil-mind-burn t :abil-heal-self 1 :abil-gargantaur-teleport t :abil-detect-evil t :abil-no-breathe t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 
@@ -813,6 +814,6 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
                                        :strength 1
                                        :base-light-radius 6 :base-sight 0
-                                       :abil-animal t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-detect-evil t :abil-flying t :abil-no-corpse t :abil-soul t
+                                       :abil-animal t :abil-angel t :abil-no-breathe t :abil-shared-minds t :abil-detect-evil t :abil-flying t :abil-no-corpse t :abil-soul t :abil-nameless t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
 

@@ -108,24 +108,24 @@
                            unless (get-item-by-id item-id) do
                              (error (format nil "ITEM ID ~A AT (~A ~A) NIL, FAILED!!!" item-id x y)))))
                  ;; checking for inconsistences between actual number of angels on map and (total-angels *world*)
-                 ;(loop with result = 0
-                 ;      for mob-id in (mob-id-list (level *world*))
-                 ;      for mob = (get-mob-by-id mob-id)
-                 ;      when (and (not (check-dead mob))
-                 ;                (and (mob-ability-p mob +mob-abil-angel+)
-                 ;                     (not (mob-ability-p mob +mob-abil-animal+))))
-                 ;        do
-                 ;           (incf result)
-                 ;           (loop for merged-id in (merged-id-list mob)
-                 ;                 for merged-mob = (get-mob-by-id merged-id)
-                 ;                 when (and (not (check-dead merged-mob))
-                 ;                           (and (mob-ability-p merged-mob +mob-abil-angel+)
-                 ;                                (not (mob-ability-p merged-mob +mob-abil-animal+))))
-                 ;                   do
-                 ;                      (incf result))
-                 ;      ;;finally (when (/= (total-angels (level *world*)) result)
-                 ;      ;;          (error (format nil "FAILED!!! TOTAL ANGELS = ~A, ACTUAL ANGELS ALIVE = ~A" (total-angels *world*) result)))
-                 ;      )
+                 (loop with result = 0
+                       for mob-id in (mob-id-list (level *world*))
+                       for mob = (get-mob-by-id mob-id)
+                       when (and (not (check-dead mob))
+                                 (and (mob-ability-p mob +mob-abil-angel+)
+                                      (not (mob-ability-p mob +mob-abil-animal+))))
+                         do
+                            (incf result)
+                            ;(loop for merged-id in (merged-id-list mob)
+                            ;      for merged-mob = (get-mob-by-id merged-id)
+                            ;      when (and (not (check-dead merged-mob))
+                            ;                (and (mob-ability-p merged-mob +mob-abil-angel+)
+                            ;                     (not (mob-ability-p merged-mob +mob-abil-animal+))))
+                            ;        do
+                            ;           (incf result))
+                       finally (when (/= (total-angels (level *world*)) result)
+                                 (error (format nil "FAILED!!! TOTAL ANGELS = ~A, ACTUAL ANGELS ALIVE = ~A" (total-angels (level *world*)) result)))
+                       )
                  )
 
                ))
@@ -277,7 +277,7 @@
   (add-message (format nil "!~%~%To view help, press '?'.~%To view your current objective, press 'j'.~%"))
 
   (when (player-outside-level *player*)
-    (add-message (format nil "~%Your arrival here is delayed, please wait!")))
+    (add-message (format nil "~%Your arrival here is delayed, please wait!~%")))
 
   )
 
@@ -417,7 +417,8 @@
     (loop for mob-id in (mimic-id-list *player*)
           for mob = (get-mob-by-id mob-id)
           do
-             (setf (name mob) (name *player*))))
+             (setf (name mob) (name *player*))
+             (setf (alive-name mob) (alive-name *player*))))
   
   (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
     (format file "~A" (create-options-file-string *options*))))

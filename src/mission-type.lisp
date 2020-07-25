@@ -468,6 +468,7 @@
                      (setf (mimic-id-list mob2) (list (id mob1) (id mob2) (id mob3)))
                      (setf (mimic-id-list mob3) (list (id mob1) (id mob2) (id mob3)))
                      (setf (name mob2) (name mob1) (name mob3) (name mob1))
+                     (setf (alive-name mob2) (alive-name mob1) (alive-name mob3) (alive-name mob1))
                      
                      (when is-player
                        (setf *player* mob1))

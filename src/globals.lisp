@@ -366,6 +366,7 @@
 (defconstant +mob-abil-purge-rune+ 171)
 (defconstant +mob-abil-civilian+ 172)
 (defconstant +mob-abil-deep-breath+ 173)
+(defconstant +mob-abil-nameless+ 174)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)

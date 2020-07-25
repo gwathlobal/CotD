@@ -1629,7 +1629,7 @@
   nil)
 
 (defun make-dead (mob &key (splatter t) (msg nil) (msg-newline nil) (killer nil) (corpse t) (aux-params ()) (keep-items nil))
-  (log:info (format nil "MAKE-DEAD: ~A [~A] (~A ~A ~A)~%" (name mob) (id mob) (x mob) (y mob) (z mob)))
+  (log:info "MAKE-DEAD: ~A [~A] (~A ~A ~A)" (name mob) (id mob) (x mob) (y mob) (z mob))
   (let ((dead-msg-str (format nil "~A dies. " (capitalize-name (prepend-article +article-the+ (visible-name mob)))))
         (ghost-that-cheats-death nil))
     
@@ -1737,7 +1737,7 @@
           (when (= left-body-type +item-type-body-part-full+)
             (setf (dead-mob item) (id mob)))
           (add-item-to-level-list (level *world*) item)
-          (log:info (format nil "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A ~A)~%" (name mob) (id mob) (name item) (id item) (x mob) (y mob) (z mob))))
+          (log:info "MAKE-DEAD: ~A [~A] leaves ~A [~A] at (~A ~A ~A)" (name mob) (id mob) (name item) (id item) (x mob) (y mob) (z mob)))
         
         ))
     
@@ -1764,7 +1764,7 @@
                      (mob-ability-p mob +mob-abil-human+))
                 (and (mob-ability-p killer +mob-abil-demon+)
                      (mob-ability-p mob +mob-abil-demon+)))
-        (log:info (format nil "MAKE-DEAD: ~A [~A] Real mob strength to be transferred to the killer ~A [~A] is ~A~%" (name mob) (id mob) (name killer) (id killer) (strength (get-mob-type-by-id (mob-type mob)))))
+        (log:info "MAKE-DEAD: ~A [~A] Real mob strength to be transferred to the killer ~A [~A] is ~A" (name mob) (id mob) (name killer) (id killer) (strength (get-mob-type-by-id (mob-type mob))))
         (incf (cur-fp killer) (1+ (strength (get-mob-type-by-id (mob-type mob)))))
         (when (> (cur-fp killer) (max-fp killer))
           (setf (cur-fp killer) (max-fp killer))))
@@ -1870,6 +1870,8 @@
     (setf (slave-mob-id mob) nil)
     )
 
+  (setf (alive-name mob) (name mob))
+  
   (incf-mob-motion mob *mob-motion-ascend*)
 
   (generate-sound mob (x mob) (y mob) (z mob) *mob-sound-ascend* #'(lambda (str)

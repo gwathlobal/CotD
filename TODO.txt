@@ -1,3 +1,6 @@
+- Demons are too week. Add microbial shroud ability to them releases gas around a demon and heals and gives armor to demons inside the gas
+- Chameleon ability for crimson imp (crimson demons?) Render them invisible for a duration + sudden strike ability that deals great damage while chameleoned
+- Blinding cloud ability that greatly impairs seeing inside it and reduces hit chance for ranged attacks
 - TODO: find a better way of handling primordial autowin situation in mission Satanist elimination (right now this mission is hacked not be available for quick missions)
 - Military can not have delayed arrival if no army is present
 - Worm-like multitile creatures in hell that devour you while you are inside
@@ -9,7 +12,7 @@
 - Angels get conducts (do not kill allies) they should not break or they will get penalized
 - Angels get wrath management - when they attack or kill, they accamulate wrath. When wrath reaches a threshold, they get a sin (penalty). To reduce wrath, special abilities should be given. Wrath also enables special powerful abilities which produce even more wrath.
 - Malseraph's puppets get additional task from Malseraph
-- Alarak-style gameplay where you gain resource when allies get killed and you can sacrifice your allies
+- Alarak-style gameplay where you gain resource when allies get killed and you can sacrifice your allies, corrupted angels covered with flesh
 - Unstable pocket dimensions - complete the goal before the time expires
 - Collapsing pocket dimensions - complete the goal while the map becomes smaller and smaller
 - Machine (using devices), Crimson (bio abilities), Ascendant (hybrid bio-machines)

@@ -182,6 +182,13 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-nameless+ :name "Nameless" :descr "You are one of may and have no name." 
+                                 :passive t :cost 0 :spd 0 
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-can-possess+ :name "Can possess" :descr "You are able to possess bodies of mortal creatures. Possessed creatures may sometimes revolt. Higher-ranking demons are better at supressing the victim's willpower. You need to be in the \"Ready to possess\" mode (see \"Toggle possession mode\" ability). You can not possess mortals while mounted." 
                                  :passive t :cost 0 :spd +normal-ap+ 
                                  :final t :on-touch t
@@ -3923,11 +3930,6 @@
                                                   (log:info (format nil "MOB-RESURRECTION: ~A [~A] is resurrected at (~A ~A ~A).~%" (name mob-corpse) (id mob-corpse) (x mob-corpse) (y mob-corpse) (z mob-corpse)))
                                                   (remove-item-from-world target)
                                                   (incf (stat-raised-dead actor))
-                                                  (when (and (mob-ability-p mob-corpse +mob-abil-angel+)
-                                                             (not (mob-ability-p mob-corpse +mob-abil-animal+)))
-                                                    (incf (total-angels (level *world*))))
-                                                  (when (mob-ability-p mob-corpse +mob-abil-human+)
-                                                    (incf (total-humans (level *world*))))
                                                   (when (eq actor *player*)
                                                     (incf (cur-score *player*) 10)))
                                                 (decf (cur-fp actor) (cost ability-type))
@@ -7553,7 +7555,7 @@
                                                 )
                                  :on-check-applic #'(lambda (ability-type actor target)
                                                       (declare (ignore ability-type target))
-                                                      (if (and (mob-ability-p actor +mob-abil-throw-corpse-into-portal+)
+                                                      (if (and (mob-ability-p actor +mob-abil-throw-relic-into-portal+)
                                                                (eql (mission-type-id (mission (level *world*))) :mission-type-demonic-thievery)
                                                                (loop for item-id in (inv actor)
                                                                      for item = (get-item-by-id item-id)

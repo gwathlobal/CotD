@@ -94,7 +94,7 @@
                                                                 abil-invisibility abil-passwall abil-ghost-release abil-decipher-rune abil-demon-word-flesh abil-demon-word-knockback abil-demon-word-invasion abil-demon-word-darkness
                                                                 abil-demon-word-plague abil-demon-word-power abil-soul abil-detect-unnatural abil-throw-corpse-into-portal abil-throw-relic-into-portal abil-create-demon-sigil
                                                                 abil-skinchange-to-melee abil-skinchange-to-ranged abil-skinchange-to-flyer abil-mutate-skin-ranged-to-turret abil-mutate-charge abil-mutate-explosive-glands
-                                                                abil-mutate-poisoning-glands abil-purge-rune abil-civilian abil-deep-breath)
+                                                                abil-mutate-poisoning-glands abil-purge-rune abil-civilian abil-deep-breath abil-nameless)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
   (loop for (dmg-type dir-resist %-resist) in armor do
@@ -478,7 +478,9 @@
   (when abil-civilian
     (setf (gethash +mob-abil-civilian+ (abilities mob-type)) t))
   (when abil-deep-breath
-    (setf (gethash +mob-abil-deep-breath+ (abilities mob-type)) t)))
+    (setf (gethash +mob-abil-deep-breath+ (abilities mob-type)) t))
+  (when abil-nameless
+    (setf (gethash +mob-abil-nameless+ (abilities mob-type)) t)))
 
 (defun get-mob-type-by-id (mob-type-id)
   (aref *mob-types* mob-type-id))
@@ -1326,48 +1328,38 @@
     (values (format nil "nameless ~A" (name mob)) +noun-common+ +noun-singular+)))
 
 (defun set-name (mob)
-  (when (and (not (eq mob *player*))
-             (not (mob-ability-p mob +mob-abil-human+))
-             (not (mob-ability-p mob +mob-abil-animal+))
-             (not (mob-ability-p mob +mob-abil-primordial+))
-             (not (= (mob-type mob) +mob-type-imp+))
-             (not (= (mob-type mob) +mob-type-shadow-imp+))
-             (not (= (mob-type mob) +mob-type-ghost+))
-             (not (= (mob-type mob) +mob-type-angel-image+))
-             (not (= (mob-type mob) +mob-type-demon-sigil+))
-             (not (= (mob-type mob) +mob-type-demon-machine+))
-             (not (= (mob-type mob) +mob-type-military-bomb-1+))
-             (not (= (mob-type mob) +mob-type-military-bomb-2+))
-             (not (= (mob-type mob) +mob-type-military-bomb-3+)))
-    (let ((name-pick-n))
-      (if (mob-ability-p mob +mob-abil-angel+)
-        (progn
-          (unless *cur-angel-names*
-            (return-from set-name nil))
-          (setf name-pick-n (random (length *cur-angel-names*)))
-          (setf (name mob) (nth name-pick-n *cur-angel-names*))
-          (setf *cur-angel-names* (remove (nth name-pick-n *cur-angel-names*) *cur-angel-names*)))
-        (progn
-          (unless *cur-demon-names*
-            (return-from set-name nil))
-          (setf name-pick-n (random (length *cur-demon-names*)))
-          (setf (name mob) (nth name-pick-n *cur-demon-names*))
-          (setf *cur-demon-names* (remove (nth name-pick-n *cur-demon-names*) *cur-demon-names*))))
-      ))
-  (when (and (not (eq mob *player*))
-             (or (eq (mob-type mob) +mob-type-satanist+)
-                 (eq (mob-type mob) +mob-type-priest+)))
-    (let ((name-pick-n)
-          (surname-pick-n))
-      (unless *cur-human-names*
-        (return-from set-name nil))
-      (unless *cur-human-surnames*
-        (return-from set-name nil))
-      (setf name-pick-n (random (length *cur-human-names*)))
-      (setf surname-pick-n (random (length *cur-human-surnames*)))
-      (setf (name mob) (format nil "~A ~A" (nth name-pick-n *cur-human-names*) (nth surname-pick-n *cur-human-surnames*)))
-      (setf *cur-human-names* (remove (nth name-pick-n *cur-human-names*) *cur-human-names*))
-      (setf *cur-human-surnames* (remove (nth surname-pick-n *cur-human-surnames*) *cur-human-surnames*))))
+  (when (or (eq mob *player*)
+            (mob-ability-p mob +mob-abil-nameless+))
+    ;; nameless creatures have no name
+    (return-from set-name nil))
+
+  (let ((name-pick-n)
+        (surname-pick-n))
+    (cond
+      ((mob-ability-p mob +mob-abil-angel+) (progn
+                                              (unless *cur-angel-names*
+                                                (return-from set-name nil))
+                                              (setf name-pick-n (random (length *cur-angel-names*)))
+                                              (setf (name mob) (nth name-pick-n *cur-angel-names*))
+                                              (setf *cur-angel-names* (remove (nth name-pick-n *cur-angel-names*) *cur-angel-names*))))
+      ((mob-ability-p mob +mob-abil-demon+) (progn
+                                              (unless *cur-demon-names*
+                                                (return-from set-name nil))
+                                              (setf name-pick-n (random (length *cur-demon-names*)))
+                                              (setf (name mob) (nth name-pick-n *cur-demon-names*))
+                                              (setf *cur-demon-names* (remove (nth name-pick-n *cur-demon-names*) *cur-demon-names*))))
+      ((or (eq (mob-type mob) +mob-type-satanist+)
+           (eq (mob-type mob) +mob-type-priest+)) (progn
+                                                    (unless *cur-human-names*
+                                                      (return-from set-name nil))
+                                                    (unless *cur-human-surnames*
+                                                      (return-from set-name nil))
+                                                    (setf name-pick-n (random (length *cur-human-names*)))
+                                                    (setf surname-pick-n (random (length *cur-human-surnames*)))
+                                                    (setf (name mob) (format nil "~A ~A" (nth name-pick-n *cur-human-names*) (nth surname-pick-n *cur-human-surnames*)))
+                                                    (setf *cur-human-names* (remove (nth name-pick-n *cur-human-names*) *cur-human-names*))
+                                                    (setf *cur-human-surnames* (remove (nth surname-pick-n *cur-human-surnames*) *cur-human-surnames*))))))
+  
   (setf (alive-name mob) (name mob)))
 
 (defun get-followers-list (mob)
