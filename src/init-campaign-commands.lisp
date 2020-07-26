@@ -499,12 +499,12 @@
                                                    (setf church-sector t)))))
                                            
                                            (if (and church-sector
-                                                    (null (find-campaign-effects-by-id world :campaign-effect-demons-delayed)))
+                                                    (null (find-campaign-effects-by-id world :campaign-effect-demon-delayed)))
                                              t
                                              nil)))
                       :on-trigger-start-func #'(lambda (world campaign-command)
                                                  (declare (ignore campaign-command))
-                                                 (add-campaign-effect world :id :campaign-effect-demons-delayed :cd 5)))
+                                                 (add-campaign-effect world :id :campaign-effect-demon-delayed :cd 5)))
 
 (set-campaign-command :id :campaign-command-priest-hasten-angels
                       :name-func #'(lambda (world)
@@ -532,12 +532,12 @@
                                                    (setf church-sector t)))))
                                            
                                            (if (and church-sector
-                                                    (null (find-campaign-effects-by-id world :campaign-effect-angels-hastened)))
+                                                    (null (find-campaign-effects-by-id world :campaign-effect-angel-hastened)))
                                              t
                                              nil)))
                       :on-trigger-start-func #'(lambda (world campaign-command)
                                                  (declare (ignore campaign-command))
-                                                 (add-campaign-effect world :id :campaign-effect-angels-hastened :cd 5)))
+                                                 (add-campaign-effect world :id :campaign-effect-angel-hastened :cd 5)))
 
 (set-campaign-command :id :campaign-command-eater-agitated
                       :name-func #'(lambda (world)

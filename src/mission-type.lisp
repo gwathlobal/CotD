@@ -259,13 +259,13 @@
   ;; set up delayed arrival for demons
   (setf (turns-for-delayed-demons level) 130)
 
-  (when (find-campaign-effects-by-id world :campaign-effect-demons-delayed)
+  (when (find-campaign-effects-by-id world :campaign-effect-demon-delayed)
     (incf (turns-for-delayed-demons level) 30))
   
   ;; set up delayed arrival for angels
   (setf (turns-for-delayed-angels level) 150)
 
-  (when (find-campaign-effects-by-id world :campaign-effect-angels-hastened)
+  (when (find-campaign-effects-by-id world :campaign-effect-angel-hastened)
     (decf (turns-for-delayed-angels level) 30))
   
   ;; set up delayed arrival for military depending on the distance from the nearest military-controlled sector

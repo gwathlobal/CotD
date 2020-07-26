@@ -5,11 +5,12 @@
                                        :campaign-effect-satanist-lair-hidden
                                        :campaign-effect-demon-protect-dimension
                                        :campaign-effect-demon-turmoil
-                                       :campaign-effect-demons-delayed
-                                       :campaign-effect-angels-hastened
+                                       :campaign-effect-demon-delayed
+                                       :campaign-effect-angel-hastened
                                        :campaign-effect-demon-corrupt-portals
                                        :campaign-effect-eater-agitated
-                                       :campaign-effect-angel-crusade))
+                                       :campaign-effect-angel-crusade
+                                       :campaign-effect-demon-malseraph-blessing))
 
 (defclass campaign-effect-type ()
   ((id :initarg :id :accessor campaign-effect-type/id :type campaign-effect-enum)

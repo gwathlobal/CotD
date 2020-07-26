@@ -77,6 +77,7 @@
                                        (push +game-event-campaign-move-demons+ (game-events *world*))
                                        (push +game-event-campaign-move-relic-to-church+ (game-events *world*))
                                        (push +game-event-campaign-trigger-commands+ (game-events *world*))
+                                       (push +game-event-campaign-malseraphs-focus+ (game-events *world*))
                                        
                                        (add-campaign-effect *world* :id :campaign-effect-satanist-sacrifice :cd 5)
                                                                               

@@ -112,7 +112,7 @@
                                                 (add-message (format nil "able to raise armies") sdl:*yellow* message-box-list)
                                                 (add-message (format nil " once again.~%") sdl:*white* message-box-list))))
 
-(set-campaign-effect-type :id :campaign-effect-demons-delayed
+(set-campaign-effect-type :id :campaign-effect-demon-delayed
                           :name "The Barrier thickens"
                           :descr "The Barrier between the Prison Dimension and human world thickens. When the demons arrive delayed, it takes them additional 30 turns to arrive."
                           :merge-func #'(lambda (world new-effect old-effect)
@@ -134,7 +134,29 @@
                                                 (add-message (format nil "pierced") sdl:*yellow* message-box-list)
                                                 (add-message (format nil " normally again.~%") sdl:*white* message-box-list))))
 
-(set-campaign-effect-type :id :campaign-effect-angels-hastened
+(set-campaign-effect-type :id :campaign-effect-demon-malseraph-blessing
+                          :name "Malseraph's blessing"
+                          :descr "Malseraph has focused its attention on the events at the city. From time to time it will give demons on the battlefield a modicum of power."
+                          :merge-func #'(lambda (world new-effect old-effect)
+                                          (setf (campaign-effect/cd old-effect) (campaign-effect/cd new-effect))
+                                          (when (campaign-effect/on-add-func new-effect)
+                                            (funcall (campaign-effect/on-add-func new-effect) world new-effect)))
+                          :on-add-func #'(lambda (world campaign-effect)
+                                           (declare (ignore campaign-effect))
+                                           (let ((message-box-list `(,(world/effect-message-box world))))
+                                             (add-message (format nil "Malseraph") sdl:*magenta* message-box-list)
+                                             (add-message (format nil " turned its gaze to the city and ") sdl:*white* message-box-list)
+                                             (add-message (format nil "granted its blessing") sdl:*white* message-box-list)
+                                             (add-message (format nil " to the invading demons.~%") sdl:*white* message-box-list)))
+                          :on-remove-func #'(lambda (world campaign-effect)
+                                              (declare (ignore campaign-effect))
+                                              (let ((message-box-list `(,(world/effect-message-box world))))
+                                                (add-message (format nil "Malseraph") sdl:*magenta* message-box-list)
+                                                (add-message (format nil " has diverted its gaze from the city. Demons fighting there ") sdl:*white* message-box-list)
+                                                (add-message (format nil "shall no longer have its blessing") sdl:*yellow* message-box-list)
+                                                (add-message (format nil ".~%") sdl:*white* message-box-list))))
+
+(set-campaign-effect-type :id :campaign-effect-angel-hastened
                           :name "Prayer for intervention"
                           :descr "When the angels arrive delayed, it takes them 30 turns less to arrive."
                           :merge-func #'(lambda (world new-effect old-effect)

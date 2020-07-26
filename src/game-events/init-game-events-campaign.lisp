@@ -261,3 +261,20 @@
                                                              )
                                                            )
                                ))
+
+(set-game-event (make-instance 'game-event :id +game-event-campaign-malseraphs-focus+
+                                           :descr-func #'(lambda ()
+                                                           (format nil "Each day, check if Malseraph wants to turn its attention to the city."))
+                                           :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (and (not (find-campaign-effects-by-id world :campaign-effect-demon-malseraph-blessing))
+                                                                  (or 
+                                                                      (< (random 5) 100)))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+
+                                                           (let* ((effects-list (list :campaign-effect-demon-malseraph-blessing))
+                                                                  (chosen-effect (nth (random (length effects-list)) effects-list)))
+                                                             (add-campaign-effect world :id chosen-effect :cd 4 :param nil)))
+                               ))

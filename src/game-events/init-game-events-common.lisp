@@ -296,13 +296,44 @@
                                                            
                                                            )))
 
-(set-game-event (make-instance 'game-event :id +game-event-hellday+ :disabled nil
+(set-game-event (make-instance 'game-event :id +game-event-malseraphs-power-infusion+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (declare (ignore world))
-                                                         nil)
+                                                         (if (< (random 100) 25)
+                                                           t
+                                                           nil))
                                            :on-trigger #'(lambda (world)
-                                                           (declare (ignore world))
-                                                           nil)))
+                                                           (loop with demon-list = ()
+                                                                 repeat (random 20)
+                                                                 for mob-id = (nth (random (length (mob-id-list (level world)))) (mob-id-list (level world)))
+                                                                 for mob = (get-mob-by-id mob-id)
+                                                                 when (and (mob-ability-p mob +mob-abil-demon+)
+                                                                           (not (mob-ability-p mob +mob-abil-animal+))
+                                                                           (not (mob-ability-p mob +mob-abil-primordial+))
+                                                                           (< (cur-fp mob) (max-fp mob)))
+                                                                 do
+                                                                    (pushnew mob demon-list)
+                                                                 finally
+                                                                    (loop for mob in demon-list do
+                                                                      (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                                                             (if (zerop (random 2))
+                                                                                               (format nil "Malseraph giggles and grants its blessing. ")
+                                                                                               (format nil "Malseraph cackles and grants its blessing. "))
+                                                                                             :color sdl:*magenta*
+                                                                                             :tags (list (when (and (find (id mob) (shared-visible-mobs *player*))
+                                                                                                                    (not (find (id mob) (proper-visible-mobs *player*))))
+                                                                                                           :singlemind)))
+                                                                      (let ((pwr (1+ (random 3))))
+                                                                        (when (> (+ (cur-fp mob) pwr) (max-fp mob))
+                                                                          (setf pwr (- (max-fp mob) (cur-fp mob))))
+                                                                        (incf (cur-fp mob) pwr)
+                                                                        (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
+                                                                                               (format nil "~A gains ~A unholy power.~%" (capitalize-name (prepend-article +article-the+ (visible-name mob))) pwr)
+                                                                                               :color sdl:*white*
+                                                                                               :tags (list (when (and (find (id mob) (shared-visible-mobs *player*))
+                                                                                                                      (not (find (id mob) (proper-visible-mobs *player*))))
+                                                                                                             :singlemind)))))))))
+
 
 ;;===========================
 ;; OTHER EVENTS

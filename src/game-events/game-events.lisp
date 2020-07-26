@@ -17,8 +17,6 @@
 (defconstant +game-event-constant-reanimation+ 12)
 (defconstant +game-event-hellday+ 13)
 (defconstant +game-event-acid-falls+ 14)
-
-
 (defconstant +game-event-player-died+ 15)
 (defconstant +game-event-demon-attack-win-for-church+ 16)
 (defconstant +game-event-demon-attack-win-for-satanists+ 17)
@@ -76,6 +74,9 @@
 
 (defconstant +game-event-campaign-trigger-commands+ 64)
 (defconstant +game-event-campaign-move-relic-to-church+ 65)
+
+(defconstant +game-event-malseraphs-power-infusion+ 66)
+(defconstant +game-event-campaign-malseraphs-focus+ 67)
 
 (defenum:defenum game-over-enum (:game-over-player-dead
                                  :game-over-demons-won

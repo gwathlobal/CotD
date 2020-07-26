@@ -664,6 +664,12 @@
         (progn
           (scenario-add/remove-lvl-mod scenario (get-level-modifier-by-id +lm-misc-eater-incursion+) :apply-scenario-func nil :add-general nil)))
 
+      (if (find-campaign-effects-by-id world :campaign-effect-demon-malseraph-blessing)
+        (progn
+          (scenario-add/remove-lvl-mod scenario (get-level-modifier-by-id +lm-misc-malseraphs-blessing+) :apply-scenario-func nil))
+        (progn
+          (scenario-add/remove-lvl-mod scenario (get-level-modifier-by-id +lm-misc-malseraphs-blessing+) :apply-scenario-func nil :add-general nil)))
+
       (setf (world-sector mission) world-sector)
       (setf (mission (world-sector mission)) mission)
       
@@ -764,21 +770,27 @@
       (incf (second (find +faction-type-eater+ faction-multipliers :key #'(lambda (a) (first a))))
             100))
 
-    ;; :campaign-effect-demons-delayed make it harder for delayed demons -30%
-    (when (and (find-campaign-effects-by-id world :campaign-effect-demons-delayed)
+    ;; :campaign-effect-demon-delayed make it harder for delayed demons -30%
+    (when (and (find-campaign-effects-by-id world :campaign-effect-demon-delayed)
                (find +faction-type-demons+ (faction-list mission) :key #'(lambda (a) (first a)))
                (eql (find +faction-type-demons+ (faction-list mission) :key #'(lambda (a) (first a))) :mission-faction-delayed))
       (log:info "   Demons delayed effect -30% to delayed demons")
       (decf (second (find +faction-type-demons+ faction-multipliers :key #'(lambda (a) (first a))))
             30))
 
-    ;; :campaign-effect-angels-hastened make it easier for delayed angels +30%
-    (when (and (find-campaign-effects-by-id world :campaign-effect-angels-hastened)
+    ;; :campaign-effect-angel-hastened make it easier for delayed angels +30%
+    (when (and (find-campaign-effects-by-id world :campaign-effect-angel-hastened)
                (find +faction-type-angels+ (faction-list mission) :key #'(lambda (a) (first a)))
                (eql (find +faction-type-angels+ (faction-list mission) :key #'(lambda (a) (first a))) :mission-faction-delayed))
       (log:info "   Angels hastened effect +30% to delayed angels")
       (incf (second (find +faction-type-angels+ faction-multipliers :key #'(lambda (a) (first a))))
             30))
+
+    ;; malseraphs blessing makes it easier for demons
+    (when (find +lm-misc-malseraphs-blessing+ (level-modifier-list mission))
+      (log:info "   Malseraph's blessing +10% to demons")
+      (incf (second (find +faction-type-demons+ faction-multipliers :key #'(lambda (a) (first a))))
+            10))
 
     ;; apply multipliers
     (loop with chances-multiplied = ()
