@@ -17,9 +17,9 @@
                       (> (+ y1 (* 2 (sdl:get-font-height))) (+ y h)))
              (sdl:draw-string-solid-* "(...)" x y1 :color sdl:*white*)
              (loop-finish))
-           (sdl:draw-string-solid-* (format nil "~A~A" (name (get-effect-type-by-id (effect-type effect))) (if (eq (cd effect) t)
-                                                                                                             ""
-                                                                                                             (format nil " (~A)" (cd effect))))
+           (sdl:draw-string-solid-* (format nil "~A~A" (name effect) (if (eq (cd effect) t)
+                                                                       ""
+                                                                       (format nil " (~A)" (cd effect))))
                                     x y1 :color (funcall (color-func (get-effect-type-by-id (effect-type effect)))
                                                          effect
                                                          mob))

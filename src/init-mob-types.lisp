@@ -410,7 +410,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0
-                                       :abil-can-possess 1 :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-nameless t
+                                       :abil-can-possess 1 :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-nameless t :abil-strength-in-numbers t :abil-coward t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t
                                        :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-can-possess-toggle t :abil-sacrifice-host t :abil-bend-space t 
                                        :ai-horde t :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
@@ -423,7 +423,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 3
                                        :base-light-radius 0
-                                       :abil-can-possess 2 :abil-unholy t :abil-demon t :abil-loves-infighting t 
+                                       :abil-can-possess 2 :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-strength-in-numbers t 
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 3 :abil-no-breathe t :abil-toggle-light t
                                        :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-can-possess-toggle t :abil-sacrifice-host t :abil-bend-space t 
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
@@ -436,7 +436,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 5
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-loves-infighting t
+                                       :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-strength-in-numbers t 
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-instill-fear 4 :abil-charge t :abil-no-breathe t
                                        :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-gravity-chains t :abil-bend-space t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
@@ -450,7 +450,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 1
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-nameless t
+                                       :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-nameless t :abil-strength-in-numbers t :abil-coward t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t
                                        :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t :abil-cast-shadow t
                                        :ai-horde t :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
@@ -463,7 +463,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 3
                                        :base-light-radius 0 :base-stealth 10
-                                       :abil-unholy t :abil-demon t :abil-loves-infighting t
+                                       :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-strength-in-numbers t 
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-no-breathe t :abil-toggle-light t
                                        :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t :abil-cast-shadow t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
@@ -476,7 +476,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 5 
                                        :base-light-radius -4 :base-stealth 10
-                                       :abil-unholy t :abil-demon t :abil-loves-infighting t
+                                       :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-strength-in-numbers t 
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-charge t :abil-no-breathe t
                                        :abil-dominate-fiend t :abil-dismount t :abil-toggle-light t :abil-open-close-door t :abil-shadow-step t :abil-extinguish-light t :abil-umbral-aura t :abil-cast-shadow t
                                        :ai-curious t :ai-use-ability t :ai-find-random-location t :ai-attack-nearest-enemy t))
@@ -490,7 +490,7 @@
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
                                        :strength 3
                                        :base-light-radius 0
-                                       :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-no-breathe t
+                                       :abil-unholy t :abil-demon t :abil-loves-infighting t :abil-no-breathe t :abil-strength-in-numbers t :abil-coward t
                                        :abil-detect-good t :abil-lifesteal t :abil-call-for-help t :abil-answer-the-call t :abil-toggle-light t
                                        :abil-dominate-fiend t :abil-dismount t :abil-open-close-door t :abil-remove-disguise t :abil-irradiate t :abil-fission t 
                                        :abil-deep-breath t

@@ -30,6 +30,24 @@
   (update-visible-mobs mob)
   (update-visible-items mob)
 
+  (when (mob-ability-p mob +mob-abil-strength-in-numbers+)
+    (loop with demons = 0
+          with bonus-per-demon = (if (mob-ability-p mob +mob-abil-coward+)
+                                   20
+                                   10)
+          for mob-id of-type fixnum in (visible-mobs mob)
+          for tmob = (get-mob-by-id mob-id)
+          when (and (mob-ability-p tmob +mob-abil-demon+)
+                    (= (faction mob) (faction tmob)))
+            do
+               (incf demons)
+          finally
+             (if (zerop demons)
+               (rem-mob-effect mob +mob-effect-strength-in-numbers+)
+               (progn
+                 (rem-mob-effect mob +mob-effect-strength-in-numbers+)
+                 (set-mob-effect mob :effect-type-id +mob-effect-strength-in-numbers+ :actor-id (id mob) :param1 (* demons bonus-per-demon))))))
+  
   (setf (aref (memory-map mob) (truncate (x mob) 10) (truncate (y mob) 10)) (player-game-time (level *world*)))
 
   ;; if the mob is blind - move in random direction

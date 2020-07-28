@@ -189,6 +189,20 @@
                                  :on-check-applic nil))
 
 (set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-strength-in-numbers+ :name "Strength in numbers" :descr "You get +10% max damage for each attack for every friendly demon in your line of sight." 
+                                 :passive t :cost 0 :spd 0 
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
+                                 :id +mob-abil-coward+ :name "Coward" :descr "You are a coward and feel safe only when demonic allies are nearby. You get twice as much bonus from the Strength in numbers ability." 
+                                 :passive t :cost 0 :spd 0 
+                                 :final nil :on-touch nil
+                                 :on-invoke nil
+                                 :on-check-applic nil))
+
+(set-ability-type (make-instance 'ability-type 
                                  :id +mob-abil-can-possess+ :name "Can possess" :descr "You are able to possess bodies of mortal creatures. Possessed creatures may sometimes revolt. Higher-ranking demons are better at supressing the victim's willpower. You need to be in the \"Ready to possess\" mode (see \"Toggle possession mode\" ability). You can not possess mortals while mounted." 
                                  :passive t :cost 0 :spd +normal-ap+ 
                                  :final t :on-touch t

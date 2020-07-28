@@ -2,7 +2,7 @@
 
 (defclass effect-type ()
   ((id :initarg :id :accessor id)
-   (name :initarg :name :accessor name)
+   (name-func :initarg :name-func :accessor name-func)
    (color-func :initform #'(lambda (effect actor)
                              (declare (ignore effect actor))
                              nil)
@@ -43,6 +43,12 @@
   (setf (aref *effects* (id effect)) effect)
 
   )
+
+(defmethod name ((effect effect))
+  (if (actor-id effect)
+    (let ((actor (get-mob-by-id (actor-id effect))))
+      (funcall (name-func (get-effect-type-by-id (effect-type effect))) effect actor))
+    (funcall (name-func (get-effect-type-by-id (effect-type effect))) effect nil)))
 
 (defun get-effect-by-id (effect-id)
   (aref *effects* effect-id))

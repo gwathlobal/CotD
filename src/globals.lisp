@@ -367,6 +367,8 @@
 (defconstant +mob-abil-civilian+ 172)
 (defconstant +mob-abil-deep-breath+ 173)
 (defconstant +mob-abil-nameless+ 174)
+(defconstant +mob-abil-strength-in-numbers+ 175)
+(defconstant +mob-abil-coward+ 176)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -429,6 +431,7 @@
 (defconstant +mob-effect-demonic-machine+ 58)
 (defconstant +mob-effect-bomb-ticking+ 59)
 (defconstant +mob-effect-reduce-resitances+ 60)
+(defconstant +mob-effect-strength-in-numbers+ 61)
 
 (defconstant +mob-order-follow+ 0)
 (defconstant +mob-order-target+ 1)

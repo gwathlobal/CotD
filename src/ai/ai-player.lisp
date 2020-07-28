@@ -14,6 +14,25 @@
   (update-visible-area (level *world*) (x player) (y player) (z player))
 
   (log:info "TIME-ELAPSED AFTER: ~A" (- (get-internal-real-time) *time-at-end-of-player-turn*))
+
+  (when (mob-ability-p player +mob-abil-strength-in-numbers+)
+    (loop with demons = 0
+          with bonus-per-demon = (if (mob-ability-p player +mob-abil-coward+)
+                                   20
+                                   10)
+          for mob-id of-type fixnum in (visible-mobs player)
+          for tmob = (get-mob-by-id mob-id)
+          when (and (mob-ability-p tmob +mob-abil-demon+)
+                    (= (faction player) (faction tmob)))
+            do
+               (incf demons)
+          finally
+             (if (zerop demons)
+               (rem-mob-effect player +mob-effect-strength-in-numbers+)
+               (progn
+                 (rem-mob-effect player +mob-effect-strength-in-numbers+)
+                 (set-mob-effect player :effect-type-id +mob-effect-strength-in-numbers+ :actor-id (id player) :param1 (* demons bonus-per-demon))))))
+  
   ;(format t "TIME-INSIDE PATH FUNCS: ~A~%" *ms-inside-path*)
   ;(setf *ms-inside-path* 0)
   

@@ -1,7 +1,5 @@
-- Demons have morale that improves their damage, the more demons there are around the better their morale, imps a cowardly and get twice the bonus
 - Bands of malseraph's puppets as lvl mods
 - HP Regeneration ability for demons
-- Malseraph's blessing chance depends on relic state, rework funcs that calculate relic, book, etc. ownership, rework funcs that calculate district type (corrupted, normal, etc)
 - Demons are too week. Add microbial shroud ability to them releases gas around a demon and heals and gives armor to demons inside the gas
 - Chameleon ability for crimson imp (crimson demons?) Render them invisible for a duration + sudden strike ability that deals great damage while chameleoned
 - Blinding cloud ability that greatly impairs seeing inside it and reduces hit chance for ranged attacks

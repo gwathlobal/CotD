@@ -1200,6 +1200,12 @@
   ;; specific-no-dmg-string-func is #'(lambda () (return string))
   (log:info (format nil "INFLICT-DAMAGE: target = ~A [~A]~%" (name target) (id target)))
 
+  ;; actor is under effect of strength in numbers, increase max-dmg
+  (when (and actor
+             (mob-effect-p actor +mob-effect-strength-in-numbers+))
+    (let ((bonus (param1 (get-effect-by-id (mob-effect-p actor +mob-effect-strength-in-numbers+)))))
+      (setf max-dmg (truncate (* max-dmg (/ (+ 100 bonus) 100))))))
+  
   ;; target under protection of divine shield - consume the shield and quit
   (when (mob-effect-p target +mob-effect-divine-shield+)
     (if actor
