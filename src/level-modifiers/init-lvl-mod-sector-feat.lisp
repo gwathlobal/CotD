@@ -132,7 +132,7 @@
                                                   (if (or (eq world-sector-type-id :world-sector-normal-island)
                                                           (eq world-sector-type-id :world-sector-abandoned-island)
                                                           (eq world-sector-type-id :world-sector-corrupted-island)
-                                                          (eq world-sector-type-id :world-sector-hell-jungle))
+                                                          (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id)))
                                                     nil
                                                     t))
                     :scenario-disabled-func #'(lambda (world-map x y)
@@ -287,10 +287,8 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for islands & corrupted & abandoned districts
-                                                  (if (or (eq world-sector-type-id :world-sector-normal-forest)
-                                                          (eq world-sector-type-id :world-sector-normal-port)
-                                                          (eq world-sector-type-id :world-sector-normal-residential)
-                                                          (eq world-sector-type-id :world-sector-normal-lake))
+                                                  (if (and (world-sector-normal-p (get-world-sector-type-by-id world-sector-type-id))
+                                                           (not (eq world-sector-type-id :world-sector-normal-island)))
                                                     t
                                                     nil))
                     :scenario-disabled-func #'(lambda (world-map x y)
@@ -341,23 +339,11 @@
                                                  (log:info "TEMPLATE LEVEL FUNC: LM FEAT LIBRARY")
                                                                                                   
                                                  (loop with library-types = (prepare-spec-build-id-list (cond
-                                                                                                          ((or (eq (wtype world-sector) :world-sector-normal-residential)
-                                                                                                               (eq (wtype world-sector) :world-sector-normal-island)
-                                                                                                               (eq (wtype world-sector) :world-sector-normal-port)
-                                                                                                               (eq (wtype world-sector) :world-sector-normal-lake)
-                                                                                                               (eq (wtype world-sector) :world-sector-normal-forest))
+                                                                                                          ((world-sector-normal-p world-sector)
                                                                                                            +building-type-library+)
-                                                                                                          ((or (eq (wtype world-sector) :world-sector-abandoned-residential)
-                                                                                                               (eq (wtype world-sector) :world-sector-abandoned-island)
-                                                                                                               (eq (wtype world-sector) :world-sector-abandoned-port)
-                                                                                                               (eq (wtype world-sector) :world-sector-abandoned-lake)
-                                                                                                               (eq (wtype world-sector) :world-sector-abandoned-forest))
+                                                                                                          ((world-sector-abandoned-p world-sector)
                                                                                                            +building-type-ruined-library+)
-                                                                                                          ((or (eq (wtype world-sector) :world-sector-corrupted-residential)
-                                                                                                               (eq (wtype world-sector) :world-sector-corrupted-island)
-                                                                                                               (eq (wtype world-sector) :world-sector-corrupted-port)
-                                                                                                               (eq (wtype world-sector) :world-sector-corrupted-lake)
-                                                                                                               (eq (wtype world-sector) :world-sector-corrupted-forest))
+                                                                                                          ((world-sector-corrupted-p world-sector)
                                                                                                            +building-type-corrupted-library+)))
                                                        for x = (random (array-dimension template-level 0))
                                                        for y = (random (array-dimension template-level 1))
@@ -369,7 +355,7 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
+                                                  (if (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id))
                                                     nil
                                                     t)))
 
@@ -377,12 +363,7 @@
                     :name "Church"
                     :priority 30
                     :faction-list-func #'(lambda (sector-type-id)
-                                           (if (or (eq sector-type-id :world-sector-normal-residential)
-                                                   (eq sector-type-id :world-sector-normal-sea)
-                                                   (eq sector-type-id :world-sector-normal-island)
-                                                   (eq sector-type-id :world-sector-normal-port)
-                                                   (eq sector-type-id :world-sector-normal-lake)
-                                                   (eq sector-type-id :world-sector-normal-forest))
+                                           (if (world-sector-normal-p (get-world-sector-type-by-id sector-type-id))
                                              (list (list +faction-type-church+ :mission-faction-present))
                                              nil)
                                            )
@@ -437,12 +418,8 @@
                                                   ;; is not available for celestial retrieval
                                                    (if (and (or (not (eq mission-type-id :mission-type-celestial-retrieval))
                                                                 (and (eq mission-type-id :mission-type-celestial-retrieval)
-                                                                     (or (eq world-sector-type-id :world-sector-abandoned-forest)
-                                                                         (eq world-sector-type-id :world-sector-abandoned-port)
-                                                                         (eq world-sector-type-id :world-sector-abandoned-residential)
-                                                                         (eq world-sector-type-id :world-sector-abandoned-lake)
-                                                                         (eq world-sector-type-id :world-sector-abandoned-island))))
-                                                            (not (eq world-sector-type-id :world-sector-hell-jungle)))
+                                                                     (world-sector-abandoned-p (get-world-sector-type-by-id world-sector-type-id))))
+                                                            (not (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id))))
                                                      t
                                                      nil))
                     )
@@ -475,9 +452,9 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
-                                                    nil
-                                                    t))
+                                                  (if (not (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id)))
+                                                    t
+                                                    nil))
                     :always-present-func #'(lambda (world-sector mission world-time)
                                              (declare (ignore world-sector world-time))
                                              (if (eq (mission-type-id mission) :mission-type-eliminate-satanists)
@@ -514,7 +491,7 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore world-time))
                                                   ;; is not available for everybody other than hell jungle
-                                                  (if (and (or (eq world-sector-type-id :world-sector-hell-jungle))
+                                                  (if (and (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id))
                                                            (eq mission-type-id :mission-type-celestial-sabotage))
                                                     t
                                                     nil))
@@ -554,7 +531,7 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore world-time))
                                                   ;; is not available for everybody other than hell jungle
-                                                  (if (and (or (eq world-sector-type-id :world-sector-hell-jungle))
+                                                  (if (and (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id))
                                                            (eq mission-type-id :mission-type-military-sabotage))
                                                     t
                                                     nil))

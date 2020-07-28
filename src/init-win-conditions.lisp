@@ -65,8 +65,8 @@
                                    (loop for x from 0 below (array-dimension cells 0) do
                                      (loop for y from 0 below (array-dimension cells 1) do
                                        (setf world-sector (aref cells x y))
-                                       (case (wtype world-sector)
-                                         ((:world-sector-normal-lake :world-sector-normal-forest :world-sector-normal-residential :world-sector-normal-island :world-sector-normal-port) (incf normal-sum)))))
+                                       (when (world-sector-normal-p world-sector)
+                                         (incf normal-sum))))
                                    normal-sum)
                                  )
                    )
@@ -82,8 +82,8 @@
                                    (loop for x from 0 below (array-dimension cells 0) do
                                      (loop for y from 0 below (array-dimension cells 1) do
                                        (setf world-sector (aref cells x y))
-                                       (case (wtype world-sector)
-                                         ((:world-sector-corrupted-lake :world-sector-corrupted-forest :world-sector-corrupted-residential :world-sector-corrupted-island :world-sector-corrupted-port) (incf corrupted-sum)))
+                                       (when (world-sector-corrupted-p world-sector)
+                                         (incf corrupted-sum))
                                        (when (find +lm-feat-lair+ (feats world-sector) :key #'(lambda (a) (first a)))
                                          (incf satanists-num))))
                                    (values corrupted-sum satanists-num))

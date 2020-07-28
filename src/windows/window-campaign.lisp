@@ -59,12 +59,14 @@
 (defmethod campaign-win-display-effects ((win campaign-window))
   (let* ((effects-message-box (make-message-box))
          (message-box-list `(,effects-message-box)))
-    (loop for campaign-effect in (world/campaign-effects *world*) do
-      (add-message (format nil "~A" (campaign-effect/name campaign-effect)) sdl:*yellow* message-box-list)
-      (if (campaign-effect/cd campaign-effect)
-        (add-message (format nil " [~A turn~:P left]~%" (campaign-effect/cd campaign-effect)) sdl:*white* message-box-list)
-        (add-message (format nil "~%") sdl:*white* message-box-list))
-      (add-message (format nil "~A~%~%" (campaign-effect/descr campaign-effect)) sdl:*white* message-box-list))
+    (loop for campaign-effect in (world/campaign-effects *world*)
+          when (campaign-effect/displayed campaign-effect)
+            do
+               (add-message (format nil "~A" (campaign-effect/name campaign-effect)) sdl:*yellow* message-box-list)
+               (if (campaign-effect/cd campaign-effect)
+                 (add-message (format nil " [~A turn~:P left]~%" (campaign-effect/cd campaign-effect)) sdl:*white* message-box-list)
+                 (add-message (format nil "~%") sdl:*white* message-box-list))
+               (add-message (format nil "~A~%~%" (campaign-effect/descr campaign-effect)) sdl:*white* message-box-list))
     
     (when (not (eq (campaign-window/cur-mode win) :campaign-window-effects-mode))
       (setf (campaign-window/prev-mode win) (campaign-window/cur-mode win))

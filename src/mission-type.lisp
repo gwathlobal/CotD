@@ -690,27 +690,19 @@
   (let ((demon-power 0)
         (angel-power 0))
     ;; in hell, demon always start with at least 2
-    (when (or (eql (wtype world-sector) :world-sector-hell-jungle))
+    (when (world-sector-hell-p world-sector)
       (incf demon-power 2))
 
     ;; if the relic is captured, add 1 to demons
     ;; if the relic is in church, add 1 to angels
     (loop for dx from 0 below (array-dimension (cells (world-map world)) 0) do
             (loop for dy from 0 below (array-dimension (cells (world-map world)) 1) do
-              (when (and (or (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-forest)
-                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-lake)
-                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-residential)
-                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-island)
-                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-port))
+              (when (and (world-sector-normal-p (aref (cells (world-map world)) dx dy))
                          (find +lm-feat-church+ (feats (aref (cells (world-map world)) dx dy)) :key #'(lambda (a) (first a)))
                          (find +lm-item-holy-relic+ (items (aref (cells (world-map world)) dx dy))))
                 (incf angel-power 1))
               
-              (when (and (or (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-forest)
-                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-lake)
-                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-residential)
-                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-island)
-                             (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-corrupted-port))
+              (when (and (world-sector-corrupted-p (aref (cells (world-map world)) dx dy))
                          (find +lm-item-holy-relic+ (items (aref (cells (world-map world)) dx dy))))
                 (incf demon-power 1))))
 

@@ -285,16 +285,13 @@
          (barricade-func #'(lambda ()
                              (find +lm-feat-barricade+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))))
          (can-barricade-func #'(lambda (sx sy tx ty)
-                                 (if (and (or (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-forest)
-                                              (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-lake)
-                                              (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-port)
-                                              (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-residential)
+                                 (if (and 
+                                          (or (and (world-sector-normal-p (aref (cells world-map) sx sy))
+                                                   (not (eq (wtype (aref (cells world-map) sx sy)) :world-sector-normal-island)))
                                               (= (controlled-by (aref (cells world-map) sx sy)) +lm-controlled-by-military+))
                                           (or (= (controlled-by (aref (cells world-map) tx ty)) +lm-controlled-by-demons+)
-                                              (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-forest)
-                                              (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-lake)
-                                              (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-port)
-                                              (eq (wtype (aref (cells world-map) tx ty)) :world-sector-corrupted-residential)))
+                                              (and (world-sector-corrupted-p (aref (cells world-map) sx sy))
+                                                   (not (eq (wtype (aref (cells world-map) sx sy)) :world-sector-corrupted-island)))))
                                    t
                                    nil))))
   ;; reset barricades
@@ -463,19 +460,11 @@
         (let ((world-sector (aref (cells (world-map world)) x y)))
           (when (and (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
                      (find +lm-item-holy-relic+ (items world-sector))
-                     (or (eq (wtype world-sector) :world-sector-normal-forest)
-                         (eq (wtype world-sector) :world-sector-normal-port)
-                         (eq (wtype world-sector) :world-sector-normal-island)
-                         (eq (wtype world-sector) :world-sector-normal-residential)
-                         (eq (wtype world-sector) :world-sector-normal-lake)))
+                     (world-sector-normal-p world-sector))
             (incf angels-mission-limit))
           
           (when (and (find +lm-item-holy-relic+ (items world-sector))
-                     (or (eq (wtype world-sector) :world-sector-corrupted-forest)
-                         (eq (wtype world-sector) :world-sector-corrupted-port)
-                         (eq (wtype world-sector) :world-sector-corrupted-island)
-                         (eq (wtype world-sector) :world-sector-corrupted-residential)
-                         (eq (wtype world-sector) :world-sector-corrupted-lake)))
+                     (world-sector-corrupted-p world-sector))
             (incf demons-mission-limit)))))
     ))
 
@@ -513,11 +502,7 @@
                            for mission-type = (get-mission-type-by-id mission-type-id)
                            when (and (null (mission world-sector))
                                      (eq (controlled-by world-sector) +lm-controlled-by-none+)
-                                     (or (eq (wtype world-sector) :world-sector-corrupted-forest)
-                                         (eq (wtype world-sector) :world-sector-corrupted-lake)
-                                         (eq (wtype world-sector) :world-sector-corrupted-residential)
-                                         (eq (wtype world-sector) :world-sector-corrupted-island)
-                                         (eq (wtype world-sector) :world-sector-corrupted-port)))
+                                     (world-sector-corrupted-p world-sector))
                              do
                                 (incf (getf avail-mission-slots (mission-slot-type mission-type)))
                                 (loop-finish)))))))
@@ -556,11 +541,7 @@
                    for world-sector = (aref (cells (world-map world)) rx ry)
                    until (and (null (mission world-sector))
                               (eq (controlled-by world-sector) +lm-controlled-by-none+)
-                              (or (eq (wtype world-sector) :world-sector-corrupted-forest)
-                                  (eq (wtype world-sector) :world-sector-corrupted-lake)
-                                  (eq (wtype world-sector) :world-sector-corrupted-residential)
-                                  (eq (wtype world-sector) :world-sector-corrupted-island)
-                                  (eq (wtype world-sector) :world-sector-corrupted-port)))
+                              (world-sector-corrupted-p world-sector))
                    finally
                       (when avail-missions
                         (let ((mission-type-id (nth (random (length avail-missions)) avail-missions)))
@@ -729,7 +710,7 @@
 
     ;; it is harder for non-demons in hell districts -60%
     (when (and (world-sector mission)
-               (or (eq (wtype (world-sector mission)) :world-sector-hell-jungle)))
+               (world-sector-hell-p (world-sector mission)))
       (loop for faction-id in (list +faction-type-angels+ +faction-type-military+ +faction-type-church+)
             do
                (log:info "   Corrupted district -60% to non-demons")
@@ -739,11 +720,7 @@
     
     ;; it is harder for non-demons in corrupted districts -30%
     (when (and (world-sector mission)
-               (or (eq (wtype (world-sector mission)) :world-sector-corrupted-forest)
-                   (eq (wtype (world-sector mission)) :world-sector-corrupted-port)
-                   (eq (wtype (world-sector mission)) :world-sector-corrupted-island)
-                   (eq (wtype (world-sector mission)) :world-sector-corrupted-residential)
-                   (eq (wtype (world-sector mission)) :world-sector-corrupted-lake)))
+               (world-sector-corrupted-p (world-sector mission)))
       (loop for faction-id in (list +faction-type-angels+ +faction-type-military+ +faction-type-church+)
             do
                (log:info "   Corrupted district -30% to non-demons")
@@ -753,11 +730,7 @@
 
     ;; it is harder for non-demons in abandoned districts -15%
     (when (and (world-sector mission)
-               (or (eq (wtype (world-sector mission)) :world-sector-abandoned-forest)
-                   (eq (wtype (world-sector mission)) :world-sector-abandoned-port)
-                   (eq (wtype (world-sector mission)) :world-sector-abandoned-island)
-                   (eq (wtype (world-sector mission)) :world-sector-abandoned-residential)
-                   (eq (wtype (world-sector mission)) :world-sector-abandoned-lake)))
+               (world-sector-abandoned-p (world-sector mission)))
       (loop for faction-id in (list +faction-type-angels+ +faction-type-military+ +faction-type-church+)
             do
                (log:info "   Abandonded district -15% to non-demons")
@@ -948,11 +921,7 @@
   (let ((corrupted-sector (loop with corrupted-district-list = ()
                                 for dx from 0 below (array-dimension (cells world-map) 0) do
                                   (loop for dy from 0 below (array-dimension (cells world-map) 1) do
-                                    (when (and (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-forest)
-                                                   (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-lake)
-                                                   (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-residential)
-                                                   (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-island)
-                                                   (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-port))
+                                    (when (and (world-sector-corrupted-p (aref (cells world-map) dx dy))
                                                (not (and (= x dx) (= y dy)))
                                                (not (find +lm-item-holy-relic+ (items (aref (cells world-map) dx dy)))))
                                       (push (aref (cells world-map) dx dy) corrupted-district-list)))
@@ -973,21 +942,13 @@
   (when (or (not (find +lm-item-holy-relic+ (items (aref (cells world-map) x y))))
             (and (find +lm-item-holy-relic+ (items (aref (cells world-map) x y)))
                  (find +lm-feat-church+ (feats (aref (cells world-map) x y)) :key #'(lambda (a) (first a)))
-                 (or (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-forest)
-                     (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-lake)
-                     (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-residential)
-                     (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-island)
-                     (eq (wtype (aref (cells world-map) x y)) :world-sector-normal-port))))
+                 (world-sector-normal-p (aref (cells world-map) x y))))
     (return-from move-relic-to-church nil))
   
   (let ((church-sector (loop with church-sector-list = ()
                              for dx from 0 below (array-dimension (cells world-map) 0) do
                                (loop for dy from 0 below (array-dimension (cells world-map) 1) do
-                                 (when (and (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-forest)
-                                                (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-lake)
-                                                (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-residential)
-                                                (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-island)
-                                                (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-port))
+                                 (when (and (world-sector-normal-p (aref (cells world-map) dx dy))
                                             (not (and (= x dx) (= y dy)))
                                             (find +lm-feat-church+ (feats (aref (cells world-map) dx dy)) :key #'(lambda (a) (first a)))
                                             (not (find +lm-item-holy-relic+ (items (aref (cells world-map) dx dy)))))
@@ -1012,11 +973,7 @@
   (let ((free-sector (let ((free-sector-list ()))
                        (check-surroundings x y nil #'(lambda (dx dy)
                                                        (when (and (>= dx 0) (>= dy 0) (< dx (array-dimension (cells world-map) 0)) (< dy (array-dimension (cells world-map) 1))
-                                                                  (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-forest)
-                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-lake)
-                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-residential)
-                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-island)
-                                                                      (eq (wtype (aref (cells world-map) dx dy)) :world-sector-normal-port))
+                                                                  (world-sector-normal-p (aref (cells world-map) dx dy))
                                                                   (not (and (= x dx) (= y dy)))
                                                                   (eq (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-none+))
                                                          (push (aref (cells world-map) dx dy) free-sector-list))))
@@ -1051,11 +1008,7 @@
   (let ((corrupted-sector (let ((corrupted-sector-list ()))
                             (check-surroundings x y nil #'(lambda (dx dy)
                                                             (when (and (>= dx 0) (>= dy 0) (< dx (array-dimension (cells world-map) 0)) (< dy (array-dimension (cells world-map) 1))
-                                                                       (or (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-forest)
-                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-lake)
-                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-residential)
-                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-island)
-                                                                           (eq (wtype (aref (cells world-map) dx dy)) :world-sector-corrupted-port))
+                                                                       (world-sector-corrupted-p (aref (cells world-map) dx dy))
                                                                        (not (and (= x dx) (= y dy)))
                                                                        (eq (controlled-by (aref (cells world-map) dx dy)) +lm-controlled-by-none+))
                                                               (push (aref (cells world-map) dx dy) corrupted-sector-list))))
@@ -1253,3 +1206,18 @@
     (when (campaign-effect/on-remove-func campaign-effect)
       (funcall (campaign-effect/on-remove-func campaign-effect) world campaign-effect))
     (setf campaign-effects (remove campaign-effect campaign-effects))))
+
+(defun find-specific-world-sectors (world &rest args)
+  (let ((cells (cells (world-map world)))
+        (world-sector nil)
+        (result (make-list (length args))))
+    (loop for x from 0 below (array-dimension cells 0) do
+      (loop for y from 0 below (array-dimension cells 1) do
+        (setf world-sector (aref cells x y))
+        ;; each argument of the args shall be a function
+        (loop for func in args
+              for i from 0
+              do
+                 (when (funcall func world-sector x y)
+                   (push world-sector (nth i result))))))
+    result))

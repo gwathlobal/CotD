@@ -38,5 +38,11 @@
                                                 :mission-faction-present
                                                 :mission-faction-delayed))
 
+(defenum:defenum world-sector-general-type (:world-sector-sea
+                                            :world-sector-normal
+                                            :world-sector-abandoned
+                                            :world-sector-corrupted
+                                            :world-sector-hell))
+
 (defparameter *mission-types* (make-hash-table))
 (defparameter *campaign-effect-types* (make-hash-table))

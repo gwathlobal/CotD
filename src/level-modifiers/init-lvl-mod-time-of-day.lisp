@@ -25,9 +25,9 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
-                                                    nil
-                                                    t)))
+                                                  (if (not (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id)))
+                                                    t
+                                                    nil)))
 
 (set-level-modifier :id +lm-tod-noon+ :type :level-mod-tod
                     :name "Afternoon"
@@ -51,9 +51,9 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
-                                                    nil
-                                                    t)))
+                                                  (if (not (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id)))
+                                                    t
+                                                    nil)))
 
 (set-level-modifier :id +lm-tod-evening+ :type :level-mod-tod
                     :name "Evening"
@@ -76,9 +76,9 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
-                                                    nil
-                                                    t)))
+                                                  (if (not (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id)))
+                                                    t
+                                                    nil)))
 
 (set-level-modifier :id +lm-tod-night+ :type :level-mod-tod
                     :name "Midnight"
@@ -101,9 +101,9 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
-                                                    nil
-                                                    t)))
+                                                  (if (not (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id)))
+                                                    t
+                                                    nil)))
 
 (set-level-modifier :id +lm-tod-hell+ :type :level-mod-tod
                     :name "Hellday"
@@ -127,6 +127,6 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is only available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
+                                                  (if (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id))
                                                     t
                                                     nil)))

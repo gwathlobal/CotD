@@ -27,9 +27,9 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
-                                                    nil
-                                                    t))
+                                                  (if (not (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id)))
+                                                    t
+                                                    nil))
                     )
 
 (set-level-modifier :id +lm-item-holy-relic+ :type :level-mod-sector-item
@@ -40,11 +40,7 @@
 
                                                  (log:info "TEMPLATE LEVEL FUNC: Lvl Mod Relic")
                                                  
-                                                 (when (or (eq (wtype world-sector) :world-sector-corrupted-residential)
-                                                           (eq (wtype world-sector) :world-sector-corrupted-island)
-                                                           (eq (wtype world-sector) :world-sector-corrupted-port)
-                                                           (eq (wtype world-sector) :world-sector-corrupted-lake)
-                                                           (eq (wtype world-sector) :world-sector-corrupted-forest))
+                                                 (when (world-sector-corrupted-p world-sector)
                                                    (log:info "   TEMPLATE LEVEL FUNC: Lvl Mod Relic in Corrupted District")
                                                  
                                                    (loop with shrine-types = (prepare-spec-build-id-list +building-type-corrupted-shrine+)
@@ -71,19 +67,15 @@
                                                           (reverse func-list)))
                     :depends-on-lvl-mod-func #'(lambda (world-sector mission-type-id world-time)
                                                  (declare (ignore mission-type-id world-time))
-                                                 (if (not (or (eq (wtype world-sector) :world-sector-corrupted-residential)
-                                                              (eq (wtype world-sector) :world-sector-corrupted-island)
-                                                              (eq (wtype world-sector) :world-sector-corrupted-port)
-                                                              (eq (wtype world-sector) :world-sector-corrupted-lake)
-                                                              (eq (wtype world-sector) :world-sector-corrupted-forest)))
+                                                 (if (not (world-sector-corrupted-p world-sector))
                                                    (list +lm-feat-church+)
                                                    nil))
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for hell districts
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle))
-                                                    nil
-                                                    t))
+                                                  (if (not (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id)))
+                                                    t
+                                                    nil))
                     :always-present-func #'(lambda (world-sector mission world-time)
                                              (declare (ignore world-sector world-time))
                                              (if (or (eq (mission-type-id mission) :mission-type-demonic-thievery)

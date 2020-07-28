@@ -150,11 +150,20 @@
                                              (add-message (format nil " to the invading demons.~%") sdl:*white* message-box-list)))
                           :on-remove-func #'(lambda (world campaign-effect)
                                               (declare (ignore campaign-effect))
+                                              (add-campaign-effect world :id :campaign-effect-demon-malseraph-bored :cd (+ 2 (random 2)))
                                               (let ((message-box-list `(,(world/effect-message-box world))))
                                                 (add-message (format nil "Malseraph") sdl:*magenta* message-box-list)
                                                 (add-message (format nil " has diverted its gaze from the city. Demons fighting there ") sdl:*white* message-box-list)
                                                 (add-message (format nil "shall no longer have its blessing") sdl:*yellow* message-box-list)
                                                 (add-message (format nil ".~%") sdl:*white* message-box-list))))
+
+(set-campaign-effect-type :id :campaign-effect-demon-malseraph-bored
+                          :name "Malseraph bored"
+                          :descr "Malseraph is bored for a while."
+                          :displayed nil
+                          :merge-func #'(lambda (world new-effect old-effect)
+                                          (declare (ignore world))
+                                          (setf (campaign-effect/cd old-effect) (campaign-effect/cd new-effect))))
 
 (set-campaign-effect-type :id :campaign-effect-angel-hastened
                           :name "Prayer for intervention"

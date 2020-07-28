@@ -220,11 +220,7 @@
                                              (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
                                                (let ((world-sector (aref (cells (world-map world)) x y)))
                                                  (when (and (eq (controlled-by world-sector) +lm-controlled-by-none+)
-                                                            (or (eq (wtype world-sector) :world-sector-corrupted-forest)
-                                                                (eq (wtype world-sector) :world-sector-corrupted-port)
-                                                                (eq (wtype world-sector) :world-sector-corrupted-island)
-                                                                (eq (wtype world-sector) :world-sector-corrupted-residential)
-                                                                (eq (wtype world-sector) :world-sector-corrupted-lake)))
+                                                            (world-sector-corrupted-p world-sector))
                                                    (incf corrupted-sectors)))))
                                            
                                            (if (and (> corrupted-sectors 0)
@@ -241,11 +237,7 @@
                                                      (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
                                                        (let ((world-sector (aref (cells (world-map world)) x y)))
                                                          (when (and (eq (controlled-by world-sector) +lm-controlled-by-none+)
-                                                                    (or (eq (wtype world-sector) :world-sector-corrupted-forest)
-                                                                        (eq (wtype world-sector) :world-sector-corrupted-port)
-                                                                        (eq (wtype world-sector) :world-sector-corrupted-island)
-                                                                        (eq (wtype world-sector) :world-sector-corrupted-residential)
-                                                                        (eq (wtype world-sector) :world-sector-corrupted-lake)))
+                                                                    (world-sector-corrupted-p world-sector))
                                                            (push (list x y) corrupted-sector-list)))))
                                                    
                                                    (setf selected-sector (nth (random (length corrupted-sector-list)) corrupted-sector-list))
@@ -277,11 +269,7 @@
                                              (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
                                                (let ((world-sector (aref (cells (world-map world)) x y)))
                                                  (when (and (find +lm-item-book-of-rituals+ (items world-sector))
-                                                            (or (eq (wtype world-sector) :world-sector-corrupted-forest)
-                                                                (eq (wtype world-sector) :world-sector-corrupted-port)
-                                                                (eq (wtype world-sector) :world-sector-corrupted-island)
-                                                                (eq (wtype world-sector) :world-sector-corrupted-residential)
-                                                                (eq (wtype world-sector) :world-sector-corrupted-lake)))
+                                                            (world-sector-corrupted-p world-sector))
                                                    (setf book-sector t)))))
                                            
                                            (if (and book-sector
@@ -312,11 +300,7 @@
                                              (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
                                                (let ((world-sector (aref (cells (world-map world)) x y)))
                                                  (when (and (find +lm-item-holy-relic+ (items world-sector))
-                                                            (or (eq (wtype world-sector) :world-sector-corrupted-forest)
-                                                                (eq (wtype world-sector) :world-sector-corrupted-port)
-                                                                (eq (wtype world-sector) :world-sector-corrupted-island)
-                                                                (eq (wtype world-sector) :world-sector-corrupted-residential)
-                                                                (eq (wtype world-sector) :world-sector-corrupted-lake)))
+                                                            (world-sector-corrupted-p world-sector))
                                                    (setf relic-sector t)))))
                                            
                                            (if (and relic-sector
@@ -373,11 +357,7 @@
                                              (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
                                                (let ((world-sector (aref (cells (world-map world)) x y)))
                                                  (when (and (eq (controlled-by world-sector) +lm-controlled-by-none+)
-                                                            (or (eq (wtype world-sector) :world-sector-normal-forest)
-                                                                (eq (wtype world-sector) :world-sector-normal-port)
-                                                                (eq (wtype world-sector) :world-sector-normal-island)
-                                                                (eq (wtype world-sector) :world-sector-normal-residential)
-                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                            (world-sector-normal-p world-sector))
                                                    (incf residential-sectors)))))
                                            
                                            (if (and (> residential-sectors 0)
@@ -394,11 +374,7 @@
                                                      (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
                                                        (let ((world-sector (aref (cells (world-map world)) x y)))
                                                          (when (and (eq (controlled-by world-sector) +lm-controlled-by-none+)
-                                                                    (or (eq (wtype world-sector) :world-sector-normal-forest)
-                                                                (eq (wtype world-sector) :world-sector-normal-port)
-                                                                (eq (wtype world-sector) :world-sector-normal-island)
-                                                                (eq (wtype world-sector) :world-sector-normal-residential)
-                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                                    (world-sector-normal-p world-sector))
                                                            (push (list x y) residential-sector-list)))))
                                                                                                       
                                                    (setf selected-sector (nth (random (length residential-sector-list)) residential-sector-list))
@@ -434,11 +410,7 @@
                                              (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
                                                (let ((world-sector (aref (cells (world-map world)) x y)))
                                                  (when (and (eq (controlled-by world-sector) +lm-controlled-by-none+)
-                                                            (or (eq (wtype world-sector) :world-sector-normal-forest)
-                                                                (eq (wtype world-sector) :world-sector-normal-port)
-                                                                (eq (wtype world-sector) :world-sector-normal-island)
-                                                                (eq (wtype world-sector) :world-sector-normal-residential)
-                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                            (world-sector-normal-p world-sector))
                                                    (incf residential-sectors)))))
                                            (multiple-value-bind (corrupted-sectors-left satanist-lairs-left) (funcall (win-condition/win-func military-win-cond) *world* military-win-cond)
                                              (declare (ignore satanist-lairs-left))
@@ -456,11 +428,7 @@
                                                      (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
                                                        (let ((world-sector (aref (cells (world-map world)) x y)))
                                                          (when (and (eq (controlled-by world-sector) +lm-controlled-by-none+)
-                                                                    (or (eq (wtype world-sector) :world-sector-normal-forest)
-                                                                (eq (wtype world-sector) :world-sector-normal-port)
-                                                                (eq (wtype world-sector) :world-sector-normal-island)
-                                                                (eq (wtype world-sector) :world-sector-normal-residential)
-                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                                    (world-sector-normal-p world-sector))
                                                            (push (list x y) residential-sector-list)))))
                                                                                                       
                                                    (setf selected-sector (nth (random (length residential-sector-list)) residential-sector-list))
@@ -491,11 +459,7 @@
                                              (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
                                                (let ((world-sector (aref (cells (world-map world)) x y)))
                                                  (when (and (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
-                                                            (or (eq (wtype world-sector) :world-sector-normal-forest)
-                                                                (eq (wtype world-sector) :world-sector-normal-port)
-                                                                (eq (wtype world-sector) :world-sector-normal-island)
-                                                                (eq (wtype world-sector) :world-sector-normal-residential)
-                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                            (world-sector-normal-p world-sector))
                                                    (setf church-sector t)))))
                                            
                                            (if (and church-sector
@@ -524,11 +488,7 @@
                                              (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
                                                (let ((world-sector (aref (cells (world-map world)) x y)))
                                                  (when (and (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
-                                                            (or (eq (wtype world-sector) :world-sector-normal-forest)
-                                                                (eq (wtype world-sector) :world-sector-normal-port)
-                                                                (eq (wtype world-sector) :world-sector-normal-island)
-                                                                (eq (wtype world-sector) :world-sector-normal-residential)
-                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                            (world-sector-normal-p world-sector))
                                                    (setf church-sector t)))))
                                            
                                            (if (and church-sector
@@ -559,23 +519,11 @@
                                            (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
                                              (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
                                                (let ((world-sector (aref (cells (world-map world)) x y)))
-                                                 (when (or (eq (wtype world-sector) :world-sector-normal-forest)
-                                                           (eq (wtype world-sector) :world-sector-normal-port)
-                                                           (eq (wtype world-sector) :world-sector-normal-island)
-                                                           (eq (wtype world-sector) :world-sector-normal-residential)
-                                                           (eq (wtype world-sector) :world-sector-normal-lake))
+                                                 (when (world-sector-normal-p world-sector)
                                                    (incf normal-sectors))
-                                                 (when (or (eq (wtype world-sector) :world-sector-abandoned-forest)
-                                                           (eq (wtype world-sector) :world-sector-abandoned-port)
-                                                           (eq (wtype world-sector) :world-sector-abandoned-island)
-                                                           (eq (wtype world-sector) :world-sector-abandoned-residential)
-                                                           (eq (wtype world-sector) :world-sector-abandoned-lake))
+                                                 (when (world-sector-abandoned-p world-sector)
                                                    (incf abandoned-sectors))
-                                                 (when (or (eq (wtype world-sector) :world-sector-corrupted-forest)
-                                                           (eq (wtype world-sector) :world-sector-corrupted-port)
-                                                           (eq (wtype world-sector) :world-sector-corrupted-island)
-                                                           (eq (wtype world-sector) :world-sector-corrupted-residential)
-                                                           (eq (wtype world-sector) :world-sector-corrupted-lake))
+                                                 (when (world-sector-corrupted-p world-sector)
                                                    (incf corrupted-sectors)))))
                                            (if (and (>= abandoned-sectors (+ corrupted-sectors normal-sectors))
                                                     (not (find-campaign-effects-by-id world :campaign-effect-eater-agitated)))
@@ -606,11 +554,7 @@
                                                (let ((world-sector (aref (cells (world-map world)) x y)))
                                                  (when (and (find +lm-item-holy-relic+ (items world-sector))
                                                             (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
-                                                            (or (eq (wtype world-sector) :world-sector-normal-forest)
-                                                                (eq (wtype world-sector) :world-sector-normal-port)
-                                                                (eq (wtype world-sector) :world-sector-normal-island)
-                                                                (eq (wtype world-sector) :world-sector-normal-residential)
-                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                            (world-sector-normal-p world-sector))
                                                    (setf relic-sector t)))))
                                            
                                            (multiple-value-bind (corrupted-sectors-left satanist-lairs-left) (funcall (win-condition/win-func military-win-cond) world military-win-cond)
@@ -655,11 +599,7 @@
                                                (let ((world-sector (aref (cells (world-map world)) x y)))
                                                  (when (and (find +lm-item-holy-relic+ (items world-sector))
                                                             (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
-                                                            (or (eq (wtype world-sector) :world-sector-normal-forest)
-                                                                (eq (wtype world-sector) :world-sector-normal-port)
-                                                                (eq (wtype world-sector) :world-sector-normal-island)
-                                                                (eq (wtype world-sector) :world-sector-normal-residential)
-                                                                (eq (wtype world-sector) :world-sector-normal-lake)))
+                                                            (world-sector-normal-p world-sector))
                                                    (setf relic-sector t)))))
                                            
                                            (if (and relic-sector

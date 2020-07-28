@@ -5,7 +5,7 @@
    (glyph-idx :initform 0 :initarg :glyph-idx :accessor glyph-idx :type fixnum)
    (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
    (name :initform "" :initarg :name :accessor name :type string)
-
+   (general-type :initform :world-sector-normal :initarg :general-type :accessor general-type :type world-sector-general-type)
    (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; funcation that returns a list of (list <faction type id> <mission faction status id>)
 
    (sector-level-gen-func :initform nil :initarg :sector-level-gen-func :accessor sector-level-gen-func)
@@ -19,7 +19,19 @@
 
 (defparameter *world-sector-types* (make-hash-table))
 
-(defun set-world-sector-type (&key wtype glyph-idx glyph-color name faction-list-func sector-level-gen-func template-level-gen-func terrain-post-process-func-list
+(defmethod world-sector-normal-p ((world-sector-type world-sector-type))
+  (eql (general-type world-sector-type) :world-sector-normal))
+
+(defmethod world-sector-abandoned-p ((world-sector-type world-sector-type))
+  (eql (general-type world-sector-type) :world-sector-abandoned))
+
+(defmethod world-sector-corrupted-p ((world-sector-type world-sector-type))
+  (eql (general-type world-sector-type) :world-sector-corrupted))
+
+(defmethod world-sector-hell-p ((world-sector-type world-sector-type))
+  (eql (general-type world-sector-type) :world-sector-hell))
+
+(defun set-world-sector-type (&key wtype glyph-idx glyph-color name general-type faction-list-func sector-level-gen-func template-level-gen-func terrain-post-process-func-list
                                    overall-post-process-func-list angel-disguised-mob-type-id scenario-enabled-func
                                    (always-lvl-mods-func #'(lambda (world-sector mission-type-id world-time)
                                                              (declare (ignore world-sector mission-type-id world-time))
@@ -28,8 +40,9 @@
   (unless name (error ":NAME is an obligatory parameter!"))
   (unless glyph-idx (error ":GLYPH-IDX is an obligatory parameter!"))
   (unless glyph-color (error ":GLYPH-COLOR is an obligatory parameter!"))
+  (unless general-type (error ":GENERAL-TYPE is an obligatory parameter!"))
   
-  (setf (gethash wtype *world-sector-types*) (make-instance 'world-sector-type :wtype wtype :glyph-idx glyph-idx :glyph-color glyph-color :name name
+  (setf (gethash wtype *world-sector-types*) (make-instance 'world-sector-type :wtype wtype :glyph-idx glyph-idx :glyph-color glyph-color :name name :general-type general-type
                                                                                :faction-list-func faction-list-func
                                                                                :sector-level-gen-func sector-level-gen-func
                                                                                :template-level-gen-func template-level-gen-func
@@ -160,6 +173,18 @@
 (defmethod name ((world-sector world-sector))
   (name (get-world-sector-type-by-id (wtype world-sector))))
 
+(defmethod world-sector-normal-p ((world-sector world-sector))
+  (eql (general-type (get-world-sector-type-by-id (wtype world-sector))) :world-sector-normal))
+
+(defmethod world-sector-abandoned-p ((world-sector world-sector))
+  (eql (general-type (get-world-sector-type-by-id (wtype world-sector))) :world-sector-abandoned))
+
+(defmethod world-sector-corrupted-p ((world-sector world-sector))
+  (eql (general-type (get-world-sector-type-by-id (wtype world-sector))) :world-sector-corrupted))
+
+(defmethod world-sector-hell-p ((world-sector world-sector))
+  (eql (general-type (get-world-sector-type-by-id (wtype world-sector))) :world-sector-hell))
+
 (defun world-find-sides-for-world-sector (world-sector world-map
                                           test-north-func test-south-func test-west-func test-east-func
                                           call-north-func call-south-func call-west-func call-east-func)
@@ -213,20 +238,14 @@
          (demon-test-func #'(lambda (x y)
                               (if (and (<= (abs (- x (x world-sector))) 1) (<= (abs (- y (y world-sector))) 1)
                                        (or (= (controlled-by (aref (cells (world-map world)) x y)) +lm-controlled-by-demons+)
-                                           (eq (wtype (aref (cells (world-map world)) x y)) :world-sector-corrupted-forest)
-                                           (eq (wtype (aref (cells (world-map world)) x y)) :world-sector-corrupted-port)
-                                           (eq (wtype (aref (cells (world-map world)) x y)) :world-sector-corrupted-residential)
-                                           (eq (wtype (aref (cells (world-map world)) x y)) :world-sector-corrupted-lake)))
+                                           (and (world-sector-corrupted-p (aref (cells (world-map world)) x y))
+                                                (not (eql (wtype (aref (cells (world-map world)) x y)) :world-sector-corrupted-island)))))
                                 t
                                 nil)))
          (military-test-func #'(lambda (x y)
                                  (if (and (<= (abs (- x (x world-sector))) 1) (<= (abs (- y (y world-sector))) 1)
                                           (or (= (controlled-by (aref (cells (world-map world)) x y)) +lm-controlled-by-military+)
-                                              (eq (wtype (aref (cells (world-map world)) x y)) :world-sector-normal-residential)
-                                              (eq (wtype (aref (cells (world-map world)) x y)) :world-sector-normal-island)
-                                              (eq (wtype (aref (cells (world-map world)) x y)) :world-sector-normal-port)
-                                              (eq (wtype (aref (cells (world-map world)) x y)) :world-sector-normal-lake)
-                                              (eq (wtype (aref (cells (world-map world)) x y)) :world-sector-normal-forest)))
+                                              (world-sector-normal-p (aref (cells (world-map world)) x y))))
                                    t
                                    nil)))
          (hash-print-func #'(lambda ()
@@ -241,16 +260,8 @@
     
     (when (or (not (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a))))
               (and (find +lm-feat-church+ (feats world-sector) :key #'(lambda (a) (first a)))
-                   (or (eql (wtype world-sector) :world-sector-abandoned-residential)
-                       (eql (wtype world-sector) :world-sector-abandoned-island)
-                       (eql (wtype world-sector) :world-sector-abandoned-port)
-                       (eql (wtype world-sector) :world-sector-abandoned-lake)
-                       (eql (wtype world-sector) :world-sector-abandoned-forest)
-                       (eql (wtype world-sector) :world-sector-corrupted-residential)
-                       (eql (wtype world-sector) :world-sector-corrupted-island)
-                       (eql (wtype world-sector) :world-sector-corrupted-port)
-                       (eql (wtype world-sector) :world-sector-corrupted-lake)
-                       (eql (wtype world-sector) :world-sector-corrupted-forest))))
+                   (or (world-sector-abandoned-p world-sector)
+                       (world-sector-corrupted-p world-sector))))
       (push (list :angels +feature-start-place-angels+) side-party-list))
     
     (unless (= (controlled-by world-sector) +lm-controlled-by-military+)

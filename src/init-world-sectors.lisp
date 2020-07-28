@@ -8,6 +8,7 @@
                        :glyph-idx +glyph-id-large-t+
                        :glyph-color sdl:*white*
                        :name "A test district"
+                       :general-type :world-sector-normal
                        :faction-list-func #'(lambda ()
                                               ())
                        :angel-disguised-mob-type-id +mob-type-man+
@@ -25,6 +26,7 @@
                        :glyph-idx 40
                        :glyph-color sdl:*white*
                        :name "An ordinary district"
+                       :general-type :world-sector-normal
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-civilians+ :mission-faction-present)
                                                     (list +faction-type-eater+ :mission-faction-present)
@@ -59,6 +61,7 @@
                        :glyph-idx 48
                        :glyph-color sdl:*white*
                        :name "A seaport district"
+                       :general-type :world-sector-normal
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-civilians+ :mission-faction-present)
                                                     (list +faction-type-eater+ :mission-faction-present)
@@ -124,6 +127,7 @@
                        :glyph-idx 38
                        :glyph-color sdl:*white*
                        :name "The outskirts of the city"
+                       :general-type :world-sector-normal
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-civilians+ :mission-faction-present)
                                                     (list +faction-type-eater+ :mission-faction-present)
@@ -164,6 +168,7 @@
                        :glyph-idx 44
                        :glyph-color sdl:*white*
                        :name "A district upon a lake"
+                       :general-type :world-sector-normal
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-civilians+ :mission-faction-present)
                                                     (list +faction-type-eater+ :mission-faction-present)
@@ -202,12 +207,14 @@
 (set-world-sector-type :wtype :world-sector-normal-sea
                        :glyph-idx 51
                        :glyph-color sdl:*white*
-                       :name "Sea")
+                       :name "Sea"
+                       :general-type :world-sector-sea)
 
 (set-world-sector-type :wtype :world-sector-normal-island
                        :glyph-idx 41
                        :glyph-color sdl:*white*
                        :name "An island district"
+                       :general-type :world-sector-normal
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-civilians+ :mission-faction-present)
                                                     (list +faction-type-eater+ :mission-faction-present)
@@ -247,6 +254,7 @@
                         :glyph-idx 40
                         :glyph-color (sdl:color :r 150 :g 150 :b 150)
                         :name "An abandoned residential district"
+                        :general-type :world-sector-abandoned
                         :faction-list-func #'(lambda ()
                                                (list (list +faction-type-eater+ :mission-faction-present)
                                                      ;(list +faction-type-eater+ :mission-faction-absent)
@@ -285,6 +293,7 @@
                        :glyph-idx 48
                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
                        :name "An abandoned seaport district"
+                       :general-type :world-sector-abandoned
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ :mission-faction-present)
                                                     ;(list +faction-type-eater+ :mission-faction-absent)
@@ -355,6 +364,7 @@
                        :glyph-idx 38
                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
                        :name "The abandoned outskirts of the city"
+                       :general-type :world-sector-abandoned
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ :mission-faction-present)
                                                     ;(list +faction-type-eater+ :mission-faction-absent)
@@ -400,6 +410,7 @@
                        :glyph-idx 44
                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
                        :name "An abandoned district upon a lake"
+                       :general-type :world-sector-abandoned
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ :mission-faction-present)
                                                     ;(list +faction-type-eater+ :mission-faction-absent)
@@ -447,6 +458,7 @@
                        :glyph-idx 41
                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
                        :name "An abandoned island district"
+                       :general-type :world-sector-abandoned
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ :mission-faction-present)
                                                     ;(list +faction-type-eater+ :mission-faction-absent)
@@ -490,6 +502,7 @@
                        :glyph-idx 40
                        :glyph-color sdl:*magenta*
                        :name "A corrupted residential district"
+                       :general-type :world-sector-corrupted
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ :mission-faction-present)
                                                     ;(list +faction-type-eater+ :mission-faction-absent)
@@ -559,6 +572,7 @@
                        :glyph-idx 48
                        :glyph-color sdl:*magenta*
                        :name "A corrupted seaport district"
+                       :general-type :world-sector-corrupted
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ :mission-faction-present)
                                                     ;(list +faction-type-eater+ :mission-faction-absent)
@@ -656,6 +670,7 @@
                        :glyph-idx 38
                        :glyph-color sdl:*magenta*
                        :name "The corrupted outskirts of the city"
+                       :general-type :world-sector-corrupted
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ :mission-faction-present)
                                                     ;(list +faction-type-eater+ :mission-faction-absent)
@@ -727,6 +742,7 @@
                        :glyph-idx 44
                        :glyph-color sdl:*magenta*
                        :name "A corrupted district upon a lake"
+                       :general-type :world-sector-corrupted
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ :mission-faction-present)
                                                     ;(list +faction-type-eater+ :mission-faction-absent)
@@ -796,6 +812,7 @@
                        :glyph-idx 41
                        :glyph-color sdl:*magenta*
                        :name "A corrupted island district"
+                       :general-type :world-sector-corrupted
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-eater+ :mission-faction-present)
                                                     ;(list +faction-type-eater+ :mission-faction-absent)
@@ -869,6 +886,7 @@
                        :glyph-idx 40
                        :glyph-color sdl:*magenta*
                        :name "A hell jungle"
+                       :general-type :world-sector-hell
                        :faction-list-func #'(lambda ()
                                               (list (list +faction-type-demons+ :mission-faction-present)))
                        :angel-disguised-mob-type-id +mob-type-soldier+

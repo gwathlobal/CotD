@@ -10,8 +10,7 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for world sectors in hell
-                                                  (if (or (eq world-sector-type-id :world-sector-hell-jungle)
-                                                          )
+                                                  (if (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id))
                                                     nil
                                                     t)))
 
@@ -73,18 +72,14 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for missions where demons attack
-                                                  (if (or (eq world-sector-type-id :world-sector-corrupted-forest)
-                                                          (eq world-sector-type-id :world-sector-corrupted-lake)
-                                                          (eq world-sector-type-id :world-sector-corrupted-residential)
-                                                          (eq world-sector-type-id :world-sector-corrupted-island)
-                                                          (eq world-sector-type-id :world-sector-corrupted-port)
-                                                          (eq world-sector-type-id :world-sector-hell-jungle))
+                                                  (if (or (world-sector-corrupted-p (get-world-sector-type-by-id world-sector-type-id))
+                                                          (world-sector-hell-p (get-world-sector-type-by-id world-sector-type-id)))
                                                     t
                                                     nil)
                                                   )
                     :always-present-func #'(lambda (world-sector mission world-time)
                                              (declare (ignore mission world-time))
-                                             (if (or (eq (wtype world-sector) :world-sector-hell-jungle))
+                                             (if (world-sector-corrupted-p world-sector)
                                                t
                                                nil))
                     )
@@ -121,11 +116,7 @@
                     :is-available-for-mission #'(lambda (world-sector-type-id mission-type-id world-time)
                                                   (declare (ignore mission-type-id world-time))
                                                   ;; is not available for missions where military attack
-                                                  (if (or (eq world-sector-type-id :world-sector-normal-forest)
-                                                          (eq world-sector-type-id :world-sector-normal-port)
-                                                          (eq world-sector-type-id :world-sector-normal-island)
-                                                          (eq world-sector-type-id :world-sector-normal-residential)
-                                                          (eq world-sector-type-id :world-sector-normal-lake))
+                                                  (if (world-sector-normal-p (get-world-sector-type-by-id world-sector-type-id))
                                                     t
                                                     nil))
                     )

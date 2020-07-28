@@ -90,16 +90,8 @@
                                                                  (loop for x from 0 below (array-dimension (cells (world-map world)) 0) do
                                                                    (loop for y from 0 below (array-dimension (cells (world-map world)) 1) do
                                                                      (setf world-sector (aref (cells (world-map world)) x y))
-                                                                     (when (or (eq (wtype world-sector) :world-sector-abandoned-forest)
-                                                                               (eq (wtype world-sector) :world-sector-abandoned-lake)
-                                                                               (eq (wtype world-sector) :world-sector-abandoned-residential)
-                                                                               (eq (wtype world-sector) :world-sector-abandoned-island)
-                                                                               (eq (wtype world-sector) :world-sector-abandoned-port)
-                                                                               (eq (wtype world-sector) :world-sector-corrupted-forest)
-                                                                               (eq (wtype world-sector) :world-sector-corrupted-lake)
-                                                                               (eq (wtype world-sector) :world-sector-corrupted-residential)
-                                                                               (eq (wtype world-sector) :world-sector-corrupted-island)
-                                                                               (eq (wtype world-sector) :world-sector-corrupted-port))
+                                                                     (when (or (world-sector-abandoned-p world-sector)
+                                                                               (world-sector-corrupted-p world-sector))
                                                                        (unless nearest-sector
                                                                          (setf nearest-sector world-sector))
                                                                        (when (< (get-distance (x military-sector) (y military-sector) (x world-sector) (y world-sector))
@@ -115,11 +107,7 @@
                                                                          when (and (>= (+ dx x) 0) (>= (+ dy y) 0) (< (+ dx x) (array-dimension (cells (world-map world)) 0)) (< (+ dy y) (array-dimension (cells (world-map world)) 1))
                                                                                    (< (get-distance (+ dx x) (+ dy y) (x nearest-sector) (y nearest-sector))
                                                                                       (get-distance x y (x nearest-sector) (y nearest-sector)))
-                                                                                   (or (eq (wtype (aref (cells (world-map world)) (+ dx x) (+ dy y))) :world-sector-normal-forest)
-                                                                                       (eq (wtype (aref (cells (world-map world)) (+ dx x) (+ dy y))) :world-sector-normal-lake)
-                                                                                       (eq (wtype (aref (cells (world-map world)) (+ dx x) (+ dy y))) :world-sector-normal-residential)
-                                                                                       (eq (wtype (aref (cells (world-map world)) (+ dx x) (+ dy y))) :world-sector-normal-island)
-                                                                                       (eq (wtype (aref (cells (world-map world)) (+ dx x) (+ dy y))) :world-sector-normal-port))
+                                                                                   (world-sector-normal-p (aref (cells (world-map world)) (+ dx x) (+ dy y)))
                                                                                    (eq (controlled-by (aref (cells (world-map world)) (+ dx x) (+ dy y))) +lm-controlled-by-none+))
                                                                            do
                                                                               (push dir correct-dirs)
@@ -158,11 +146,7 @@
                                                                                      #'(lambda (dx dy)
                                                                                          (when (and (>= dx 0) (>= dy 0) (< dx (array-dimension (cells (world-map world)) 0)) (< dy (array-dimension (cells (world-map world)) 1))
                                                                                                     (setf world-sector (aref (cells (world-map world)) dx dy))
-                                                                                                    (or (eq (wtype world-sector) :world-sector-corrupted-forest)
-                                                                                                        (eq (wtype world-sector) :world-sector-corrupted-lake)
-                                                                                                        (eq (wtype world-sector) :world-sector-corrupted-residential)
-                                                                                                        (eq (wtype world-sector) :world-sector-corrupted-island)
-                                                                                                        (eq (wtype world-sector) :world-sector-corrupted-port))
+                                                                                                    (world-sector-corrupted-p world-sector)
                                                                                                     (eq (controlled-by world-sector) +lm-controlled-by-none+))
                                                                                            (push world-sector avail-sectors))))
 
@@ -225,11 +209,7 @@
                                                            (let ((free-church-sectors (loop with church-sector-list = ()
                                                                                             for dx from 0 below (array-dimension (cells (world-map world)) 0) do
                                                                                               (loop for dy from 0 below (array-dimension (cells (world-map world)) 1) do
-                                                                                                (when (and (or (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-forest)
-                                                                                                               (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-lake)
-                                                                                                               (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-residential)
-                                                                                                               (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-island)
-                                                                                                               (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-port))
+                                                                                                (when (and (world-sector-normal-p (aref (cells (world-map world)) dx dy))
                                                                                                            (find +lm-feat-church+ (feats (aref (cells (world-map world)) dx dy)) :key #'(lambda (a) (first a)))
                                                                                                            (not (find +lm-item-holy-relic+ (items (aref (cells (world-map world)) dx dy)))))
                                                                                                   (push (aref (cells (world-map world)) dx dy) church-sector-list)))
@@ -237,11 +217,7 @@
                                                                  (normal-relic-sectors (loop with relic-sector-list = ()
                                                                                              for dx from 0 below (array-dimension (cells (world-map world)) 0) do
                                                                                                (loop for dy from 0 below (array-dimension (cells (world-map world)) 1) do
-                                                                                                 (when (and (or (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-forest)
-                                                                                                                (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-lake)
-                                                                                                                (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-residential)
-                                                                                                                (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-island)
-                                                                                                                (eq (wtype (aref (cells (world-map world)) dx dy)) :world-sector-normal-port))
+                                                                                                 (when (and (world-sector-normal-p (aref (cells (world-map world)) dx dy))
                                                                                                             (not (find +lm-feat-church+ (feats (aref (cells (world-map world)) dx dy)) :key #'(lambda (a) (first a))))
                                                                                                             (find +lm-item-holy-relic+ (items (aref (cells (world-map world)) dx dy))))
                                                                                                    (push (aref (cells (world-map world)) dx dy) relic-sector-list)))
@@ -268,13 +244,18 @@
                                            :disabled nil
                                            :on-check #'(lambda (world)
                                                          (if (and (not (find-campaign-effects-by-id world :campaign-effect-demon-malseraph-blessing))
-                                                                  (or 
-                                                                      (< (random 5) 100)))
+                                                                  (not (find-campaign-effects-by-id world :campaign-effect-demon-malseraph-bored))
+                                                                  (or (and (first (find-specific-world-sectors world #'(lambda (world-sector x y)
+                                                                                                                         (declare (ignore x y))
+                                                                                                                         (and (find +lm-item-holy-relic+ (items world-sector))
+                                                                                                                              (world-sector-corrupted-p world-sector)))))
+                                                                           (< (random 100) 15))
+                                                                      (< (random 100) 5)))
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
 
                                                            (let* ((effects-list (list :campaign-effect-demon-malseraph-blessing))
                                                                   (chosen-effect (nth (random (length effects-list)) effects-list)))
-                                                             (add-campaign-effect world :id chosen-effect :cd 4 :param nil)))
+                                                             (add-campaign-effect world :id chosen-effect :cd (+ 3 (random 4)) :param nil)))
                                ))
