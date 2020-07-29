@@ -689,6 +689,9 @@
           
           do
              (log:debug "CHECK-MOVE ~A, XYZ = (~A ~A ~A)" check-result x y z)
+             ;; TODO: replace this hack with something more solid
+             (when (check-dead mob)
+               (loop-finish))
              (cond
                ;; all clear - move freely
                ((eq check-result t)

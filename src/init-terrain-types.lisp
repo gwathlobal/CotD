@@ -495,6 +495,11 @@
                                                             (declare (ignore x y z))
                                                             (set-mob-effect mob :effect-type-id +mob-effect-wet+ :actor-id (id mob) :cd 4))))
 
+(set-terrain-type (make-instance 'terrain-type :id +terrain-wall-ice+ :name "ice"
+                                               :glyph-idx +glyph-id-wall+ :glyph-color (sdl:color :r 0 :g 150 :b 255) :back-color (sdl:color :r 0 :g 150 :b 255) 
+                                               :trait-blocks-move t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-projectiles-floor t
+                                               :trait-blocks-sound 25 :trait-blocks-sound-floor 20))
+
 ;;--------------------
 ;; Air
 ;;--------------------

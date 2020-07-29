@@ -21,13 +21,16 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (let ((if-player-won (if (or (= (loyal-faction *player*) +faction-type-angels+)
-                                                                                        (= (loyal-faction *player*) +faction-type-church+))
-                                                                                  t
-                                                                                  nil)))
+                                                           (let* ((if-player-won (if (or (= (loyal-faction *player*) +faction-type-angels+)
+                                                                                         (= (loyal-faction *player*) +faction-type-church+))
+                                                                                   t
+                                                                                   nil))
+                                                                  (bonus (if if-player-won
+                                                                           1400
+                                                                           0)))
                                                              (trigger-game-over world
                                                                                 :final-str "Satanists eliminated."
-                                                                                :score (calculate-player-score (+ 1400 (if (not (mimic-id-list *player*))
+                                                                                :score (calculate-player-score (+ bonus (if (not (mimic-id-list *player*))
                                                                                                                          0
                                                                                                                          (loop for mimic-id in (mimic-id-list *player*)
                                                                                                                                for mimic = (get-mob-by-id mimic-id)
@@ -59,13 +62,16 @@
                                                              t
                                                              nil))
                                            :on-trigger #'(lambda (world)
-                                                           (let ((if-player-won (if (or (= (loyal-faction *player*) +faction-type-demons+)
-                                                                                        (= (loyal-faction *player*) +faction-type-satanists+))
-                                                                                  t
-                                                                                  nil)))
+                                                           (let* ((if-player-won (if (or (= (loyal-faction *player*) +faction-type-demons+)
+                                                                                         (= (loyal-faction *player*) +faction-type-satanists+))
+                                                                                   t
+                                                                                   nil))
+                                                                  (bonus (if if-player-won
+                                                                           1450
+                                                                           0)))
                                                              (trigger-game-over world
                                                                                 :final-str "Satanists protected."
-                                                                                :score (calculate-player-score 1450)
+                                                                                :score (calculate-player-score bonus)
                                                                                 :if-player-won if-player-won
                                                                                 :player-msg (if if-player-won
                                                                                               (format nil "Congratulations! Your faction has won!~%")
@@ -83,12 +89,15 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (let ((if-player-won (if (= (loyal-faction *player*) +faction-type-military+)
+                                                           (let* ((if-player-won (if (= (loyal-faction *player*) +faction-type-military+)
                                                                                   t
-                                                                                  nil)))
+                                                                                   nil))
+                                                                  (bonus (if if-player-won
+                                                                           1500
+                                                                           0)))
                                                              (trigger-game-over world
                                                                                 :final-str "Satanists eliminated."
-                                                                                :score (calculate-player-score (+ 1500 (* 10 (total-humans (level world)))))
+                                                                                :score (calculate-player-score (+ bonus (* 10 (total-humans (level world)))))
                                                                                 :if-player-won if-player-won
                                                                                 :player-msg (if if-player-won
                                                                                               (format nil "Congratulations! Your faction has won!~%")

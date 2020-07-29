@@ -998,6 +998,11 @@
     (values (slot-value mob 'name) +noun-proper+ +noun-singular+)
     (values (name (get-mob-type-by-id (mob-type mob))) +noun-common+ +noun-singular+)))
 
+(defmethod alive-name ((mob mob))
+  (if (slot-value mob 'alive-name)
+    (values (slot-value mob 'alive-name) +noun-proper+ +noun-singular+)
+    (values (name (get-mob-type-by-id (mob-type mob))) +noun-common+ +noun-singular+)))
+
 (defmethod visible-name ((mob mob))
   (when (and (not (eq *player* mob))
              (or ;(mob-effect-p *player* +mob-effect-blind+)

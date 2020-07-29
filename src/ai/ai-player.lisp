@@ -56,7 +56,9 @@
                  (= (loyal-faction *player*) +faction-type-church+)
                  (= (loyal-faction *player*) +faction-type-satanists+)
                  (= (loyal-faction *player*) +faction-type-military+))
-             (eql (mission-type-id (mission (level *world*))) :mission-type-demonic-conquest))
+             (or (eql (mission-type-id (mission (level *world*))) :mission-type-demonic-conquest)
+                 (eql (mission-type-id (mission (level *world*))) :mission-type-celestial-purge)
+                 (eql (mission-type-id (mission (level *world*))) :mission-type-military-conquest)))
     (sense-sigil))
 
   (when (and (or (= (loyal-faction *player*) +faction-type-demons+)

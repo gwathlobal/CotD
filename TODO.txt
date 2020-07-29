@@ -1,6 +1,7 @@
+- TODO: When a creature has momentum and step on damaging terrain, it can dies but still keeps momnentum. For now the bug is fixed, but there should be a better way of handling this situation, probably using action queue or something
 - Bands of malseraph's puppets as lvl mods
 - HP Regeneration ability for demons
-- Demons are too week. Add microbial shroud ability to them releases gas around a demon and heals and gives armor to demons inside the gas
+- Demons are too weak. Add microbial shroud ability to them releases gas around a demon and heals and gives armor to demons inside the gas
 - Chameleon ability for crimson imp (crimson demons?) Render them invisible for a duration + sudden strike ability that deals great damage while chameleoned
 - Blinding cloud ability that greatly impairs seeing inside it and reduces hit chance for ranged attacks
 - TODO: find a better way of handling primordial autowin situation in mission Satanist elimination (right now this mission is hacked not be available for quick missions)

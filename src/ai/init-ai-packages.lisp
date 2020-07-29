@@ -1608,6 +1608,7 @@
                                                                                    (>= ry (array-dimension (terrain (level *world*)) 1))
                                                                                    (>= rz (array-dimension (terrain (level *world*)) 2))
                                                                                    (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move+)
+                                                                                   (= (get-terrain-* (level *world*) rx ry rz) +terrain-floor-air+)
                                                                                    (and (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+)
                                                                                         (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-water+))
                                                                                         (not (get-terrain-type-trait (get-terrain-* (level *world*) rx ry rz) +terrain-trait-blocks-move-floor+))

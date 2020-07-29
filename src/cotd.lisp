@@ -630,9 +630,9 @@
                                           (with-slots (game-slot-id) *game-manager*
                                             (setf game-slot-id nil))
                                           (main-menu)))
-                 ((:game-state-custom-scenario :game-state-custom-scenario-end) (scenario-game-loop))
+                 ((:game-state-custom-scenario) (scenario-game-loop))
                  ((:game-state-campaign-map :game-state-campaign-init) (campaign-game-loop))
-                 ((:game-state-campaign-scenario :game-state-campaign-scenario-end) (scenario-game-loop))
+                 ((:game-state-campaign-scenario) (scenario-game-loop))
                  (:game-state-post-scenario (process-post-scenario))))
            quit-menu-tag
              (stop-path-thread))

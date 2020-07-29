@@ -137,8 +137,10 @@
           ((= (aref (terrain level) x y z) +terrain-floor-dirt-bright+) (setf (aref (terrain level) x y z) +terrain-floor-snow+))
           ((= (aref (terrain level) x y z) +terrain-floor-grass+) (setf (aref (terrain level) x y z) +terrain-floor-snow+))
           ((= (aref (terrain level) x y z) +terrain-tree-birch+) (setf (aref (terrain level) x y z) +terrain-tree-birch-snow+))
-          ((= (aref (terrain level) x y z) +terrain-water-liquid+) (progn (setf (aref (terrain level) x y z) +terrain-water-ice+)
-                                                                         (when (< z (1- (array-dimension (terrain level) 2)))
-                                                                           (setf (aref (terrain level) x y (1+ z)) +terrain-water-ice+))))
+          ((= (aref (terrain level) x y z) +terrain-water-liquid+) (progn
+                                                                     (setf (aref (terrain level) x y z) +terrain-wall-ice+)
+                                                                     (when (and (< z (1- (array-dimension (terrain level) 2)))
+                                                                                (= (aref (terrain level) x y (1+ z)) +terrain-floor-air+))
+                                                                       (setf (aref (terrain level) x y (1+ z)) +terrain-water-ice+))))
           ((= (aref (terrain level) x y z) +terrain-floor-leaves+) (setf (aref (terrain level) x y z) +terrain-floor-leaves-snow+))))))
   )

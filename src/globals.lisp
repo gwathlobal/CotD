@@ -640,6 +640,7 @@
 (defconstant +terrain-floor-glass+ 66)
 (defconstant +terrain-wall-raw-flesh+ 67)
 (defconstant +terrain-floor-slime+ 68)
+(defconstant +terrain-wall-ice+ 69)
 
 ;;--------------------
 ;; GOD Constants
