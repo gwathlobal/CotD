@@ -916,8 +916,7 @@
 			(make-output *current-window*)
 			(go exit-loop)
                         )
-       (:idle () #+swank
-                 (update-swank)
+       (:idle () (update-swank)
               
                  (set-idle-calcing win)
 

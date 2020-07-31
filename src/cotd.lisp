@@ -661,7 +661,7 @@
   (setf *current-dir* *default-pathname-defaults*)
   (setf *cotd-release* t)
   (setf *cotd-logging* :log-option-none)
-  (setf *cotd-log-level* :info)
+  (setf *cotd-log-level* :error)
 
   (sdl:with-init ()  
     (cotd-main))
@@ -683,7 +683,7 @@
   (setf *current-dir* *default-pathname-defaults*)
   (setf *cotd-release* t)
   (setf *cotd-logging* :log-option-file)
-  (setf *cotd-log-level* :info)
+  (setf *cotd-log-level* :error)
   
   (sdl:with-init ()  
     (cotd-main))

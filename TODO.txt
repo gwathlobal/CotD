@@ -1,4 +1,4 @@
-- TODO: When a creature has momentum and step on damaging terrain, it can dies but still keeps momnentum. For now the bug is fixed, but there should be a better way of handling this situation, probably using action queue or something
+- TODO: When a creature has momentum and step on damaging terrain, it can dies but still keeps momnentum. For now the bug is fixed, but there should be a better way of handling this situation, probably using action queue or something. So problem is that after any elementaty action (moving a single tile, casting an ability, etc.) the mob can die and all subsequent actions shall be cancelled, but now it is never checked against.
 - Bands of malseraph's puppets as lvl mods
 - HP Regeneration ability for demons
 - Demons are too weak. Add microbial shroud ability to them releases gas around a demon and heals and gives armor to demons inside the gas

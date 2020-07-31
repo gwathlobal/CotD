@@ -9,26 +9,38 @@ The year is 1915. The Great War thunders in the west, but the Hinterland is not 
 This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
-LATEST CHANGES v1.3.4
+LATEST CHANGES v2.0.0
 
-- Added a new primordial playable character - Skinchanger. The Skinchanger can shift between three archetypes: a melee warrior, a ranged shooter and a quick flyer. Some additional mutations can be received to improve on the strengths of each archetype.
-- Fixed Resurrection not spending Power points after usage.
-- Rearranged the Satanists' lair to reduce the chance of 'traffic jams'.
-- When angels conceal their divinity in abandoned and corrupted districts, they now look like soldiers.
-- Angels can now bless humans without revealing themselves. Also, angels will not reveal themselves unless they are about to attack an enemy in melee.
-- Fixed the bug where demonic sigils could spawn on sludgeshrooms and die on their own.
-- For the Celestial retrieval mission, some demons will start inside the corrupted shrine to protect the relic.
-- NPCs with Sense good and Sense evil will make use of these abilities to no wander randomly but to places where they feel that the enemy is.
-- Added a district with a lake to the map layouts.
-- Added a district with a lake and a river to the map layouts.
-- Added a seaport district with a river to the map layouts.
-- Added some performance optimizations.
-- Chrome angels are now armed with holy fists and can no longer sever body parts.
+- Added campaigns as a whole new mode for the game. A city map is generated for the campaign where the missions take place. Each side of the conflict (angels, demons, and the military) have their own goals in the campaign. Each campaign day the player shall be presented with several available missions. The player can take one and play it as a usual game scenario. Or the player can choose to pass the day without taking a mission. Either way, all missions where the did no actively participate will be resolved automatically and the mission outcome will directly affect the campaign map.
+- Added saving and loading of campaigns and standalone scenarios.
+- A new type of mission added: Satanist elimination. The military tries to eradicate the satanists' lair and kill all satanists in the district.
+- A new type of mission added: Celestial sabotage. The mission takes place in a hell dimension where the angels try to destroy dimensional engines that give demons the ability to open portals to Earth
+- A new type of mission added: Military sabotage. The mission takes place in a hell dimension where the military tries to destroy stockpiles of raw flesh that the demons have stolen from Earth
+- A new type of level map: hell jungle. Similar to the corrupted districts (the ground is covered with creep and demonic outgrowth is here and there) except it is even more otherworldly and sinister.
+- The player shall now see what is happening on the upper or lower Z level whenever something interesting is nearby.
+- Added a new terrain tile to the corrupted districts - glowshrooms. Glowshrooms emit faint light and illuminate everything around them.
+- Message log can be now quickly skimmed using Shift+Up/Down.
+- Added craters from artillery fire to abandoned and corrupted districts. 
+- Added a new terrain tile to the corrupted districts and hell maps - glowing creep. If somebody steps on this tile, it will give irradiation to this character.
+- Added an ability to purge demonic runes to angels. Purging runes provides 4 power to the angel.
+- The following abilities:
+     mount a horse, fiend, or Gargantaur, 
+     merge trinity mimics 
+     decipher runes
+  will now show up only when the corresponding target is next to you to avoid confusion.
+- Malseraph's Puppet irradiation strength will now depend on his favor with Malseraph.
+- Malseraph's Puppet gets an ability to draw breath and exhale irradiation around them on the next turn.
+- Made an option to hide messages that are visible through Angel's 'Singlemind' ability.
+- Restructured the main menu: moved all quick scenario options into a submenu.
+- Highscores shall be reset in the new version.
+- Fixed the bug when merged angels did not merge their power values.
+- Fixed the bug when slowed characters did not have their speed returned to normal.
 
 
 --------------------
 FEATURES
 
+ - Global campaign
  - Different scenarios
  - Giant overland City
  - Angels and Demons battling in its streets
