@@ -1190,7 +1190,7 @@
                                          (list +faction-type-angels+ (list +ai-package-patrol-district+))
                                          (list +faction-type-military+ (list +ai-package-patrol-district+))
                                          (list +faction-type-church+ (list +ai-package-patrol-district+))
-                                         (list +faction-type-satanists+ (list +ai-package-patrol-district+))
+                                         (list +faction-type-satanists+ (list +ai-package-patrol-district+ +ai-package-coward+))
                                          (list +faction-type-eater+ (list +ai-package-patrol-district+))
                                          (list +faction-type-criminals+ (list +ai-package-patrol-district+))
                                          (list +faction-type-ghost+ (list +ai-package-patrol-district+))

@@ -3,8 +3,9 @@
 (set-ai-package (make-instance 'ai-package :id +ai-package-coward+
                                            :priority 9
                                            :on-check-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs)
-                                                            (declare (ignore actor nearest-ally hostile-mobs allied-mobs))
-                                                            (if nearest-enemy
+                                                            (declare (ignore nearest-ally hostile-mobs allied-mobs))
+                                                            (if (and nearest-enemy
+                                                                     (>= (strength nearest-enemy) (strength actor)))
                                                               t
                                                               nil))
                                            :on-invoke-ai #'(lambda (actor nearest-enemy nearest-ally hostile-mobs allied-mobs check-result)

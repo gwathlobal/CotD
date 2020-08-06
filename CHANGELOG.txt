@@ -2,6 +2,7 @@ CHANGELOG
 
 - Fixed the bug with crashing at the start of a mission in hell dimension.
 - In Demonic Raid and Demonic Thievery missions, the direction to the nearest portal shall be indicated when playing for demons and satanists.
+- During Satanist Elimination missions, satanists shall flee from enemies so that they do not get killed too quickly.
 
 --------------------
 August 1, 2020 v2.0.0
