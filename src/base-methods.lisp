@@ -2196,10 +2196,25 @@
         
     (setf (sense-relic-pos *player*) nearest-power)))
 
+(defun sense-portal ()
+  (setf (sense-portal-pos *player*) nil)
+  (let ((portals nil))
+    ;; search for nearest portal on the map
+    (setf portals (stable-sort (loop for feature-id in (demonic-portals (level *world*))
+                                     for feature = (get-feature-by-id feature-id)
+                                     collect feature)
+                               #'(lambda (a b)
+                                   (if (< (get-distance-3d (x *player*) (y *player*) (z *player*) (x a) (y a) (z a))
+                                          (get-distance-3d (x *player*) (y *player*) (z *player*) (x b) (y b) (z b)))
+                                     t
+                                     nil))))
+    (when portals
+      (setf (sense-portal-pos *player*) (list (x (first portals)) (y (first portals)))))))
+
 (defun sense-sigil ()
   (setf (sense-sigil-pos *player*) nil)
   (let ((nearest-power nil))
-    ;; search for item on the map
+    ;; search for sigil on the map
     (loop for mob-id in (mob-id-list (level *world*))
           for mob = (get-mob-by-id mob-id)
           when (= (mob-type mob) +mob-type-demon-sigil+)

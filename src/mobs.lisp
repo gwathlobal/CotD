@@ -1468,6 +1468,7 @@
    (dead-message-displayed :initform nil :accessor dead-message-displayed)
    (sense-unnatural-pos :initform nil :accessor sense-unnatural-pos)
    (sense-relic-pos :initform nil :accessor sense-relic-pos)
+   (sense-portal-pos :initform nil :accessor sense-portal-pos)
    (sense-sigil-pos :initform nil :accessor sense-sigil-pos)
    (sense-machine-pos :initform nil :accessor sense-machine-pos)
    (sense-stockpile-pos :initform nil :accessor sense-stockpile-pos)

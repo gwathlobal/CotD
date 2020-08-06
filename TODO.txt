@@ -1,3 +1,4 @@
+- in Satanist Elimination missions, make satanists flee from enemies
 - 'u' to bring up a list of usable items (and use them from it, instead of going to inventory)
 - Sectors controlled by neutral powers creatures who kill everybody in their way
 - Command for demons - seduce human army and disband it (maybe if there corrupted angels present in the demon army)

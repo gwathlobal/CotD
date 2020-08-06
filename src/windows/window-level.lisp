@@ -111,8 +111,7 @@
         (let ((win-formula (win-condition/win-formula (get-win-condition-by-id :win-cond-thief))))
           (format str "~%Value left: ~A$~%" (if (> (- win-formula (get-overall-value (inv *player*))) 0)
                                           (- win-formula (get-overall-value (inv *player*)))
-                                          0)))
-        )
+                                          0))))
 
       ;; win condition for demonic conquest
       (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+)
@@ -126,8 +125,7 @@
           (format str "~%Demonic sigils: ~A/~A (~A)~%" (length (demonic-sigils (level *world*))) max-sigils
                   (if (>= (length (demonic-sigils (level *world*))) max-sigils)
                     (format nil "~D turn~:P left" (- max-turns (get-demon-conquest-turns-left *world*)))
-                    "none")))
-        )
+                    "none"))))
 
       ;; win condition for celestial purge
       (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+)
@@ -147,8 +145,7 @@
                      (eq (mission-type-id (mission (level *world*))) :mission-type-military-conquest))
                 (eq (mission-type-id (mission (level *world*))) :mission-type-test))
         (let ((max-sigils (win-condition/win-formula (get-win-condition-by-id :win-cond-military-conquest))))
-          (format str "~%Demonic sigils: ~A/~A~%" (length (demonic-sigils (level *world*))) max-sigils))
-        )
+          (format str "~%Demonic sigils: ~A/~A~%" (length (demonic-sigils (level *world*))) max-sigils)))
       
       ;; win condition for satanist elimination
       (when (or (and (or (= (loyal-faction *player*) +faction-type-demons+)
@@ -279,6 +276,9 @@
     (when (sense-relic-pos *player*)
       (when first (format str "~%") (setf first nil))
       (format str "Sense relic: ~A~%" (general-direction-str (x *player*) (y *player*) (first (sense-relic-pos *player*)) (second (sense-relic-pos *player*)))))
+    (when (sense-portal-pos *player*)
+      (when first (format str "~%") (setf first nil))
+      (format str "Sense portal: ~A~%" (general-direction-str (x *player*) (y *player*) (first (sense-portal-pos *player*)) (second (sense-portal-pos *player*)))))
     (when (sense-sigil-pos *player*)
       (when first (format str "~%") (setf first nil))
       (format str "Sense sigil: ~A~A~%" (general-direction-str (x *player*) (y *player*) (first (sense-sigil-pos *player*)) (second (sense-sigil-pos *player*)))
