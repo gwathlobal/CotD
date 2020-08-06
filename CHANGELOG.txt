@@ -1,5 +1,7 @@
 CHANGELOG
 
+- Fixed the bug with crashing at the start of a mission in hell dimension.
+
 --------------------
 August 1, 2020 v2.0.0
 

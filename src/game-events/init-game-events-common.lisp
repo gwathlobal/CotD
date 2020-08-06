@@ -397,6 +397,14 @@
                                                                       (set-terrain-* (level world) x y 2 +terrain-floor-snow+))
                                                            )))
 
+(set-game-event (make-instance 'game-event :id +game-event-hellday+ :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (declare (ignore world))
+                                                         t)
+                                           :on-trigger #'(lambda (world)
+                                                           (declare (ignore world))
+                                                           nil)))
+
 (set-game-event (make-instance 'game-event :id +game-event-adjust-outdoor-light+ :disabled nil
                                            :on-check #'(lambda (world)
                                                          (declare (ignore world))
