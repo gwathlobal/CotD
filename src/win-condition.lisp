@@ -11,7 +11,8 @@
                                 :win-cond-military-sabotage
                                 :win-cond-demon-campaign
                                 :win-cond-military-campaign
-                                :win-cond-angels-campaign))
+                                :win-cond-angels-campaign
+                                :win-cond-eater-cosnume))
 
 (defclass win-condition ()
   ((id :initarg :id :accessor win-condition/id :type win-cond-enum)

@@ -1200,7 +1200,7 @@
                                             (list +faction-type-military+ +game-event-eliminate-satanists-win-for-military+)
                                             (list +faction-type-church+ +game-event-eliminate-satanists-win-for-church+)
                                             (list +faction-type-satanists+ +game-event-eliminate-satanists-win-for-satanists+)
-                                            (list +faction-type-eater+ +game-event-win-for-eater+)
+                                            (list +faction-type-eater+ +game-event-win-for-eater-consume+)
                                             (list +faction-type-criminals+ +game-event-win-for-thief+)
                                             (list +faction-type-ghost+ +game-event-win-for-ghost+)
                                             )

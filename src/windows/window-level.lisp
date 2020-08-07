@@ -164,16 +164,22 @@
                      (eq (mission-type-id (mission (level *world*))) :mission-type-celestial-sabotage))
                 (eq (mission-type-id (mission (level *world*))) :mission-type-test))
         (let ((max-machines (win-condition/win-formula (get-win-condition-by-id :win-cond-celestial-sabotage))))
-          (format str "~%Demonic machines: ~A/~A~%" (length (demonic-machines (level *world*))) max-machines))
-        )
+          (format str "~%Demonic machines: ~A/~A~%" (length (demonic-machines (level *world*))) max-machines)))
      
       ;; win condition for military sabotage
       (when (or (and (or (= (loyal-faction *player*) +faction-type-military+)
                          (= (loyal-faction *player*) +faction-type-angels+))
                      (eq (mission-type-id (mission (level *world*))) :mission-type-military-sabotage))
                 (eq (mission-type-id (mission (level *world*))) :mission-type-test))
-        (format str "~%Raw storages left: ~A~%" (length (bomb-plant-locations (level *world*))))
-        )
+        (format str "~%Raw storages left: ~A~%" (length (bomb-plant-locations (level *world*)))))
+
+      ;; win condition for eater during satanist elimination
+      (when (or (and (= (loyal-faction *player*) +faction-type-eater+)
+                     (eq (mission-type-id (mission (level *world*))) :mission-type-eliminate-satanists))
+                (eq (mission-type-id (mission (level *world*))) :mission-type-test))
+        (let* ((win-condition (get-win-condition-by-id :win-cond-eater-cosnume))
+               (corpses (funcall (win-condition/win-func win-condition) *world* win-condition)))
+          (format str "~%Corpses eaten: ~A/~A~%" (eater-corpses-consumed *player*) corpses)))
 
       ;; delayed arrival
       (loop with do-once = nil

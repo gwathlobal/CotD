@@ -191,27 +191,26 @@
                                                                                 :game-over-type :game-over-eater-won))
                                                            )))
 
-(set-game-event (make-instance 'game-event :id +game-event-win-for-eater-ascend+
+(set-game-event (make-instance 'game-event :id +game-event-win-for-eater-consume+
                                            :descr-func #'(lambda ()
-                                                           "To win, get at least . To lose, die.")
+                                                           (let* ((win-condition (get-win-condition-by-id :win-cond-eater-cosnume))
+                                                                  (corpses (funcall (win-condition/win-func win-condition) *world* win-condition)))
+                                                             (format nil "To win, eat at least ~A corpses using your 'Cannibalize' ability. To lose, die." corpses)))
                                            :disabled nil
                                            :on-check #'(lambda (world)
-                                                         (if (or (and (= (loyal-faction *player*) +faction-type-eater+)
-                                                                      (zerop (total-demons (level world)))
-                                                                      (zerop (total-angels (level world))))
-                                                                 (and (/= (loyal-faction *player*) +faction-type-eater+)
-                                                                      (> (nth +faction-type-military+ (total-faction-list (level world))) 0)
-                                                                      (zerop (total-demons (level world)))
-                                                                      (zerop (total-angels (level world)))))
-                                                           t
-                                                           nil))
+                                                         (let* ((win-condition (get-win-condition-by-id :win-cond-eater-cosnume))
+                                                                (corpses (funcall (win-condition/win-func win-condition) world win-condition)))
+                                                           (if (and (= (loyal-faction *player*) +faction-type-eater+)
+                                                                    (>= (eater-corpses-consumed *player*) corpses))
+                                                             t
+                                                             nil)))
                                            :on-trigger #'(lambda (world)
                                                            (let ((if-player-won (if (or (= (loyal-faction *player*) +faction-type-angels+)
                                                                                         (= (loyal-faction *player*) +faction-type-church+))
                                                                                   t
                                                                                   nil)))
                                                              (trigger-game-over world
-                                                                                :final-str "Enemies of Primordials eliminated."
+                                                                                :final-str "Primordials have satiated their hunger."
                                                                                 :score (calculate-player-score 1430)
                                                                                 :if-player-won if-player-won
                                                                                 :player-msg (if if-player-won

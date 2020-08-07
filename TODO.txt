@@ -1,5 +1,3 @@
-- TODO: the eater should get all available mutations in missions where neither demons nor angels are present at the start
-- TODO: find a better way of handling primordial autowin situation in mission Satanist elimination (right now this mission is hacked not be available for quick missions)
 - Sectors controlled by neutral powers creatures who kill everybody in their way
 - Command for demons - seduce human army and disband it (maybe if there corrupted angels present in the demon army)
 - Move from lispbuidlder-sdl to sdl2 or trivial-gamekit

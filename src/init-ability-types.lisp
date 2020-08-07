@@ -4296,14 +4296,18 @@
                                  :motion 100
                                  :on-invoke #'(lambda (ability-type actor target)
                                                 (declare (ignore ability-type))
-                                                (log:info (format nil "MOB-CANNIBALIZE: ~A [~A] invokes cannibalize on ~A [~A].~%" (name actor) (id actor) (name target) (id target)))
+                                                (log:info "MOB-CANNIBALIZE: ~A [~A] invokes cannibalize on ~A [~A].~%" (name actor) (id actor) (name target) (id target))
                                                 (generate-sound actor (x actor) (y actor) (z actor) 80 #'(lambda (str)
                                                                                                              (format nil "You hear someone munching~A. " str)))
                                                 (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                        (format nil "~A devours ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor))) (prepend-article +article-a+ (visible-name target)))
                                                                        :color sdl:*white*
-                                                                           :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
-                                                                                         :singlemind)))
+                                                                       :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                                                                     :singlemind)))
+
+                                                ;; for +game-event-win-for-eater-consume+ win event
+                                                (when (eq actor *player*)
+                                                  (incf (eater-corpses-consumed actor)))
 
                                                 (let ((already-mutated nil) (mutation-chance 20))
                                                   (when (dead-mob target)

@@ -1466,6 +1466,7 @@
    (view-y :initform 0 :accessor view-y)
    (view-z :initform 0 :accessor view-z)
    (dead-message-displayed :initform nil :accessor dead-message-displayed)
+   (eater-corpses-consumed :initform 0 :accessor eater-corpses-consumed)
    (sense-unnatural-pos :initform nil :accessor sense-unnatural-pos)
    (sense-relic-pos :initform nil :accessor sense-relic-pos)
    (sense-portal-pos :initform nil :accessor sense-portal-pos)

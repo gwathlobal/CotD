@@ -95,3 +95,12 @@
                    :win-func #'(lambda (world win-condition)
                                  (- (win-condition/win-formula win-condition) (world/machine-destroyed world)))
                    )
+
+(set-win-condition :id :win-cond-eater-cosnume
+                   :win-formula 0
+                   :win-func #'(lambda (world win-condition)
+                                 (declare (ignore win-condition))
+                                 (truncate (+ (initial-angels (level world))
+                                              (initial-humans (level world))
+                                              (initial-demons (level world)))
+                                           3)))
