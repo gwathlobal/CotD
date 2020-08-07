@@ -10,83 +10,167 @@
    (enter-func :initarg :enter-func :accessor enter-func) ;; 1 arg - cur-sel
    (select-color-func :initform nil :initarg :select-color-func :accessor select-color-func) ;; 1 arg - cur-sel
    (can-esc :initform t :initarg :can-esc :accessor can-esc)
-   )) 
+   
+   (x :initform nil :initarg :x :accessor select-obj-window/x)
+   (y :initform nil :initarg :y :accessor select-obj-window/y)
+   (w :initform nil :initarg :w :accessor select-obj-window/w)
+   (h-list :initform nil :accessor select-obj-window/h-list)
+   (h-descr :initform nil :accessor select-obj-window/h-descr)
+   (margin :initform 4 :accessor select-obj-window/margin :type fixnum)
+   ))
+
+(defmethod initialize-instance :after ((win select-obj-window) &key)
+  (with-slots (x y w h-list h-descr margin cur-sel header-line line-list descr-list prompt-list can-esc) win
+    (let ((default-w 330))
+      ;; find the maximum width among all strings
+      (unless w
+        (setf w (loop with max = default-w
+                      for str in (append (if (header-line win)
+                                           (list (header-line win))
+                                           nil)
+                                         (line-list win)
+                                         (loop for prompt-func in prompt-list
+                                               collect (return-prompt-str prompt-func cur-sel :can-esc can-esc)))
+                      for try-max = (+ 10 (* (sdl:char-width sdl:*default-font*) (+ 10 (length str))))
+                      when (> try-max max) do
+                        (setf max try-max)
+                      finally (return-from nil max))))
+
+      ;; find the maximum height of the description text depending on the found width
+      (if descr-list
+        (sdl:with-rectangle (rect (sdl:rectangle :x 0 :y 0 :w (- w margin margin) :h 30))
+          (setf h-descr (loop with max = 0
+                              for descr in descr-list
+                              for try-max = (* (sdl:char-height sdl:*default-font*) (write-text descr rect :count-only t))
+                              when (> try-max max) do
+                                (setf max try-max)
+                              finally (return-from nil max))))
+        (setf h-descr 0))
+
+      ;; find the height of the list
+      (unless h-list
+        (setf h-list (* (sdl:char-height sdl:*default-font*) (length line-list))))
+      
+      ;; set x if necessary
+      (unless x
+        (setf x (- (truncate *window-width* 2) (truncate w 2) margin)))
+      
+      ;; set y if necessary
+      (unless y
+        (setf y (- (truncate *window-height* 2) (truncate (+ h-descr h-list) 2) margin))))))
+
+(defun return-prompt-str (prompt-func cur-sel &key (can-esc t))
+  (if prompt-func
+    (funcall prompt-func cur-sel)
+    (if can-esc
+      "[Esc] Escape"
+      "")))
 
 (defmethod make-output ((win select-obj-window))
-  (let* ((w (loop with max = 330
-                  for str in (append (list (header-line win)) (line-list win))
-                  for try-max = (+ 10 (* (sdl:char-width sdl:*default-font*) (+ 10 (length str))))
-                  when (> try-max max) do
-                    (setf max try-max)
-                  finally (return-from nil max)))
-         (x (- (truncate *window-width* 2) (truncate w 2)))
-         (h 65)
-         (y (- (truncate *window-height* 2) (truncate h 2)))
-         (descr-h 0))
-    ;; find the descr height
-    (when (descr-list win)
-      (sdl:with-rectangle (rect (sdl:rectangle :x x :y y :w (- w 8) :h 600))
-	(let ((first-descr t) (new-descr-h 0))
-	  (loop for descr in (descr-list win) do
-	       (setf new-descr-h (+ 2 (* (sdl:char-height sdl:*default-font*) (write-text descr rect :count-only t))))
-	       (when first-descr 
-		 (setf descr-h new-descr-h)
-		 (setf first-descr nil))
-	       (when (> new-descr-h descr-h) (setf descr-h new-descr-h))))))
+  (with-slots (x y w h-list h-descr margin cur-sel header-line line-list descr-list prompt-list can-esc select-color-func color-list) win
+    (let* ((h-header (sdl:char-height sdl:*default-font*))
+           (h-prompt (sdl:char-height sdl:*default-font*))
+           (cur-y y)
 
-    ;; define the height of the window depending on the length of the object array
-    (setf y (- (truncate *window-height* 2) (truncate (+ (* (sdl:char-height sdl:*default-font*) (length (line-list win))) descr-h) 2)))
-    (setf h (+ 19 (* 13 (length (line-list win))) descr-h))
+           (x-rect x)
+           (w-rect w)
+           (x-txt (+ x-rect margin))
+           (w-txt (- w-rect margin margin))
 
-    ;; drawing a large rectangle in white
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
-      (sdl:fill-surface sdl:*white* :template a-rect))
-    ;; drawing a smaller rectanagle in black to make a 1 pixel width border
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x (1+ x) :y (1+ y) :w (- w 2) :h (- h 2)))
-      (sdl:fill-surface sdl:*black* :template a-rect))
-    ;; drawing a line to separate the lines with the descr
-    (sdl:with-rectangle (rect (sdl:rectangle :x x :y (- (+ y h) 17 descr-h) :w w :h 1))
-      (sdl:fill-surface sdl:*white* :template rect))
-    ;; drawing a line to separate the prompt and command hint line
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y (- (+ y h) 17) :w w :h 1))
-      (sdl:fill-surface sdl:*white* :template a-rect))
+           (y-header-rect)
+           (h-header-rect)
 
-    (when (header-line win)
-      (sdl:with-rectangle (rect (sdl:rectangle :x x :y (- y (sdl:char-height sdl:*default-font*) 2) :w w :h (+ (sdl:char-height sdl:*default-font*) 2)))
-        (sdl:fill-surface sdl:*white* :template rect))
-      (sdl:with-rectangle (rect (sdl:rectangle :x (1+ x) :y (1- (- y (sdl:char-height sdl:*default-font*))) :w (- w 2) :h (+ (sdl:char-height sdl:*default-font*) 1)))
-        (sdl:fill-surface sdl:*black* :template rect))
-      (sdl:draw-string-solid-* (header-line win) (+ x 5) (- y (sdl:char-height sdl:*default-font*) 1) :color sdl:*white*))
-    ;; drawing objects
-    (let ((cur-str) (color-list nil))
-      (setf cur-str (cur-sel win))
-      (dotimes (i (length (line-list win)))
-	;; choose the description
-	;;(setf lst (append lst (list (aref (line-array win) i))))
+           (y-header-txt)
+           (h-header-txt)
 
-        (if (= i cur-str) 
-          (if (select-color-func win)
-            (setf color-list (append color-list (list (funcall (select-color-func win) cur-str)))) 
-            (setf color-list (append color-list (list sdl:*yellow*))))
-          (if (color-list win)
-            (setf color-list (append color-list (list (nth i (color-list win)))))
-            (setf color-list (append color-list (list sdl:*white*)))))
-        )
-      (draw-selection-list (line-list win) cur-str (length (line-list win)) (+ x 10) (1+ y) :color-list color-list :use-letters t))
+           (y-list-rect)
+           (h-list-rect)
 
-    ;; drawing descriptions
-    (when (descr-list win)
-      (sdl:with-rectangle (rect (sdl:rectangle :x (+ x 4) :y (- (+ y h) 16 descr-h) :w (- w 8) :h descr-h))
-        (write-text (nth (cur-sel win) (descr-list win)) rect :color sdl:*white*)))
+           (y-list-txt)
 
-    (let ((str))
-      ;; choose the prompt
-      (if (prompt-list win)
-        (setf str (funcall (nth (cur-sel win) (prompt-list win)) (cur-sel win)))
-        (setf str "[Esc] Escape"))
+           (y-descr-rect)
+           (h-descr-rect)
+
+           (y-descr-txt)
+           (h-descr-txt)
+
+           (y-prompt-rect)
+           (h-prompt-rect)
+
+           (y-prompt-txt)
+           (h-prompt-txt)
+           )
+
+      (when header-line
+        ;; setting up coordiantes
+        (setf y-header-rect cur-y
+              h-header-rect (+ h-header margin margin)
+              y-header-txt (+ y-header-rect margin)
+              h-header-txt (- h-header-rect margin margin)
+              cur-y (+ cur-y h-header-rect -1))
+        ;; draw rectangle for header
+        (sdl:with-rectangle (rect (sdl:rectangle :x x-rect :y y-header-rect :w w-rect :h h-header-rect))
+          (sdl:fill-surface sdl:*black* :template rect)
+          (sdl:draw-rectangle rect :color sdl:*white*))
+        ;; draw text for header
+        (sdl:with-rectangle (rect (sdl:rectangle :x x-txt :y y-header-txt :w w-txt :h h-header-txt))
+          (write-text header-line rect)))
+
+      (when line-list
+        ;; setting up coordiantes
+        (setf y-list-rect cur-y
+              h-list-rect (+ h-list margin margin)
+              y-list-txt (+ y-list-rect margin)
+              cur-y (+ cur-y h-list-rect -1))
+        ;; draw rectangle for list
+        (sdl:with-rectangle (rect (sdl:rectangle :x x-rect :y y-list-rect :w w-rect :h h-list-rect))
+          (sdl:fill-surface sdl:*black* :template rect)
+          (sdl:draw-rectangle rect :color sdl:*white*))
+        ;; draw list
+        (loop with final-color-list = ()
+              for i from 0 below (length line-list) do
+                (if (= i cur-sel) 
+                  (if select-color-func
+                    (push (funcall select-color-func cur-sel) final-color-list)
+                    (push sdl:*yellow* final-color-list))
+                  (if color-list
+                    (push (nth i color-list) final-color-list)
+                    (push sdl:*white* final-color-list)))
+              finally
+                 (setf final-color-list (reverse final-color-list))
+                 (draw-selection-list line-list cur-sel (length line-list) x-txt y-list-txt :color-list final-color-list :use-letters t)))
+
+      (when descr-list
+        ;; setting up coordiantes
+        (setf y-descr-rect cur-y
+              h-descr-rect (+ h-descr margin margin)
+              y-descr-txt (+ y-descr-rect margin)
+              h-descr-txt (- h-descr-rect margin margin)
+              cur-y (+ cur-y h-descr-rect -1))
+        ;; draw rectangle for description
+        (sdl:with-rectangle (rect (sdl:rectangle :x x-rect :y y-descr-rect :w w-rect :h h-descr-rect))
+          (sdl:fill-surface sdl:*black* :template rect)
+          (sdl:draw-rectangle rect :color sdl:*white*))
+        ;; draw description text
+        (sdl:with-rectangle (rect (sdl:rectangle :x x-txt :y y-descr-txt :w w-txt :h h-descr-txt))
+          (write-text (nth cur-sel descr-list) rect :color sdl:*white*)))
       
-      (sdl:draw-string-solid-* str (+ x 5) (- (+ y h) (sdl:char-height sdl:*default-font*) 2) :color sdl:*white*))
-    (sdl:update-display)))
+      (when prompt-list
+        ;; setting up coordiantes
+        (setf y-prompt-rect cur-y
+              h-prompt-rect (+ h-prompt margin margin)
+              y-prompt-txt (+ y-prompt-rect margin)
+              h-prompt-txt (- h-prompt-rect margin margin)
+              cur-y (+ cur-y h-prompt-rect -1))
+        ;; draw rectangle for prompt
+        (sdl:with-rectangle (rect (sdl:rectangle :x x-rect :y y-prompt-rect :w w-rect :h h-prompt-rect))
+          (sdl:fill-surface sdl:*black* :template rect)
+          (sdl:draw-rectangle rect :color sdl:*white*))
+        ;; draw text for prompt
+        (sdl:with-rectangle (rect (sdl:rectangle :x x-txt :y y-prompt-txt :w w-txt :h h-prompt-txt))
+          (write-text (return-prompt-str (nth cur-sel prompt-list) cur-sel :can-esc can-esc) rect)))
+      ))
+  (sdl:update-display))
 
 (defmethod run-window ((win select-obj-window))
   (tagbody

@@ -177,12 +177,47 @@
                                                            t
                                                            nil))
                                            :on-trigger #'(lambda (world)
-                                                           (trigger-game-over world
-                                                                              :final-str "Enemies of Primordials eliminated."
-                                                                              :score (calculate-player-score 1430)
-                                                                              :if-player-won t
-                                                                              :player-msg (format nil "Congratulations! You have won the game!~%")
-                                                                              :game-over-type :game-over-eater-won)
+                                                           (let ((if-player-won (if (or (= (loyal-faction *player*) +faction-type-angels+)
+                                                                                        (= (loyal-faction *player*) +faction-type-church+))
+                                                                                  t
+                                                                                  nil)))
+                                                             (trigger-game-over world
+                                                                                :final-str "Enemies of Primordials eliminated."
+                                                                                :score (calculate-player-score 1430)
+                                                                                :if-player-won if-player-won
+                                                                                :player-msg (if if-player-won
+                                                                                              (format nil "Congratulations! Your have won!~%")
+                                                                                              (format nil "Curses! Your faction has lost!~%"))
+                                                                                :game-over-type :game-over-eater-won))
+                                                           )))
+
+(set-game-event (make-instance 'game-event :id +game-event-win-for-eater-ascend+
+                                           :descr-func #'(lambda ()
+                                                           "To win, get at least . To lose, die.")
+                                           :disabled nil
+                                           :on-check #'(lambda (world)
+                                                         (if (or (and (= (loyal-faction *player*) +faction-type-eater+)
+                                                                      (zerop (total-demons (level world)))
+                                                                      (zerop (total-angels (level world))))
+                                                                 (and (/= (loyal-faction *player*) +faction-type-eater+)
+                                                                      (> (nth +faction-type-military+ (total-faction-list (level world))) 0)
+                                                                      (zerop (total-demons (level world)))
+                                                                      (zerop (total-angels (level world)))))
+                                                           t
+                                                           nil))
+                                           :on-trigger #'(lambda (world)
+                                                           (let ((if-player-won (if (or (= (loyal-faction *player*) +faction-type-angels+)
+                                                                                        (= (loyal-faction *player*) +faction-type-church+))
+                                                                                  t
+                                                                                  nil)))
+                                                             (trigger-game-over world
+                                                                                :final-str "Enemies of Primordials eliminated."
+                                                                                :score (calculate-player-score 1430)
+                                                                                :if-player-won if-player-won
+                                                                                :player-msg (if if-player-won
+                                                                                              (format nil "Congratulations! Your have won!~%")
+                                                                                              (format nil "Curses! Your faction has lost!~%"))
+                                                                                :game-over-type :game-over-eater-won))
                                                            )))
 
 (set-game-event (make-instance 'game-event :id +game-event-win-for-ghost+

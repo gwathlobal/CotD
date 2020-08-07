@@ -1,4 +1,5 @@
-- 'u' to bring up a list of usable items (and use them from it, instead of going to inventory)
+- TODO: the eater should get all available mutations in missions where neither demons nor angels are present at the start
+- TODO: find a better way of handling primordial autowin situation in mission Satanist elimination (right now this mission is hacked not be available for quick missions)
 - Sectors controlled by neutral powers creatures who kill everybody in their way
 - Command for demons - seduce human army and disband it (maybe if there corrupted angels present in the demon army)
 - Move from lispbuidlder-sdl to sdl2 or trivial-gamekit
@@ -8,7 +9,6 @@
 - Demons are too weak. Add microbial shroud ability to them releases gas around a demon and heals and gives armor to demons inside the gas
 - Chameleon ability for crimson imp (crimson demons?) Render them invisible for a duration + sudden strike ability that deals great damage while chameleoned
 - Blinding cloud ability that greatly impairs seeing inside it and reduces hit chance for ranged attacks
-- TODO: find a better way of handling primordial autowin situation in mission Satanist elimination (right now this mission is hacked not be available for quick missions)
 - Military can not have delayed arrival if no army is present
 - Worm-like multitile creatures in hell that devour you while you are inside
 - BUG: Fix the bug with military movement on campaign map

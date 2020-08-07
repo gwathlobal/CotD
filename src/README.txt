@@ -138,6 +138,7 @@ KEYBINDINGS
  [5], [.]                         - Wait a turn
 
  [a]                              - Invoke ability 
+ [u]                              - Use an item from inventory
  [l]                              - Look mode
  [f]                              - Fire mode
  [r]                              - Reload 

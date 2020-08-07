@@ -16,6 +16,7 @@
 (defconstant +cotd-unicode-latin-n-small+ 110)
 (defconstant +cotd-unicode-latin-r-small+ 114)
 (defconstant +cotd-unicode-latin-s-small+ 115)
+(defconstant +cotd-unicode-latin-u-small+ 117)
 (defconstant +cotd-unicode-greater-than-sign+ 62)
 (defconstant +cotd-unicode-less-than-sign+ 60)
 

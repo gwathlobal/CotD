@@ -655,7 +655,73 @@
                                   (eq unicode +cotd-unicode-question-mark+)
                                   (and (sdl:key= key :sdl-key-slash) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
                                   (and (sdl:key= key :sdl-key-7) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0)))
-			  (setf *current-window* (make-instance 'help-window :return-to *current-window*)))		
+			  (setf *current-window* (make-instance 'help-window :return-to *current-window*)))
+                        ;;------------------
+			;; select item to use - u
+                        (when (or (and (sdl:key= key :sdl-key-u))
+                                  (eq unicode +cotd-unicode-latin-u-small+))
+                          (when (can-move-if-possessed *player*)
+                            (setf (can-move-if-possessed *player*) nil)
+                            (go exit-loop))
+                          
+                          (let ((item-name-list nil)
+                                (item-descr-list nil)
+                                (item-prompt-list nil)
+                                (item-color-list nil)
+                                (mob-items nil))
+
+                            ;; filter item list to leave only usable ones
+                            (setf mob-items (loop for item-id in (inv *player*)
+                                                  for item = (get-item-by-id item-id)
+                                                  when (and (on-check-applic item)
+                                                            (on-use item)
+                                                            (funcall (on-check-applic item) *player* item))
+                                                    collect item))
+                            
+                            (if mob-items
+                              (progn
+                                ;; populate item name list 
+                                (setf item-name-list
+                                      (loop for item in mob-items
+                                            collect (capitalize-name (prepend-article +article-a+ (visible-name item)))))
+
+                                ;; populate item descripiton list
+                                (setf item-descr-list
+                                      (loop for item in mob-items
+                                            collect (descr item)))
+
+                                ;; populate item color list
+                                (setf item-color-list
+                                      (loop for item in mob-items
+                                            collect sdl:*white*))
+
+                                ;; populate item prompt list
+                                (setf item-prompt-list
+                                      (loop for item in mob-items
+                                            collect #'(lambda (cur-sel)
+                                                        (declare (ignore cur-sel))
+                                                        "[Enter] Use  [Escape] Cancel")))
+                                
+                                ;; display the window with the list
+                                (setf *current-window* (make-instance 'select-obj-window 
+                                                                      :return-to *current-window*
+                                                                      :w (- *window-width* 300)
+                                                                      :header-line "Choose item:"
+                                                                      :color-list item-color-list
+                                                                      :select-color-func #'(lambda (cur-sel)
+                                                                                             (declare (ignore cur-sel))
+                                                                                             sdl:*yellow*)
+                                                                      :enter-func #'(lambda (cur-sel)
+                                                                                      (let ((item (get-inv-item-by-pos (inv *player*) cur-sel)))
+                                                                                        (window-use-item item win)))
+                                                                      :line-list item-name-list
+                                                                      :descr-list item-descr-list
+                                                                      :prompt-list item-prompt-list)))
+                              (progn
+                                ;; no items - display a message
+                                (add-message (format nil "You have no items to use.~%"))
+                                ))
+			    ))
                         ;;------------------
 			;; select abilities - a
                         (when (or (and (sdl:key= key :sdl-key-a))

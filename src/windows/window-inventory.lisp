@@ -70,40 +70,6 @@
           (t (sdl:initialise-default-font sdl:*font-6x13*))))
       ))
 
-  ;; drawing some player chars
-  ;(let ((str (make-array (list 0) :element-type 'character :adjustable t :fill-pointer t)))
-  ;  (format str "")
-  ;  (when (> (length (weapons *player*)) 0)
-  ;    (format str "[Attack]~%")
-  ;    (dolist (weapon-params (weapons *player*))
-  ;	(format str " ~A-~A (Crit: ~A%)~%" (get-dmg-min-from-list weapon-params) (get-dmg-max-from-list weapon-params) (get-dmg-crit-from-list weapon-params)))
-  ;    (format str " Acc: ~A% Spd: ~A~%" (accuracy *player*) (att-spd *player*)))
-  ;  
-  ;  (when (> (length (ranged *player*)) 0)
-  ;    (format str "[Ranged]~%")
-  ;    (dolist (weapon-params (ranged *player*))
-  ;	(format str " ~A-~A (Crit: ~A%) (Acc: ~A% Spd: ~A)~%" (get-dmg-min-from-list weapon-params) (get-dmg-max-from-list weapon-params) (get-dmg-crit-from-list weapon-params) (get-ranged-acc *player*)
-  ;		(get-dmg-speed-from-list weapon-params))))
-  ;  
-  ;  (format str "[Defense]~%")
-  ;  (format str " Dodge: ~A% Block: ~A%~%" (cur-dodge *player*) (cur-block *player*))
-  ;  (format str " Protection: ~A Clothing: ~A~%" (cur-armor *player*) (cur-cloth *player*))
-    
-    ;(when (> (length (armors *player*)) 0)
-     ; (format str "[Armor]~%")
-  ;;    (dolist (item (armors *player*))
-;;	(format str "~A~%" (get-line-descr item)))
-      ;(format str "~%"))
-
-    ;(when (> (length (shields *player*)) 0)
-     ; (format str "[Shield]~%")
-      ;(dolist (item (shields *player*))
-;	(format str "~A~%" (get-line-descr item)))
- ;     (format str "~%"))
-  ;  
-  ;  (sdl:with-default-font ((sdl:initialise-default-font sdl:*font-6x13*))
-  ;	(write-text str (sdl:rectangle :x 330 :y 250 :w 295 :h 215))))
-
   (sdl:update-display))
 
 (defmethod run-window ((win inventory-window))
@@ -164,39 +130,11 @@
                           ))
                        ;; u - use an item
                        ((sdl:key= key :sdl-key-u)
-                        (when (and (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win)))
-                                   (on-use (get-inv-item-by-pos (inv *player*) (cur-inv win)))
-                                   (funcall (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win))) *player* (get-inv-item-by-pos (inv *player*) (cur-inv win))))
-                          (cond
-                            ((map-select-func (get-inv-item-by-pos (inv *player*) (cur-inv win)))
-                             (progn
-                               (setf *current-window* (make-instance 'map-select-window 
-                                                                     :return-to *current-window*
-                                                                     :start-map-select (start-map-select-func (get-inv-item-by-pos (inv *player*) (cur-inv win)))
-                                                                     :cmd-str (list "[Enter] Use  "
-                                                                                    "")
-                                                                     :exec-func #'(lambda ()
-                                                                                    (if (funcall (map-select-func (get-inv-item-by-pos (inv *player*) (cur-inv win)))
-                                                                                                 (get-inv-item-by-pos (inv *player*) (cur-inv win)))
-                                                                                      (progn
-                                                                                        (setf *current-window* (return-to win))
-                                                                                        (make-output *current-window*)
-                                                                                        t)
-                                                                                      (progn
-                                                                                        nil)))
-                                                                     ))
-                               (make-output *current-window*)
-                               (when (run-window *current-window*)
-                                 (return-from run-window nil))))
-                            (t
-                             (progn
-                               (clear-message-list (level/small-message-box (level *world*)))
-                               (mob-use-item *player* nil (get-inv-item-by-pos (inv *player*) (cur-inv win)))
-                               (setf *current-window* (return-to win))
-                               (make-output *current-window*)
-                               (return-from run-window nil))))
-                          ))
-                       )
+                        (let ((item (get-inv-item-by-pos (inv *player*) (cur-inv win)))
+                              (result))
+                          (setf result (window-use-item item (return-to win)))
+                          (when result
+                            (return-from run-window nil)))))
                      (make-output *current-window*)
                      
                      )

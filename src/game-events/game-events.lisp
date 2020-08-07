@@ -78,6 +78,8 @@
 (defconstant +game-event-malseraphs-power-infusion+ 66)
 (defconstant +game-event-campaign-malseraphs-focus+ 67)
 
+(defconstant +game-event-win-for-eater-ascend+ 68)
+
 (defenum:defenum game-over-enum (:game-over-player-dead
                                  :game-over-demons-won
                                  :game-over-angels-won

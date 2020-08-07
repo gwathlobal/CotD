@@ -867,3 +867,31 @@
                   do
                      (draw-world-map-cell sector x1 y1 :reveal-lair reveal-lairs))))
   )
+
+(defun window-use-item (item success-return-win)
+  (cond
+    ((map-select-func item)
+     (progn
+       (setf *current-window* (make-instance 'map-select-window 
+                                             :return-to *current-window*
+                                             :start-map-select (start-map-select-func item)
+                                             :cmd-str (list "[Enter] Use  "
+                                                            "")
+                                             :exec-func #'(lambda ()
+                                                            (if (funcall (map-select-func item)
+                                                                         item)
+                                                              (progn
+                                                                (setf *current-window* success-return-win)
+                                                                (make-output *current-window*)
+                                                                t)
+                                                              (progn
+                                                                nil)))))
+       (make-output *current-window*)
+       (run-window *current-window*)))
+    (t
+     (progn
+       (clear-message-list (level/small-message-box (level *world*)))
+       (mob-use-item *player* nil item)
+       (setf *current-window* success-return-win)
+       (make-output *current-window*)
+       t))))
