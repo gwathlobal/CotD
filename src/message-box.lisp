@@ -36,6 +36,7 @@
 
 (defun prepend-article-func (article name &rest args)
   (let ((article-str (cond
+                       ((and (= article +article-a+) (find (char (string-downcase name) 0) '(#\a #\u #\o #\i #\e))) "an ")
                        ((= article +article-a+) "a ")
                        ((= article +article-the+) "the ")
                        (t ""))))

@@ -1842,14 +1842,6 @@
   (setf (cur-sight mob) (base-sight mob))
   
   (setf (face-mob-type-id mob) (mob-type mob))
-  (when (= (mob-type mob) +mob-type-demon+) 
-    (set-name mob)
-    (unless (eq mob *player*)
-      (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "It will be hereby known as ~A! " (name mob))
-                             :color sdl:*white*
-                             :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
-                                           :singlemind)))))
-  
   (set-cur-weapons mob)
   (adjust-abilities mob)
   (adjust-dodge mob)
@@ -1857,6 +1849,15 @@
   (adjust-m-acc mob)
   (adjust-r-acc mob)
   (adjust-sight mob)
+
+  (when (or (= (mob-type mob) +mob-type-demon+)
+            (= (mob-type mob) +mob-type-shadow-demon+)) 
+    (set-name mob)
+    (unless (eq mob *player*)
+      (print-visible-message (x mob) (y mob) (z mob) (level *world*) (format nil "It will be hereby known as ~A! " (get-qualified-name mob))
+                             :color sdl:*white*
+                             :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
+                                           :singlemind)))))
 
   ;; if the mob has no climbing ability - disable it
   (when (not (mob-ability-p mob +mob-abil-climbing+))

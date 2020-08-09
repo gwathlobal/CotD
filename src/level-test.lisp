@@ -162,11 +162,11 @@
   (set-terrain-* (level world) 48 19 1 +terrain-floor-creep+)
   (set-terrain-* (level world) 49 19 1 +terrain-floor-creep-bright+)
   
-  (setf *player* (make-instance 'player :mob-type +mob-type-angel+ :x 47 :y 18 :z 1))
+  (setf *player* (make-instance 'player :mob-type +mob-type-imp+ :x 47 :y 18 :z 1))
   (add-mob-to-level-list (level world) *player*)
   
   (let (;(soldier (make-instance 'mob :mob-type +mob-type-satanist+ :x 49 :y 20 :z 1))
-        ;(demon (make-instance 'mob :mob-type +mob-type-demon+ :x 45 :y 15 :z 1))
+        (demon (make-instance 'mob :mob-type +mob-type-imp+ :x 45 :y 15 :z 1))
         ;(angel (make-instance 'mob :mob-type +mob-type-man+ :x 46 :y 16 :z 1))
         )
     (setf (cur-fp *player*) 15)
@@ -192,7 +192,7 @@
     ;(setf (cur-fp soldier) 20)
     ;(set-mob-effect soldier :effect-type-id +mob-effect-blessed+ :actor-id (id soldier))
     ;(add-mob-to-level-list (level world) soldier)
-    ;(add-mob-to-level-list (level world) demon)
+    (add-mob-to-level-list (level world) demon)
     ;(add-mob-to-level-list (level world) angel)
     
     ;(setf (mimic-id-list *player*) (list (id angel) (id soldier) (id demon)))
