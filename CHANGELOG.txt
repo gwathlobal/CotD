@@ -1,7 +1,7 @@
 CHANGELOG
 
-- Fixed the bug with crashing at the start of a mission in hell dimension.
-- Fixed the issue when Satanist Elimination missions could end because the Primordials instant win. Now, the Primordials goal for this mission shall be eating a certain number of corpses.
+- Fixed the bug with crashing at the start of a mission in a hell dimension.
+- Fixed the issue when Satanist Elimination missions could end because of the Primordials instant win. Now, the Primordials goal for this mission shall be eating a certain number of corpses.
 - Fixed the bug when a new demon name was not announced when an imp evolved into a demon.
 - In Demonic Raid and Demonic Thievery missions, the direction to the nearest portal shall be indicated when playing for demons and satanists.
 - During Satanist Elimination missions, satanists shall flee from enemies so that they do not get killed too quickly.

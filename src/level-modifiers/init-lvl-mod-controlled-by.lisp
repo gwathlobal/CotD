@@ -79,7 +79,7 @@
                                                   )
                     :always-present-func #'(lambda (world-sector mission world-time)
                                              (declare (ignore mission world-time))
-                                             (if (world-sector-corrupted-p world-sector)
+                                             (if (world-sector-hell-p world-sector)
                                                t
                                                nil))
                     )

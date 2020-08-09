@@ -1,5 +1,7 @@
 (in-package :cotd)
 
+(defparameter *save-version* 1)
+
 (defenum:defenum save-game-type-enum (:save-game-campaign
                                       :save-game-scenario))
 
@@ -111,7 +113,7 @@
                                                                            (if (eql save-type :save-scenario)
                                                                              (format nil ", T: ~A" (player-game-time (level *world*)))
                                                                              ""))
-                                                   :params ())))
+                                                   :params (list :version *save-version*))))
         (ensure-directories-exist dir-pathname)
         (cl-store:store serialized-save-descr descr-file-pathname)
         (cl-store:store serialized-game game-file-pathname))

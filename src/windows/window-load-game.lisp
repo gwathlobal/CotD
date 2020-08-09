@@ -134,24 +134,35 @@
                          ;; enter - load selected game
                          ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
                           (when (and game-pathname-list (nth cur-sel game-pathname-list))
-                            (let ((saved-game nil))
-                              (setf saved-game (load-game-from-disk (nth cur-sel game-pathname-list)))
-                              (if saved-game
+                            (let ((saved-game nil)
+                                  (serialized-save-descr (load-descr-from-disk (nth cur-sel descr-pathname-list))))
+                              (if (and serialized-save-descr
+                                         (not (eq (getf (serialized-save-descr/params serialized-save-descr) :version) *save-version*)))
                                 (progn
                                   (setf *current-window* (make-instance 'display-msg-window
-                                                                        :msg-line (format nil "Save game loaded successfully!" )
-                                                                        :w (- *window-width* 400)))
-                                  (make-output *current-window*)
-                                  (run-window *current-window*)
-                                  (setf (game-manager/game-slot-id *game-manager*) (nth cur-sel game-slot-list))
-                                  (return-from run-window (serialized-game/save-type saved-game)))
-                                (progn
-                                  (setf *current-window* (make-instance 'display-msg-window
-                                                                        :msg-line (format nil "Failed to load the game!~%The save file is corrupted and it is recommended to remove it." )
+                                                                        :msg-line (format nil "Failed to load the game!~%The save file is incompatible with the current version of the game and it is recommended to remove it." )
                                                                         :w (- *window-width* 400)))
                                   (make-output *current-window*)
                                   (run-window *current-window*))
-                                )))
+                                (progn
+                                  (setf saved-game (load-game-from-disk (nth cur-sel game-pathname-list)))
+                                  (if saved-game
+                                    (progn
+                                      (setf *current-window* (make-instance 'display-msg-window
+                                                                            :msg-line (format nil "Save game loaded successfully!" )
+                                                                            :w (- *window-width* 400)))
+                                      (make-output *current-window*)
+                                      (run-window *current-window*)
+                                      (setf (game-manager/game-slot-id *game-manager*) (nth cur-sel game-slot-list))
+                                      (return-from run-window (serialized-game/save-type saved-game)))
+                                    (progn
+                                      (setf *current-window* (make-instance 'display-msg-window
+                                                                            :msg-line (format nil "Failed to load the game!~%The save file is corrupted and it is recommended to remove it." )
+                                                                            :w (- *window-width* 400)))
+                                      (make-output *current-window*)
+                                      (run-window *current-window*))
+                                    )))
+                              ))
                            )
                          )
                        (make-output *current-window*)

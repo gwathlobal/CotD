@@ -588,6 +588,7 @@
      (handler-case
          (progn ,@body)
        (t (c)
+         (stop-path-thread)
          (setf *cotd-logging* :log-option-all)
          (setf *cotd-log-level* :info)
          (setup-log)
@@ -608,35 +609,34 @@
 
   (sdl:with-init ()
     (handle-errors-to-ui
-      (progn
-          (cotd-init)
-          (tagbody
-             (setf *quit-func* #'(lambda ()
-                                   (when (and *game-manager*
-                                              *world*)
-                                     (case (game-manager/game-state *game-manager*)
-                                       ((:game-state-custom-scenario) (save-game-to-disk :save-game-scenario :save-scenario))
-                                       ((:game-state-campaign-scenario) (save-game-to-disk :save-game-campaign :save-scenario))
-                                       ((:game-state-campaign-map :game-state-post-scenario) (save-game-to-disk :save-game-campaign :save-campaign))))
-                                   
-                                   (go quit-menu-tag)))
-             (setf *start-func* #'(lambda () (go start-game-tag)))
-             (game-state-init->menu)
-           start-game-tag
-             (loop while t do
-               (case (game-manager/game-state *game-manager*)
-                 (:game-state-main-menu (progn
-                                          (stop-path-thread)
-                                          (with-slots (game-slot-id) *game-manager*
-                                            (setf game-slot-id nil))
-                                          (main-menu)))
-                 ((:game-state-custom-scenario) (scenario-game-loop))
-                 ((:game-state-campaign-map :game-state-campaign-init) (campaign-game-loop))
-                 ((:game-state-campaign-scenario) (scenario-game-loop))
-                 (:game-state-post-scenario (process-post-scenario))))
-           quit-menu-tag
-             (stop-path-thread))
-          (log:info "End program~%")))
+      (cotd-init)
+      (tagbody
+         (setf *quit-func* #'(lambda ()
+                               (when (and *game-manager*
+                                          *world*)
+                                 (case (game-manager/game-state *game-manager*)
+                                   ((:game-state-custom-scenario) (save-game-to-disk :save-game-scenario :save-scenario))
+                                   ((:game-state-campaign-scenario) (save-game-to-disk :save-game-campaign :save-scenario))
+                                   ((:game-state-campaign-map :game-state-post-scenario) (save-game-to-disk :save-game-campaign :save-campaign))))
+                               
+                               (go quit-menu-tag)))
+         (setf *start-func* #'(lambda () (go start-game-tag)))
+         (game-state-init->menu)
+       start-game-tag
+         (loop while t do
+           (case (game-manager/game-state *game-manager*)
+             (:game-state-main-menu (progn
+                                      (stop-path-thread)
+                                      (with-slots (game-slot-id) *game-manager*
+                                        (setf game-slot-id nil))
+                                      (main-menu)))
+             ((:game-state-custom-scenario) (scenario-game-loop))
+             ((:game-state-campaign-map :game-state-campaign-init) (campaign-game-loop))
+             ((:game-state-campaign-scenario) (scenario-game-loop))
+             (:game-state-post-scenario (process-post-scenario))))
+       quit-menu-tag
+         (stop-path-thread))
+      (log:info "End program~%"))
     nil))
 
 (defun setup-log ()
