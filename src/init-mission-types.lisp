@@ -1139,7 +1139,11 @@
                                                                   
                                                         ;; create delayed points from respective features
                                                         (push #'place-delayed-arrival-points-on-level
-                                                              func-list)    
+                                                              func-list)
+
+                                                        ;; add disguises to satanists
+                                                        (push #'add-disguises-to-satanists
+                                                               func-list)
 
                                                         ;; place 1 thief
                                                         (push #'place-ai-thief-on-level

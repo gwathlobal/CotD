@@ -8,7 +8,7 @@
                    )
 
 (set-win-condition :id :win-cond-demonic-raid
-                   :win-formula 200
+                   :win-formula 300
                    :win-func #'(lambda (world win-condition)
                                  (declare (ignore world win-condition))
                                  ;; do not do anything

@@ -257,13 +257,13 @@
   (log:info "Set up turns for delayed arrival")
 
   ;; set up delayed arrival for demons
-  (setf (turns-for-delayed-demons level) 130)
+  (setf (turns-for-delayed-demons level) 90)
 
   (when (find-campaign-effects-by-id world :campaign-effect-demon-delayed)
     (incf (turns-for-delayed-demons level) 30))
   
   ;; set up delayed arrival for angels
-  (setf (turns-for-delayed-angels level) 150)
+  (setf (turns-for-delayed-angels level) 90)
 
   (when (find-campaign-effects-by-id world :campaign-effect-angel-hastened)
     (decf (turns-for-delayed-angels level) 30))
@@ -282,8 +282,8 @@
             (setf nearest-military-sector (aref (cells (world-map world)) x y))))))
     
     (if nearest-military-sector
-      (setf (turns-for-delayed-military level) (+ 120 (* (truncate (get-distance (x nearest-military-sector) (y nearest-military-sector) (x world-sector) (y world-sector))) 20)))
-      (setf (turns-for-delayed-military level) 220)))
+      (setf (turns-for-delayed-military level) (+ 90 (* (truncate (get-distance (x nearest-military-sector) (y nearest-military-sector) (x world-sector) (y world-sector))) 20)))
+      (setf (turns-for-delayed-military level) 130)))
   )
 
 (defun place-custom-portals (level portal-feature-id &key (map-margin 30) (distance 6) (max-portals 1) (test-mob-free t) (test-repel-demons nil) (move-type +connect-map-move-walk+))
@@ -748,3 +748,19 @@
                             :spd nil :silent t)
         )
   )
+
+(defun add-disguises-to-satanists (level world-sector mission world)
+  (declare (ignore world-sector mission world))
+  (log:info "Add disguises to satanists")
+  (loop for mob-id in (mob-id-list level)
+        for mob = (get-mob-by-id mob-id)
+        when (eq (faction mob) +faction-type-satanists+)
+          do
+             (mob-pick-item mob (make-instance 'item :item-type +item-type-disguise+ :x (x mob) :y (y mob) :z (z mob) :qty 1)
+                            :spd nil :silent t)
+             (mob-pick-item mob (make-instance 'item :item-type +item-type-disguise+ :x (x mob) :y (y mob) :z (z mob) :qty 1)
+                            :spd nil :silent t)
+             (mob-pick-item mob (make-instance 'item :item-type +item-type-disguise+ :x (x mob) :y (y mob) :z (z mob) :qty 1)
+                            :spd nil :silent t)
+             (mob-pick-item mob (make-instance 'item :item-type +item-type-medkit+ :x (x mob) :y (y mob) :z (z mob) :qty 1)
+                            :spd nil :silent t)))

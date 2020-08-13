@@ -1,7 +1,10 @@
 CHANGELOG
 
-- Fix the issue when campaign mode was saved as if the player was inside a mission.
-- Fix the bug when the game crashed after a player's took part in a corrupted district a second time.
+- Satanists during the Satanist Elimination mission are given 3 disguises and 1 medkit.
+- When delayed, it now takes angels, demons, and military around 90 turns to arrive.
+- It is necessary to gather 300 pts of flesh now (up from 200) during the Demonic Raid mission.
+- Fix the issue when campaign mode was saved as if the player was inside a mission and not on a campaign map.
+- Fix the bug when the game crashed after a player's mission happened in a corrupted district a second time.
 
 --------------------
 August 9, 2020 v2.0.1
