@@ -1,5 +1,7 @@
 CHANGELOG
 
+- Fix the issue when campaign mode was saved as if the player was inside a mission.
+
 --------------------
 August 9, 2020 v2.0.1
 
