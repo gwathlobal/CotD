@@ -9,14 +9,13 @@ The year is 1915. The Great War thunders in the west, but the Hinterland is not 
 This is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 
 --------------------
-LATEST CHANGES v2.0.1
+LATEST CHANGES v2.0.2
 
-- Fixed the bug with crashing at the start of a mission in a hell dimension.
-- Fixed the issue when Satanist Elimination missions could end because of the Primordials instant win. Now, the Primordials goal for this mission shall be eating a certain number of corpses.
-- Fixed the bug when a new demon name was not announced when an imp evolved into a demon.
-- In Demonic Raid and Demonic Thievery missions, the direction to the nearest portal shall be indicated when playing for demons and satanists.
-- During Satanist Elimination missions, satanists shall flee from enemies so that they do not get killed too quickly.
-- You can press 'u' to bring up a menu of usable items (and use them from this menu, instead of going to inventory).
+- Satanists during the Satanist Elimination mission are given 3 disguises and 1 medkit.
+- When delayed, it now takes angels, demons, and military around 90 turns to arrive.
+- It is necessary to gather 300 pts of flesh now (up from 200) during the Demonic Raid mission.
+- Fix the issue when campaign mode was saved as if the player was inside a mission and not on a campaign map.
+- Fix the bug when the game crashed after a player's mission happened in a corrupted district a second time.
 
 
 --------------------

@@ -1,5 +1,8 @@
 CHANGELOG
 
+--------------------
+August 13, 2020 v2.0.2
+
 - Satanists during the Satanist Elimination mission are given 3 disguises and 1 medkit.
 - When delayed, it now takes angels, demons, and military around 90 turns to arrive.
 - It is necessary to gather 300 pts of flesh now (up from 200) during the Demonic Raid mission.
