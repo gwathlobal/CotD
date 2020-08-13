@@ -1,6 +1,7 @@
 CHANGELOG
 
 - Fix the issue when campaign mode was saved as if the player was inside a mission.
+- Fix the bug when the game crashed after a player's took part in a corrupted district a second time.
 
 --------------------
 August 9, 2020 v2.0.1
