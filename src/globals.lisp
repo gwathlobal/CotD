@@ -53,9 +53,11 @@
                                      (format nil "The Creator was not satisfied with Its first creation for the Firstborn were a mass of multiplying mingling flesh lacking any divine spark. So, the Creator confined them into a Prison Dimension as they were a disgrace to Its will.")
                                      (format nil "The humankind was created the second. They were given flesh as their shell and a soul as their core. But the flesh corrupted the Secondborn nonetheless and they forgot their origin.")
                                      (format nil "The Creator gave the Secondborn a world of their own and let them be. From time to time, it sent spoke to some of the humankind so that they did not go astray. Those humans were declared Prophets by their brethren.")
+                                     (format nil "The Creator installed the Font from where a human soul comes when a human is born and where it returns to when a human dies. The number of souls is finite but they are infinitely divisible. Yet as humans multiplied, their divine spark wore thinner and thinner in them.")
+                                     (format nil "Those Secondborn souls that were not blemished by sinful flesh during their mortal life remain in the Font free from any corrupting action. The souls stained by sin are torn and reforged to feed the demand of the ever-spawning humanity in new souls.")
                                      (format nil "The One takes great pity in humans for they are the Secondborn and possess the divine spark. Yet their fleshly shells make them akin to demons who were imprisoned in Hell for their misguided ways.")
-                                     (format nil "We are the Thirdborn, the pinnacle of creation, the ultimate design of the One. We reject the malign flesh and exist as pure spirits. We are the host of the Creator and allowed into Its inner circle.")
-                                     (format nil "We, the Thirdborn, serve as guards of the Prison Dimension and Its personal messengers. The One confides Its secrets in us and we are granted the privilege to speak to It orderly.")))
+                                     (format nil "We are the Thirdborn, the pinnacle of creation, the ultimate design of the One. We reject the malign flesh and exist as pure spirits. Our numbers are constant and our self can never be reduced.")
+                                     (format nil "We, the Thirdborn, are the host of the Creator and allowed into Its inner circle. We serve as guards of the Prison Dimension and Its personal messengers. The One confides Its secrets in us and we are granted the privilege to speak to It orderly.")))
 
 ;;--------------------
 ;; MOB-TEMPLATE Constants

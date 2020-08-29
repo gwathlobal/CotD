@@ -1,3 +1,4 @@
+- An ability (a gaze) that triggers (damages, etc) when an enemy which is seen by the unit with the ability moves
 - Sectors controlled by neutral powers creatures who kill everybody in their way
 - Command for demons - seduce human army and disband it (maybe if there corrupted angels present in the demon army)
 - Move from lispbuidlder-sdl to sdl2 or trivial-gamekit
