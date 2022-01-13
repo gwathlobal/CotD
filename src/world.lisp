@@ -7,11 +7,11 @@
 (defclass level ()
   ((player-game-time :initform 0 :accessor player-game-time)
 
-   (terrain :initform nil :accessor terrain :type simple-array) ; of type int, which is a idx of terrain-type
-   (memo :initform nil :accessor memo :type simple-array) ; of type list containing (idx of glyph, color of glyph, color of background, visibility flag, revealed flag)
-   (mobs :initform nil :accessor mobs :type simple-array) ; of type fixnum, which is the id of a mob
-   (items :initform nil :accessor items :type simple-array) ; of type (<item id> ...)
-   (features :initform nil :accessor features :type simple-array) ; of type (<feature id> ...)
+   (terrain :initform nil :accessor terrain :type (or simple-array null)) ; of type int, which is a idx of terrain-type
+   (memo :initform nil :accessor memo :type (or simple-array null)) ; of type list containing (idx of glyph, color of glyph, color of background, visibility flag, revealed flag)
+   (mobs :initform nil :accessor mobs :type (or simple-array null)) ; of type fixnum, which is the id of a mob
+   (items :initform nil :accessor items :type (or simple-array null)) ; of type (<item id> ...)
+   (features :initform nil :accessor features :type (or simple-array null)) ; of type (<feature id> ...)
    (mob-id-list :initarg :mob-id-list :initform (make-list 0) :accessor mob-id-list)
    (item-id-list :initarg :item-id-list :initform (make-list 0) :accessor item-id-list)
    (feature-id-list :initarg :feature-id-list :initform (make-list 0) :accessor feature-id-list)
@@ -180,7 +180,7 @@
            (funcall (can-merge-func feature) level feature)
            (merge-func feature))
     (progn
-      ;;(format t "MERGE: ~A [~A] (~A ~A ~A)~%" (name feature) (id feature) (x feature) (y feature) (z feature))
+      ;;(format t "MERGE: ~A [~A] (~A ~A ~A)~%" (name feature) (id featur e) (x feature) (y feature) (z feature))
       (funcall (merge-func feature) level feature))
     (progn
       ;;(format t "~A [~A] (~A ~A ~A)~%" (name feature) (id feature) (x feature) (y feature) (z feature))
@@ -490,7 +490,7 @@
   ((world-game-time :initform 0 :accessor world-game-time)
    (turn-finished :initform nil :accessor turn-finished)
    
-   (level :initform nil :accessor level :type level)
+   (level :initform nil :accessor level :type (or level null))
    
    (game-events :initform () :accessor game-events)
 

@@ -34,7 +34,7 @@
 
 (defclass campaign-effect ()
   ((id :initarg :id :accessor campaign-effect/id :type campaign-effect-enum)
-   (cd :initform nil :initarg :cd :accessor campaign-effect/cd :type '(or null fixnum))
+   (cd :initform nil :initarg :cd :accessor campaign-effect/cd :type (or null fixnum))
    (param :initform nil :initarg :param :accessor campaign-effect/param)
    ))
 

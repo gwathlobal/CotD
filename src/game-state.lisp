@@ -12,7 +12,7 @@
 
 (defclass game-manager ()
   ((game-state :initform :game-state-start :accessor game-manager/game-state :type game-state-enum)
-   (game-slot-id :initform nil :initarg :game-slot-id :accessor game-manager/game-slot-id :type '(or null fixnum))))
+   (game-slot-id :initform nil :initarg :game-slot-id :accessor game-manager/game-slot-id :type (or null fixnum))))
 
 (defun game-state-start->init ()
   (with-slots (game-state) *game-manager*

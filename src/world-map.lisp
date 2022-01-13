@@ -5,7 +5,7 @@
 (defparameter *max-y-world-map* 5)
 
 (defclass world-map ()
-  ((cells :initform nil :accessor cells :type simple-array) ;; array of world-sector
+  ((cells :initform nil :accessor cells :type (or simple-array null)) ;; array of world-sector
    (random-state :initform (make-random-state t) :accessor world-map/random-state)
    ))
 
