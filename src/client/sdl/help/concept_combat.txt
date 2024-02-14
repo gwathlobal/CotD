@@ -1,0 +1,53 @@
+RANGED COMBAT
+
+Some characters are capable of ranged combat. When they shoot, the game determines if they hit or missed the target. Their accuracy is based on the base accuracy of their weapon and is reduced for each tile away from the shooter by 5%. Note that targets standing in the neighboring tile will always be hit regardless of accuracy.
+
+Missing bullets tend to disperse around the target, the farther the target - the greater the dispersion. This means that you can hit some passer-by standing near your target (this is especially true for machine-gunners who have decreased accuracy and can shoot six bullets at once).
+
+Once the bullet's destination is determined, it flies to it until it hits an obstacle. Note that certain terrain tiles (like windows) provide a line of sight but block any line of fire, so you will always miss whenever you try to shoot through a window.
+
+
+ARMOR VS DAMAGE
+
+Whenever weapon damage is applied, the game checks the target's resistances to this damage type. Resistances are subdivided into two parts - direct resistances and percentage resistances.
+
+First, the amount of damage is reduced flatly by the amount of direct resistance (for example, 4 points of iron damage against 1 point of direct iron resistance makes 3). Then the result is further reduced by the percentage resistance, with the final damage amount rounded down (for example, 3 points of iron damage against 50% iron resistance makes 1.5, rounded down to 1). This final damage is applied to the target. 
+
+Note that only weapon damage is mitigated by armor. Other sources of damage (like burns from blessings) are applied directly to target's hit points.
+
+
+MOUNTED COMBAT
+
+Some units (horses and fiends) move in a special way - they have momentum. That means they have speed and direction where they move. The following rules apply:
+ - If a unit starts to move in a certain direction, it gains speed. 
+ - If a unit skips a turn, it will continue to move in the chosen direction. 
+ - If a unit tries to move in the opposite direction, it will lose speed. 
+ - If a unit tries to move sideways at high speed, it will change direction somewhat but will lose speed at the same time. 
+Maximum speed is limited to 2 (that means that if a horse has the speed of 2, it will cover 2 tiles in the chosen direction during its turn).
+
+If a unit with momentum hits an obstacle it will lose its speed completely and try to push the obstacle in the direction of its movement. While walls and other terrain features can not be pushed, other units are movable. If the pushed unit belongs to another faction, it will be also attacked.
+
+Units with momentum may also be used as mounts. All demons may mount fiends, and all military units (except machine-gunners) may mount horses. This will provide the benefits of a unit with momentum while allowing the rider to engage in other activities (for example, once a scout has gained speed, he will be able to shoot his target while continuing to move in the chosen direction). Mounts also serve as meatshields as the attacker has a 50% chance to attack the mount instead of the rider.
+
+Note however that engaging in combat while mounted invokes a 20% accuracy penalty to ranged attacks.
+
+
+MULTI-TILE CREATURES
+
+Some units (a Gargantaur) are so huge that they occupy several tiles on the level. This implies the following:
+ - They will not be able to get into narrow spaces (like some streets or the inside of the houses).
+ - They are much easier to be hit with ranged weapons (even if the bullets disperse, this are still likely to land on a tile which the creature occupies).
+ - They are able to move only in the direction they face (unlike smaller creatures). So if they first move south and then want to go north, it will require of them to make a 180-degree turn.
+ - They can melee attack several enemies at the same time. For example, a Gargantaur of size 3x3 can crush up to 3 units standing next to it.
+ 
+Multi-tile units may also serve as mounts (for example, Angels can dominate Gargantaurs). Riding one will give excellent protection against melee attacks, but you will still have to cope with the creature's size and the necessity to turn it around to move in the desired direction.
+
+
+IRRADIATION EFFECT
+
+The irradiation effect only seems to be pretty harmless. Apart from Malseraph's puppets who can use their Fission ability to blow up irradiated characters, high levels of irradiation may cause you to skip turns due to being sick.
+There is also a small chance that irradiation will cause a minor malmutation. These malmutations can be:
+ - light emittance makes you always emit light and illuminate everything around you,
+ - vulnerability to fire gives you -2 direct fire resistance,
+ - vulnerability to vorpal gives you -2 direct vorpal resistance.
+Only the Eater of the dead can voluntarily get rid of these mutations with their Cure mutation ability. Malseraph can sometimes cure all malmutations of its followers. 

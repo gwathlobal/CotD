@@ -1,0 +1,87 @@
+THE PLOT
+The year is 1915. The Great War thunders in the west, but the Hinterland is not safe either. The Pandemonium Hierarchy invaded the City with the intention to slay its inhabitants. The Celestial Communion had to intervene. Now both sides are bent to fight each other until none of the opponents remain.
+Choose your side and join the fray!
+
+GENERAL TIPS
+ - You are not alone here - there are allies that can help.
+ - Your enemies are able to hide their true appearance, so observe and learn their tactics to avoid nasty surprises.
+ - You can attack your allies but not members of your own faction. This does not extend to demons - they can attack anyone.
+ - Angels and Demons gain power when killing each other proportional to the strength of the slain adversary.
+ - Stockpile power to get promoted or spend it on available abilities.
+ - The objective depends on the mission scenario.
+  
+THE CELESTIAL COMMUNION
+ - The ranks of the Celestial Communion are filled with Chrome angels who can temporarily transform themselves into Avatars of Brilliance.
+ - A Chrome angel can easily dispatch lowly Imps. To deal with more powerful targets, invoke the Avatar of Brilliance powers. 
+ - Some of the angels grow tired of the ever-humming singlemind and prefer more limited but deeper bonds. These are Trinity mimics, a group of three angels who act as one.
+ - You can bless humans to gain power.
+ - You are able to hide your divinity and disguise yourself as a human to lure enemies to you.
+ - Your strength is the ability to heal yourself when needed. You are also able to see what all other Angels see.
+ 
+THE PANDEMONIUM HIERARCHY
+ - The Pandemonium Hierarchy is represented with two rows of units: a Crimson imp, Crimson demon, and Archdemon, on the one hand, and a Shadow imp, Shadow demon, and Shadow devil, on the other.
+ - You start as a puny Crimson or Shadow imp who is no match for a Chrome Angel. Run or summon help when confronted by one.
+ - Crimson imps and demons are able to possess humans. Once "in possession", you will appear as this human to everybody else. Archdemons no longer need this cowardly tactic and can not possess anybody.
+ - Shadow creatures are unable to possess mortals but can teleport around unlit areas.
+ - Apart from the usual demons stand the servants of the whimsical Demon God Malseraph - those who are called Malseraph's puppets. They lack some powers of other demons but try to please their God to receive its aid. 
+ - You kill humans (or fellow demons, by the way) to gain power and heal.
+ - Beware of blessed ones. When you touch them, you will burn and consume the blessing. Blessed humans are immune to possession. Though the damage from blessings is minor, it may prove fatal in some situations.
+ - Your strength is the ability to summon allies to yourself to gang up on your enemy. 
+ - Remember, "friendly fire" is allowed for your faction. Be cautious when walking side-by-side with your "friends".
+ 
+OUTSIDER BEASTS
+ - Outsider beasts are half-sentient creatures of various origin that will actively attack everything in sight, including their own kin.
+ - The demonic invasion has attracted Fiends. If a demon gets near one, it will be able to dominate and ride it as a mount.
+ - The gargantaur has descended from the celestial spheres. It is a huge (3x3) creature, which is able to burn enemies' minds, heal and teleport itself. The destruction of the Gargantaur is not required for the Demons to win. Angels may dominate these at the cost of their own health, but in return, they will be able to invoke the gargantaur's mind burn.
+ - The wisps have been exposed to the celestial light for so long that they are completely blind. Yet they navigate using their hearing and are able to fly. Wisps will not attack each other and the Angels.
+
+PRIMORDIALS
+ - In the taiga bogs and forests of the East live strange creatures that had walked the Earth before any ape could be called sapient. Now they slumber, waiting for the time when the cycle of humankind is complete and they are able to reign the land once more. The natives fear, worship and offer sacrifices to them. But when the outsiders from beyond Earth arrived in the City, the primordials rose once more to drive the invaders out of what they consider their own domain.
+ - You can start as an Eater of the dead, a tentacled monster, weakened by the millennia of inactivity.
+ - You can start as a Skinchanger, who can shift between different forms depending on the situation.
+ - You are able to feast on the corpses of the fallen to gain HP and power and mutate yourself gaining various abilities.
+ - You equally hate everybody in the City and are hated by everyone. 
+ - Your goal is to destroy all angels and demons.
+ 
+CITIZENS OF THE CITY
+ - Humans are frail and weak. Citizens of the City will try to flee whenever they see an enemy.
+
+THE CHURCH
+ - Priests have an array of divine abilities. They are able to grant divine shield to allies, scorch and reveal the true form of all enemies in sight, slow and smite enemies. The divine shield provides a one-time protection from any harm.
+ - Whenever a priest gives humans a divine shield, they will start to follow the preacher.
+ - Smiting damage increases with the number of humans the priest sees.
+ - Priests can also give fire-based melee attacks to themselves and their followers by praying for wrath.
+ - Priests start in the church.
+ 
+THE MILITARY 
+ - The military arrives towards the end of the battle for the City. It is allied with the citizens but opposes both angels and demons. 
+ - The military is comprised of five units: Soldiers, Scouts, Sergeants, Machine-gunners, and Chaplains. All of them are capable of ranged combat but do not gain power whatsoever.
+ - Soldiers are armed with single-shot rifles and need to reload every other turn.
+ - Scouts have a more powerful rifle than soldiers, are able to reveal the true form of a single enemy, call for an artillery strike and enter the battle riding a horse.
+ - Sergeants wield six-round revolvers that deal less damage than a rifle but do not need to be reloaded so often.
+ - Machine-gunners carry a light machine gun capable of firing the whole magazine in one turn. Alas, its accuracy leaves to be desired. 
+ - Chaplains are also armed with six-round revolvers but, more importantly, are able to pray to reveal disguised supernatural enemies or to grant divine protection to allies (similar to priests). They can also issue a "Follow me" order to lead other troops across the battlefield.
+ - If you side with the military, you may start as a Chaplain or as a Scout. 
+ - Chaplains are accompanied by a host of loyal troops. 
+ - Scouts start alone but compensate that with unsurpassed speed. Be careful, though - unlike a Chaplain, you do not have protection from possession. So if a demon traps you in your own body, the you will have to travel with that demon until you are killed with it or freed from it by some angel.
+ 
+THE CRIMINALS
+ - The criminals (who are opposed to the citizens and the military, but will not attack the Communion) are kept mainly in the prison (except for the Thief).
+ - You may start as the Thief, who is found somewhere on the rooftops of the City.
+ - Though the Thief is armed with a knife, his primary weapons are stealth and an ability to climb walls. Unlike all other characters, he is able to evade any conflict by hiding in the shadows or getting some place he can not be reached.
+ - Note that the citizens, the Communion units, and the military radiate light, while the Demons do not. 
+ - As the Thief, you always start at night but a new day will come eventually that will severely hinder your ability to hide. 
+ - To win, grab enough gold and get to the edge of the map to leave this accursed City.
+ - But beware - the Thief is rather frail and is not immune to possession.
+ 
+THE SATANISTS
+ - Satanists are allied with demons. They are able to call demons to them for free, curse all enemies in sight with inaccuracy and raise dead.
+ - While the undead (which are technically demons possessing dead bodies) are generally weak, there is no shortage of material in the City to create an enormous army.
+ - You may play as a Satanist. But beware of the military - you will not be able to conceal the fact that you are an enemy of humankind.
+ 
+THE LOST SOUL
+ - You were the one who triggered the whole invasion. The satanists have sacrificed your body to open the gates to Hell, but your soul lingered in this world.
+ - You start as a frail ghost that will be attacked by everybody and need only one hit to die.
+ - As a ghost, you can pass through walls and solid obstacles and turn yourself invisible for a short time. 
+ - You can also possess humans and dead bodies from a distance. Your possession ability is improved as compared to the demons because you retain all the traits and capabilities of your host as well as its faction alliances. As a human citizen, you will be hated by demons but blessed by angels, as a zombie you will be hated by angels but tolerated by demons.
+ - Your task is to find the Book of Rituals and recite certain passages from it while standing on the sacrificial circle, the place of your death, to find the final rest.

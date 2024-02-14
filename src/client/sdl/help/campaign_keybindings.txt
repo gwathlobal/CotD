@@ -1,0 +1,13 @@
+Arrow keys, Numpad keys,         - Move selection
+[Page Up], [Page Down], 
+[Home], [End]
+
+[Enter]                          - Start mission (if possible)
+[n]                              - Skip to the next day without taking part in any mission
+
+[Tab]                            - Switch between mission selection and map selection
+[c]                              - Select a command
+[s]                              - View situation report
+[e]                              - View campaign effects
+[?]                              - Help
+[Esc]                            - Show menu

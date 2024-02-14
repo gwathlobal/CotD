@@ -1,0 +1,21 @@
+Arrow keys, Numpad keys,         - Movement
+[Page Up], [Page Down], 
+[Home], [End]
+[5], [.]                         - Wait a turn
+
+[a]                              - Invoke ability
+[u]                              - Use an item from inventory
+[l]                              - Look mode
+[f]                              - Fire mode
+[r]                              - Reload
+[p], [g], [,]                    - Pick up an item
+
+[Shift] + [,]                    - Look up (while in Look mode) or Climb/Swim up
+[Shift] + [.]                    - Look down (while in Look mode) or Climb/Swim down
+
+[Shift] + [2]                    - Character screen
+[i]                              - Inventory
+[j]                              - Journal
+[m]                              - View messages
+[?]                              - Help
+[Esc]                            - Show menu
