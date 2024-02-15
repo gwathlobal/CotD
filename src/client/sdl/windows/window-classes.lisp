@@ -44,11 +44,24 @@
 
 (defgeneric run-window (win))
 
+(defgeneric initialize-after-set (win))
+
+(defmethod initialize-after-set ((win window)))
+
+(defgeneric handle-server-message (win msg))
+
+(defmethod handle-server-message ((win window) parsed-msg)
+  nil)
+
 (defun go-to-quit-game ()
   (funcall *quit-func*))
 
 (defun go-to-start-game ()
   (funcall *start-func*))
+
+(defun new-window (win)
+  (setf *current-window* win)
+  (initialize-after-set win))
 
 (defmacro continuable (&body body)
   "Helper macro that we can use to allow us to continue from an error. Remember to hit C in slime or pick the restart so errors don't kill the app."

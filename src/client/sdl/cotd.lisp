@@ -290,6 +290,10 @@
   (run-window *current-window*))
 
 (defun cotd-init ()
+  (setf yason:*parse-object-key-fn* #'str-to-keyword)
+  (setf yason:*symbol-key-encoder* #'yason:encode-symbol-as-lowercase)
+  (setf yason:*symbol-encoder* #'yason:encode-symbol-as-lowercase)
+  
   (let ((tiles-path))
     ;; create default options
     (setf *options* (make-options :tiles 'large))
@@ -614,17 +618,18 @@
     (handle-errors-to-ui
       (cotd-init)
       (tagbody
-         (setf *quit-func* #'(lambda ()
-                               (when (and *game-manager*
-                                          *world*)
-                                 (case (game-manager/game-state *game-manager*)
-                                   ((:game-state-custom-scenario) (save-game-to-disk :save-game-scenario :save-scenario))
-                                   ((:game-state-campaign-scenario) (save-game-to-disk :save-game-campaign :save-scenario))
-                                   ((:game-state-campaign-map :game-state-post-scenario) (save-game-to-disk :save-game-campaign :save-campaign))))
-                               
+        (setf *quit-func* #'(lambda ()
+                              (when (and *game-manager*
+                                         *world*)
+                                (case (game-manager/game-state *game-manager*)
+                                  ((:game-state-custom-scenario) (save-game-to-disk :save-game-scenario :save-scenario))
+                                  ((:game-state-campaign-scenario) (save-game-to-disk :save-game-campaign :save-scenario))
+                                  ((:game-state-campaign-map :game-state-post-scenario) (save-game-to-disk :save-game-campaign :save-campaign))))
+                              
                                (go quit-menu-tag)))
-         (setf *start-func* #'(lambda () (go start-game-tag)))
-         (game-state-init->menu)
+        (setf *start-func* #'(lambda () (go start-game-tag)))
+        (cotd-sdl/websocket:start-client 32167 #'handle-server-messages)
+        (game-state-init->menu)
        start-game-tag
          (loop while t do
            (case (game-manager/game-state *game-manager*)
@@ -634,7 +639,8 @@
              ((:game-state-campaign-scenario) (scenario-game-loop))
              (:game-state-post-scenario (process-post-scenario))))
        quit-menu-tag
-         (stop-path-thread))
+        (stop-path-thread)
+        (cotd-sdl/websocket:close-client))
       (log:info "End program~%"))
     nil))
 
@@ -643,6 +649,17 @@
     (:log-option-all (log:config :sane :console :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%D - %p (%c{1}) %m%n" *cotd-log-level*))
     (:log-option-file (log:config :sane :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%D - %p (%c{1}) %m%n" *cotd-log-level*))
     (t (log:config :off))))
+
+(defun handle-server-messages (message)
+  (log:info "Received message from server: ~A" message)
+  (log:info "Current window: ")
+  (unless (null *current-window*)
+    (let ((parsed-msg (yason:parse message)))
+      (when (null parsed-msg)
+        (log:error "Parsed message is empty.")
+        (return-from handle-server-messages))
+      
+      (handle-server-message *current-window* parsed-msg))))
 
 #+clisp
 (defun cotd-exec ()

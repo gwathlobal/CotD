@@ -1,8 +1,14 @@
-;;;; wrapper.lisp
+;;;; client.lisp
 
 (in-package :cotd-sdl/websocket)
 
 (defvar *client* nil)
+
+(defun str-to-keyword (string)
+  (if (or (null string)
+          (string= string ""))
+      nil
+      (intern (string-upcase string) '#:keyword)))
 
 (defun start-client (port on-message-func)
   (if (not (client-available-p))

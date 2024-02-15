@@ -1,6 +1,6 @@
 ;;;; rwlock.lisp
 
-(in-package :cotd)
+(in-package :cotd/websocket)
 
 ;;;; https://en.wikipedia.org/wiki/Readers%E2%80%93writer_lock#Using_a_condition_variable_and_a_mutex
 ;;;; Implementation of a read-writer-lock using a conditional variable and a mutex

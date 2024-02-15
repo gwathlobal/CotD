@@ -1,8 +1,9 @@
 (in-package :cotd-sdl)
 
 (defclass select-faction-window (window)
-  ((menu-items :initarg :menu-items :accessor select-faction-window/menu-items)
-   (menu-descrs :initarg :menu-descrs :accessor select-faction-window/menu-descrs)
+  ((option :initarg :option :reader select-faction-window/option)
+   (menu-items :initform () :initarg :menu-items :accessor select-faction-window/menu-items)
+   (menu-descrs :initform () :initarg :menu-descrs :accessor select-faction-window/menu-descrs)
 
    (cur-sel :initform 0 :accessor select-faction-window/cur-sel)
       
@@ -10,6 +11,26 @@
    (window-title :initform "QUICK SCENARIO" :initarg :window-title :accessor select-faction-window/window-title)
    (window-subtitle :initform "Choose your faction & character:" :initarg :window-subtitle :accessor select-faction-window/window-subtitle)
    ))
+
+(defmethod initialize-after-set ((win select-faction-window))
+  ;; ask the server for the options
+  (let ((msg (yason:with-output-to-string* ()
+               (yason:with-object ()
+                 (yason:encode-object-element :c :request-faction-options)
+                 (yason:encode-object-element :option (select-faction-window/option win))))))
+    (cotd-sdl/websocket:send-msg-to-server msg)))
+
+(defmethod handle-server-message ((win select-faction-window) parsed-msg)
+  (let ((cmd (str-to-keyword (gethash :c parsed-msg))))
+    (when (null cmd)
+      (log:error "No command :c in parsed message.")
+      (return-from handle-server-message))
+    
+    (case cmd
+      (:response-faction-options (progn
+                                   (setf (select-faction-window/menu-items win) (gethash :menu-items parsed-msg))
+                                   (setf (select-faction-window/menu-descrs win) (gethash :menu-descrs parsed-msg))
+                                   (make-output win))))))
 
 (defmethod make-output ((win select-faction-window))
   (with-slots (window-title window-subtitle cur-sel menu-descrs menu-items max-menu-length) win
@@ -52,20 +73,22 @@
     (sdl:with-events ()
       (:quit-event () (funcall quit-func) t)
       (:key-down-event (:key key :mod mod :unicode unicode)
-                       
-                       (setf cur-sel (run-selection-list key mod unicode cur-sel :start-page (truncate cur-sel (length menu-items)) :max-str-per-page max-menu-length))
-                       (setf cur-sel (adjust-selection-list cur-sel (length menu-items)))
-                       
-                       (cond
-                         ;; escape - quit
-                         ((sdl:key= key :sdl-key-escape) 
-                          (setf *current-window* return-to)
-                          (return-from run-window nil))
-                         ;; enter - select
-                         ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
-                          (return-from run-window cur-sel)
-                          ))
-                       (make-output *current-window*))
+
+       (unless (null menu-items)
+         (setf cur-sel (run-selection-list key mod unicode cur-sel :start-page (truncate cur-sel (length menu-items)) 
+                                           :max-str-per-page max-menu-length))
+         (setf cur-sel (adjust-selection-list cur-sel (length menu-items))))
+       
+       (cond
+         ;; escape - quit
+         ((sdl:key= key :sdl-key-escape) 
+          (setf *current-window* return-to)
+          (return-from run-window nil))
+         ;; enter - select
+         ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+          (unless (null menu-items)
+            (return-from run-window cur-sel))))
+       (make-output *current-window*))
       (:video-expose-event () (make-output *current-window*)))))
 
 (defun quick-scenario-menu-items ()

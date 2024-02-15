@@ -17,7 +17,10 @@
     
     (sdl:draw-string-solid-* "City of the Damned" (truncate *window-width* 2) 10 :justify :center :color sdl:*white*)
     
-    (sdl:draw-string-solid-* "Whoever wins... We lose" (- *window-width* 20) (+ 10 30 (sdl:char-height sdl:*default-font*)) :justify :right :color sdl:*white*)
+    (sdl:draw-string-solid-* "Whoever wins... We lose" 
+                             (- *window-width* 20)
+                             (+ 10 30 (sdl:char-height sdl:*default-font*)) 
+                             :justify :right :color sdl:*white*)
     
     ;; drawing selection list
     (loop with color-list = ()
@@ -26,7 +29,10 @@
               (push sdl:*yellow* color-list)
               (push sdl:*white* color-list))
           finally (setf color-list (reverse color-list))
-                  (draw-selection-list menu-strs cur-sel (length menu-strs) 20 (+ 10 30 20 (sdl:char-height sdl:*default-font*) (sdl:char-height sdl:*default-font*)) :color-list color-list :use-letters t))
+                  (draw-selection-list menu-strs cur-sel (length menu-strs) 20 
+                                       (+ 10 30 20 (sdl:char-height sdl:*default-font*) 
+                                          (sdl:char-height sdl:*default-font*))
+                                       :color-list color-list :use-letters t))
         
     (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Exit game")
                              10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
@@ -39,7 +45,9 @@
       (:quit-event () (funcall (quit-func win)) t)
       (:key-down-event (:key key :mod mod :unicode unicode)
                        
-                       (setf cur-sel (run-selection-list key mod unicode cur-sel :start-page (truncate cur-sel (length menu-strs)) :max-str-per-page (length menu-strs)))
+                       (setf cur-sel (run-selection-list key mod unicode cur-sel 
+                                                         :start-page (truncate cur-sel (length menu-strs)) 
+                                                         :max-str-per-page (length menu-strs)))
                        (setf cur-sel (adjust-selection-list cur-sel (length menu-strs)))
                        
                        (cond
@@ -123,12 +131,11 @@
                     (populate-main-menu win)
                     nil))))
            
-           (quick-scenario-func () 
+           (quick-scenario-func ()
              (multiple-value-bind (quick-scenario-items quick-scenario-funcs quick-scenario-descrs) 
                  (quick-scenario-menu-items)
-               (setf *current-window* (make-instance 'select-faction-window 
-                                                     :menu-items quick-scenario-items 
-                                                     :menu-descrs quick-scenario-descrs))
+               (new-window (make-instance 'select-faction-window
+                                          :option :quick-scenario))
                (make-output *current-window*)
                (let ((select-n (run-window *current-window*)))
                  (when select-n
@@ -143,7 +150,8 @@
                        ;;               :mission misson :world-sector world-sector))
              
                        (game-state-menu->custom-scenario)
-                       :menu-stop-loop))))))
+                       :menu-stop-loop)))))
+             )
            
            (custom-scenario-func ()
              (setf *current-window* (make-instance 'custom-scenario-window))

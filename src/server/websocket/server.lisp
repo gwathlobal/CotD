@@ -1,6 +1,6 @@
-;;;; wrapper.lisp
+;;;; server.lisp
 
-(in-package :cotd)
+(in-package :cotd/websocket)
 
 (setf pws:*debug-on-error* t)
 
