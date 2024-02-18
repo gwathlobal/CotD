@@ -69,6 +69,10 @@
    (:file "world-map")
    (:file "win-condition")
    (:file "generate-level")
+   (:module "scenario"
+    :components ((:file "package")
+                 (:file "random-scenario")
+                 (:file "scenario-generation")))
    (:file "random-scenario")
    (:file "campaign-effects")
    (:file "campaign-command")

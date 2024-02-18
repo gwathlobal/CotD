@@ -4,7 +4,8 @@
   ((option :initarg :option :reader select-faction-window/option)
    (menu-items :initform () :initarg :menu-items :accessor select-faction-window/menu-items)
    (menu-descrs :initform () :initarg :menu-descrs :accessor select-faction-window/menu-descrs)
-
+   (menu-factions :initform () :initarg :menu-factions :accessor select-faction-window/menu-factions)
+   
    (cur-sel :initform 0 :accessor select-faction-window/cur-sel)
       
    (max-menu-length :initform (truncate (- (/ *window-height* 2) 60) (sdl:char-height sdl:*default-font*)) :initarg :max-menu-length :accessor select-faction-window/max-menu-length)
@@ -21,15 +22,17 @@
     (cotd-sdl/websocket:send-msg-to-server msg)))
 
 (defmethod handle-server-message ((win select-faction-window) parsed-msg)
-  (let ((cmd (str-to-keyword (gethash :c parsed-msg))))
+  (let ((cmd (cotd-sdl/websocket:str-to-keyword (gethash :c parsed-msg))))
     (when (null cmd)
       (log:error "No command :c in parsed message.")
       (return-from handle-server-message))
     
     (case cmd
-      (:response-faction-options (progn
-                                   (setf (select-faction-window/menu-items win) (gethash :menu-items parsed-msg))
-                                   (setf (select-faction-window/menu-descrs win) (gethash :menu-descrs parsed-msg))
+      (:response-faction-options (with-slots (menu-items menu-descrs menu-factions) win
+                                   (setf menu-items (gethash :menu-items parsed-msg))
+                                   (setf menu-descrs (gethash :menu-descrs parsed-msg))
+                                   (setf menu-factions (gethash :menu-factions parsed-msg))
+                                   
                                    (make-output win))))))
 
 (defmethod make-output ((win select-faction-window))
@@ -69,15 +72,15 @@
     (sdl:update-display)))
 
 (defmethod run-window ((win select-faction-window))
-  (with-slots (quit-func return-to cur-sel menu-items max-menu-length) win
+  (with-slots (quit-func return-to cur-sel menu-factions max-menu-length) win
     (sdl:with-events ()
       (:quit-event () (funcall quit-func) t)
       (:key-down-event (:key key :mod mod :unicode unicode)
 
-       (unless (null menu-items)
-         (setf cur-sel (run-selection-list key mod unicode cur-sel :start-page (truncate cur-sel (length menu-items)) 
-                                           :max-str-per-page max-menu-length))
-         (setf cur-sel (adjust-selection-list cur-sel (length menu-items))))
+       (unless (null menu-factions)
+         (setf cur-sel (process-selection-list key mod unicode cur-sel (length menu-factions) 
+                                               :start-page (truncate cur-sel (length menu-factions))
+                                               :max-str-per-page max-menu-length)))
        
        (cond
          ;; escape - quit
@@ -86,8 +89,8 @@
           (return-from run-window nil))
          ;; enter - select
          ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
-          (unless (null menu-items)
-            (return-from run-window cur-sel))))
+          (unless (null menu-factions)
+            (return-from run-window (nth cur-sel menu-factions)))))
        (make-output *current-window*))
       (:video-expose-event () (make-output *current-window*)))))
 

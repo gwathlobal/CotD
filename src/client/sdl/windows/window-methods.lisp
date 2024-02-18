@@ -309,7 +309,59 @@
 ;; I might do something wrong here but I am not sure how I can access this enum otherwise
 (defconstant SDL-KEY-MOD-NUM (cffi:foreign-enum-value sdl-cffi::'Sdl-Mod :SDL-KEY-MOD-NUM))
 
+(defun process-selection-list (key mod unicode cur-str max-str 
+                               &key (start-page 0) (max-str-per-page -1) (use-letters t))
+  (declare (ignore unicode))
+
+  ;; normalize mod
+  (loop while (>= mod sdl-key-mod-num) do
+           (decf mod sdl-key-mod-num))
+  
+  (cond
+    ((and (or (sdl:key= key :sdl-key-up) 
+              (sdl:key= key :sdl-key-kp8)) 
+          (= mod 0))
+     (progn 
+       (decf cur-str)))
+    
+    ((and (or (sdl:key= key :sdl-key-down)
+              (sdl:key= key :sdl-key-kp2)) 
+          (= mod 0)) 
+     (progn
+       (incf cur-str)))
+    
+    ((and (or (sdl:key= key :sdl-key-up)
+              (sdl:key= key :sdl-key-kp8)) 
+          (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+     (if (= max-str-per-page -1)
+         (decf cur-str 10)
+         (decf cur-str max-str-per-page)))
+    
+    ((and (or (sdl:key= key :sdl-key-down)
+              (sdl:key= key :sdl-key-kp2)) 
+          (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+     (if (= max-str-per-page -1)
+         (incf cur-str 10)
+         (incf cur-str max-str-per-page))))
+  (when (and use-letters (= mod 0))
+    (loop with k-v = '((:sdl-key-a . 00) (:sdl-key-b . 01) (:sdl-key-c . 02) (:sdl-key-d . 03) (:sdl-key-e . 04)
+                       (:sdl-key-f . 05) (:sdl-key-g . 06) (:sdl-key-h . 07) (:sdl-key-i . 08) (:sdl-key-j . 09) 
+                       (:sdl-key-k . 10) (:sdl-key-l . 11) (:sdl-key-m . 12) (:sdl-key-n . 13) (:sdl-key-o . 14) 
+                       (:sdl-key-p . 15) (:sdl-key-q . 16) (:sdl-key-r . 17) (:sdl-key-s . 18) (:sdl-key-t . 19) 
+                       (:sdl-key-u . 20) (:sdl-key-v . 21) (:sdl-key-w . 22) (:sdl-key-x . 23) (:sdl-key-y . 24)
+                       (:sdl-key-z . 25))
+          for (k . v) in k-v
+          do
+             (when (and (sdl:key= key k) (< v max-str-per-page))
+               (setf cur-str (+ (* start-page max-str-per-page) v))
+               (return))))
+    
+  (when (< cur-str 0) (setf cur-str 0))
+  (when (>= cur-str max-str) (setf cur-str (- max-str 1)))
+  cur-str)
+
 (defun run-selection-list (key mod unicode cur-str &key (start-page 0) (max-str-per-page -1) (use-letters t))
+  "DEPRECATED, use process-selection-list"
   (declare (ignore unicode))
 
   ;; normalize mod
@@ -356,6 +408,8 @@
   cur-str)
 
 (defun adjust-selection-list (cur-str max-str)
+  "DEPRECATED, use process-selection-list"
+  
   (when (< cur-str 0) (setf cur-str 0))
   (when (>= cur-str max-str) (setf cur-str (- max-str 1)))
   cur-str)

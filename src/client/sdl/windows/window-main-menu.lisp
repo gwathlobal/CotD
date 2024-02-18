@@ -10,6 +10,15 @@
 (defmethod initialize-instance :after ((win main-menu-window) &key)
   (populate-main-menu win))
 
+(defmethod handle-server-message ((win main-menu-window) parsed-msg)
+  (let ((cmd (cotd-sdl/websocket:str-to-keyword (gethash :c parsed-msg))))
+    (when (null cmd)
+      (log:error "No command :c in parsed message.")
+      (return-from handle-server-message))
+    
+    (case cmd
+      )))
+
 (defmethod make-output ((win main-menu-window))
   (with-slots (cur-sel menu-items menu-strs) win
     (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
@@ -132,29 +141,60 @@
                     nil))))
            
            (quick-scenario-func ()
-             (multiple-value-bind (quick-scenario-items quick-scenario-funcs quick-scenario-descrs) 
-                 (quick-scenario-menu-items)
-               (new-window (make-instance 'select-faction-window
-                                          :option :quick-scenario))
-               (make-output *current-window*)
-               (let ((select-n (run-window *current-window*)))
-                 (when select-n
-                   (multiple-value-bind (world-sector mission) (funcall (nth select-n quick-scenario-funcs) select-n)
-                     (when (and mission world-sector)
-                       (enter-player-name)
-                       (setf *player-title* (get-specific-faction-name (player-specific-faction mission)))
-                       (prepare-game-scenario mission world-sector)
+             (new-window (make-instance 'select-faction-window :option :quick-scenario))
+             (make-output *current-window*)
+             (let ((specific-faction (run-window *current-window*)))
+               (when specific-faction
+                 ;; TODO: send request for random scenario mission given the selected menu item
+                 ;; and receive the response
+                 (let ((request-msg (yason:with-output-to-string* ()
+                                      (yason:with-object ()
+                                        (yason:encode-object-element :c :request-mission)
+                                        (yason:encode-object-element :option :random)
+                                        (yason:encode-object-element :player-faction specific-faction)))))
+                   (cotd-sdl/websocket:send-msg-to-server request-msg)
+                   
+                   (flet ((wait-request-mission-response ()
+                            ;; TODO: loop until the response is given
+                            
+                            ))
+                     (let ((future (bt2:make-thread #'wait-request-mission-response)))
+                       (bt2:join-thread future))))
 
-                       ;; TODO: send to server that a custom scenario is to be started
-                       ;; (:start-game (:type :scenario :sub-type :custom :player-name *player-name* 
-                       ;;               :mission misson :world-sector world-sector))
+                 (enter-player-name)
+
+                 ;; TODO: see how to deal without global *player-title* var
+                 ;(setf *player-title* (get-specific-faction-name (player-specific-faction mission)))
+
+                 ;; TODO: send request to start the game with the given scenario options
+
+                 ;; TODO: remove after done
+                 (funcall *quit-func*)
+                 (game-state-menu->custom-scenario)
+                 :menu-stop-loop))
+             ;; (multiple-value-bind (quick-scenario-items quick-scenario-funcs quick-scenario-descrs)
+             ;;     (quick-scenario-menu-items)
+             ;;   (new-window (make-instance 'select-faction-window
+             ;;                              :option :quick-scenario))
+             ;;   (make-output *current-window*)
+             ;;   (let ((select-n (run-window *current-window*)))
+             ;;     (when select-n
+             ;;       (multiple-value-bind (world-sector mission) (funcall (nth select-n quick-scenario-funcs) select-n)
+             ;;         (when (and mission world-sector)
+             ;;           (enter-player-name)
+             ;;           (setf *player-title* (get-specific-faction-name (player-specific-faction mission)))
+             ;;           (prepare-game-scenario mission world-sector)
+
+             ;;           ;; TODO: send to server that a custom scenario is to be started
+             ;;           ;; (:start-game (:type :scenario :sub-type :custom :player-name *player-name* 
+             ;;           ;;               :mission misson :world-sector world-sector))
              
-                       (game-state-menu->custom-scenario)
-                       :menu-stop-loop)))))
+             ;;           (game-state-menu->custom-scenario)
+             ;;           :menu-stop-loop)))))
              )
            
            (custom-scenario-func ()
-             (setf *current-window* (make-instance 'custom-scenario-window))
+             (new-window (make-instance 'custom-scenario-window))
              (make-output *current-window*)
              (multiple-value-bind (world-sector mission) (run-window *current-window*)
                (when (and world-sector mission)

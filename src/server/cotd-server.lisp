@@ -63,26 +63,90 @@
 ;;                                           (log:info "*game-loop-state* +GAME-LOOP-FINALIZE-TURN+ -> +GAME-LOOP-INIT-TURN+~%")
 ;;                                           (set-game-loop-state +game-loop-finalize-turn+ +game-loop-init+))))))
 
-(defun process-request-faction-options (client parsed-msg)
-  (let ((option (str-to-keyword (gethash :option parsed-msg))))
-    (when (null option)
-      (log:error "No option :option in parsed message.")
-      (return-from process-request-faction-options))
+(defmacro with-msg-params ((&key required optional) parsed-msg &body body)
+  "WITH-MSG-PARAMS (:required ({(var key)*}) :optional ({(var key)*})) parsed-msg forms*
 
+Take the key-value lists specified in :REQUIRED and :OPTIONAL, extract data from the PARSED-MSG by KEYs, 
+bind them to VARs, validate KEYs in :REQUIRED that all of them are not NIL and execute BODY. 
+PARSED-MSG should be a hash-table.
+KEY will most likely be a keyword."
+  (let ((let-bindings (loop for binding in (concatenate 'list required optional)
+                            for var = (first binding)
+                            for key = (second binding)
+                            collect `(,var (str-to-keyword (gethash ,key ,parsed-msg)))))
+        (validations (loop for binding in required
+                           for var = (first binding)
+                           for key = (second binding)
+                           for error-message = (format nil "No key :~A in parsed message." key)
+                           collect `(when (null ,var)
+                                      (log:error ,error-message)
+                                      (return)))))
+    `(block nil
+       (let ,let-bindings
+         ,@validations
+         ,@body))))
+
+(defun process-request-faction-options (client parsed-msg)
+  (with-msg-params (:required ((option :option))) parsed-msg
     (flet ((quick-scenario-option-func ()
-             (multiple-value-bind (quick-scenario-items quick-scenario-funcs quick-scenario-descrs)
+             (multiple-value-bind (items funcs descrs factions)
                  (quick-scenario-menu-items)
-               (declare (ignore quick-scenario-funcs))
+               (declare (ignore funcs))
                (let ((msg (yason:with-output-to-string* ()
                             (yason:with-object ()
                               (yason:encode-object-element :c :response-faction-options)
-                              (yason:encode-object-element :menu-items quick-scenario-items)
-                              (yason:encode-object-element :menu-descrs quick-scenario-descrs)))))
+                              (yason:encode-object-element :menu-items items)
+                              (yason:encode-object-element :menu-descrs descrs)
+                              (yason:encode-object-element :menu-factions factions)))))
                  (cotd/websocket:send-msg client msg)))))
       
       (case option
         (:quick-scenario (quick-scenario-option-func))
-        (t (log:warn "Unknown option ~A in :request-faction-option command." option))))))
+        (t (log:warn "Unknown option ~A in :request-faction-options command." option))))))
+
+(defun process-request-mission (client parsed-msg)
+  (with-msg-params (:required ((option :option) (player-faction :player-faction))) parsed-msg
+    ))
+
+(defun process-request-scenario-options (client parsed-msg)
+  (with-msg-params (:required ((request :request)) 
+                    :optional ((cur-mission-type :cur-mission-type)
+                               (cur-sector :cur-sector)
+                               (cur-month :cur-month)
+                               (cur-feats :cur-feats)
+                               (cur-factions :cur-factions)
+                               (cur-specific-faction :cur-specific-faction)))
+      parsed-msg
+    (flet ((missions-scenario-option-func ()
+             (let ((scenario (make-instance 'scenario)))
+               (scenario-create-world scenario)
+               (scenario-set-avail-mission-types scenario)
+               
+               (let ((msg (yason:with-output-to-string* ()
+                            (yason:with-object ()
+                              (yason:encode-object-element :c :response-scenario-options)
+                              (yason:encode-object-element : items)
+                              (yason:encode-object-element :menu-descrs descrs)
+                              (yason:encode-object-element :menu-factions factions)))))
+                 (cotd/websocket:send-msg client msg)))
+             (multiple-value-bind (items funcs descrs factions)
+                 (quick-scenario-menu-items)
+               (declare (ignore funcs))
+               (let ((msg (yason:with-output-to-string* ()
+                            (yason:with-object ()
+                              (yason:encode-object-element :c :response-faction-options)
+                              (yason:encode-object-element :menu-items items)
+                              (yason:encode-object-element :menu-descrs descrs)
+                              (yason:encode-object-element :menu-factions factions)))))
+                 (cotd/websocket:send-msg client msg)))))
+
+      ;; TODO: check through enums?
+      (when (not (or (eq request :missions)))
+        (log:error "Unknown option ~A in :request-scenario-options command." option)
+        (return))
+      
+      (let ((scenario (make-instance 'scenario-gen-class)))
+        ))))
 
 (defun process-client-message (client message)
   (log:info "Raw msg received: " message)
@@ -94,14 +158,17 @@
 
     (let ((cmd (str-to-keyword (gethash :c parsed-msg)))
           (write-operation nil)
-          (read-operation nil))
+          (read-operation nil)
+          (non-blocking nil))
       (when (null cmd)
         (log:error "No command :c in parsed message.")
         (return-from process-client-message))
       
       (case cmd
-        (:request-faction-options (setf read-operation (lambda () 
-                                                         (process-request-faction-options client parsed-msg)))))
+        (:request-faction-options (setf non-blocking (lambda () 
+                                                       (process-request-faction-options client parsed-msg))))
+        (:request-mission (setf non-blocking (lambda ()
+                                               (process-request-mission client parsed-msg)))))
       (unless (null write-operation)
          (cotd/websocket:with-write-lock *rwlock*
         ;;   ;; the write lock was released in another thread, and this thread has acquired the lock
@@ -120,13 +187,17 @@
       (unless (null read-operation)
         (cotd/websocket:with-read-lock *rwlock*
           (funcall read-operation))
+        (return-from process-client-message))
+      
+      (unless (null non-blocking)
+        (funcall non-blocking)
         (return-from process-client-message)))
     ))
 
 (defun define-client-server-communication ()
-  (define-handlers-for-url "/"
+  (cotd/websocket:define-handlers-for-url "/"
     :open (lambda (client)
-            )
+            (declare (ignore client)))
     :message (lambda (client message)
                (process-client-message client message)
                )))

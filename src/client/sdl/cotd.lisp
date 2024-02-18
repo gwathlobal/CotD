@@ -290,7 +290,7 @@
   (run-window *current-window*))
 
 (defun cotd-init ()
-  (setf yason:*parse-object-key-fn* #'str-to-keyword)
+  (setf yason:*parse-object-key-fn* #'cotd-sdl/websocket:str-to-keyword)
   (setf yason:*symbol-key-encoder* #'yason:encode-symbol-as-lowercase)
   (setf yason:*symbol-encoder* #'yason:encode-symbol-as-lowercase)
   

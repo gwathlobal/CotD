@@ -69,17 +69,15 @@
       (:video-expose-event () (make-output *current-window*)))))
 
 (defun quick-scenario-menu-items ()
-  (let ((menu-items nil)
-        (menu-funcs nil)
-        (menu-descrs nil)
-        (join-heaven-item (list "Join the Celestial Communion (as a Chrome angel)"
+  (let ((join-heaven-item (list "Join the Celestial Communion (as a Chrome angel)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
                                     (multiple-value-bind (mission world-sector) (find-random-scenario-options +specific-faction-type-angel-chrome+)
                                       (when (and mission world-sector)
                                         (values world-sector mission)))
                                     )
-                                (get-txt-from-file "data/descriptions/communion_chrome.txt")))
+                                (get-txt-from-file "data/descriptions/communion_chrome.txt")
+                                :specific-faction-type-angel-chrome))
         (join-trinity-item (list "Join the Celestial Communion (as a Trinity mimic)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
@@ -87,7 +85,8 @@
                                       (when (and mission world-sector)
                                         (values world-sector mission)))
                                     )
-                                (get-txt-from-file "data/descriptions/communion_trinity.txt")))
+                                (get-txt-from-file "data/descriptions/communion_trinity.txt")
+                                :specific-faction-type-angel-trinity))
         (join-legion-item (list "Join the Pandemonium Hierarchy (as a Crimson imp)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
@@ -95,7 +94,8 @@
                                       (when (and mission world-sector)
                                         (values world-sector mission)))
                                     )
-                                (get-txt-from-file "data/descriptions/pandemonium_crimsonimp.txt")))
+                                (get-txt-from-file "data/descriptions/pandemonium_crimsonimp.txt")
+                                :specific-faction-type-demon-crimson))
         (join-shadow-item (list "Join the Pandemonium Hierarchy (as a Shadow imp)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
@@ -107,7 +107,8 @@
                                         (when (and mission world-sector)
                                           (values world-sector mission))))
                                     )
-                                (get-txt-from-file "data/descriptions/pandemonium_shadowimp.txt")))
+                                (get-txt-from-file "data/descriptions/pandemonium_shadowimp.txt")
+                                :specific-faction-type-demon-shadow))
         (join-puppet-item (list "Join the Pandemonium Hierarchy (as Malseraph's puppet)"
                                 #'(lambda (n) 
                                     (declare (ignore n))
@@ -115,7 +116,8 @@
                                       (when (and mission world-sector)
                                         (values world-sector mission)))
                                     )
-                                (get-txt-from-file "data/descriptions/pandemonium_puppet.txt")))
+                                (get-txt-from-file "data/descriptions/pandemonium_puppet.txt")
+                                :specific-faction-type-demon-malseraph))
         (join-chaplain-item (list "Join the Military (as a Chaplain)"
                                   #'(lambda (n) 
                                       (declare (ignore n))
@@ -123,7 +125,8 @@
                                         (when (and mission world-sector)
                                           (values world-sector mission)))
                                       )
-                                  (get-txt-from-file "data/descriptions/military_chaplain.txt")))
+                                  (get-txt-from-file "data/descriptions/military_chaplain.txt")
+                                  :specific-faction-type-military-chaplain))
         (join-scout-item (list "Join the Military (as a Scout)"
                                #'(lambda (n) 
                                    (declare (ignore n))
@@ -131,7 +134,8 @@
                                      (when (and mission world-sector)
                                        (values world-sector mission)))
                                    )
-                               (get-txt-from-file "data/descriptions/military_scout.txt")))
+                               (get-txt-from-file "data/descriptions/military_scout.txt")
+                               :specific-faction-type-military-scout))
         (join-thief-item (list "Join as the Thief"
                                #'(lambda (n) 
                                    (declare (ignore n))
@@ -143,7 +147,8 @@
                                         (when (and mission world-sector)
                                           (values world-sector mission))))
                                    )
-                               (get-txt-from-file "data/descriptions/criminals.txt")))
+                               (get-txt-from-file "data/descriptions/criminals.txt")
+                               :specific-faction-type-thief))
         (join-satanist-item (list "Join the Satanists"
                                   #'(lambda (n) 
                                       (declare (ignore n))
@@ -151,7 +156,8 @@
                                         (when (and mission world-sector)
                                           (values world-sector mission)))
                                       )
-                                  (get-txt-from-file "data/descriptions/satanists.txt")))
+                                  (get-txt-from-file "data/descriptions/satanists.txt")
+                                  :specific-faction-type-satanist))
         (join-church-item (list "Join the Church"
                                 #'(lambda (n) 
                                     (declare (ignore n))
@@ -159,7 +165,8 @@
                                       (when (and mission world-sector)
                                         (values world-sector mission)))
                                     )
-                                (get-txt-from-file "data/descriptions/church.txt")))
+                                (get-txt-from-file "data/descriptions/church.txt")
+                                :specific-faction-type-priest))
         (join-eater-item (list "Join as the Eater of the dead"
                                #'(lambda (n) 
                                    (declare (ignore n))
@@ -170,7 +177,8 @@
                                         (when (and mission world-sector)
                                           (values world-sector mission))))
                                    )
-                               (get-txt-from-file "data/descriptions/primordials_eater.txt")))
+                               (get-txt-from-file "data/descriptions/primordials_eater.txt")
+                               :specific-faction-type-eater))
         (join-skin-item (list "Join as the Skinchanger"
                               #'(lambda (n) 
                                   (declare (ignore n))
@@ -181,7 +189,8 @@
                                        (when (and mission world-sector)
                                          (values world-sector mission))))
                                   )
-                              (get-txt-from-file "data/descriptions/primordials_skinchanger.txt")))
+                              (get-txt-from-file "data/descriptions/primordials_skinchanger.txt")
+                              :specific-faction-type-skinchanger))
         (join-ghost-item (list "Join as the Lost soul"
                                #'(lambda (n) 
                                    (declare (ignore n))
@@ -189,20 +198,19 @@
                                       (when (and mission world-sector)
                                         (values world-sector mission)))
                                    )
-                               (get-txt-from-file "data/descriptions/lostsoul.txt")))
+                               (get-txt-from-file "data/descriptions/lostsoul.txt")
+                               :specific-faction-type-ghost))
         )
 
-    (setf menu-items (list (first join-heaven-item) (first join-trinity-item) (first join-legion-item) (first join-shadow-item) (first join-puppet-item)
-                           (first join-chaplain-item) (first join-scout-item) (first join-thief-item) (first join-satanist-item) (first join-church-item)
-                           (first join-eater-item) (first join-skin-item) (first join-ghost-item)))
-    (setf menu-funcs (list (second join-heaven-item) (second join-trinity-item) (second join-legion-item) (second join-shadow-item) (second join-puppet-item)
-                           (second join-chaplain-item) (second join-scout-item) (second join-thief-item) (second join-satanist-item) (second join-church-item)
-                           (second join-eater-item) (second join-skin-item) (second join-ghost-item)))
-    (setf menu-descrs (list (third join-heaven-item) (third join-trinity-item) (third join-legion-item) (third join-shadow-item) (third join-puppet-item)
-                            (third join-chaplain-item) (third join-scout-item) (third join-thief-item) (third join-satanist-item) (third join-church-item)
-                            (third join-eater-item) (third join-skin-item) (third join-ghost-item)))
-
-    (values menu-items menu-funcs menu-descrs)))
+    (loop with l = (list join-heaven-item join-trinity-item join-legion-item join-shadow-item join-puppet-item
+                         join-chaplain-item join-scout-item join-thief-item join-satanist-item join-church-item
+                         join-eater-item join-skin-item join-ghost-item)
+          for i in l
+          collect (first i) into menu-items
+          collect (second i) into menu-funcs
+          collect (third i) into menu-descrs
+          collect (fourth i) into menu-factions
+          finally (return (values menu-items menu-funcs menu-descrs menu-factions)))))
 
 (defun new-campaign-menu-items ()
   (let ((menu-items nil)

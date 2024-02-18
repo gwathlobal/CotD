@@ -39,7 +39,7 @@
     ;; if no specific mission list is supplied, find all enabled missions
     (when (null avail-mission-type-list)
       (setf avail-mission-type-list (get-all-mission-types-list)))
-    ))
+    avail-mission-type-list))
 
 (defun scenario-set-avail-world-sector-types (scenario &optional (new-world-sector-type-list ()))
   (with-slots (avail-world-sector-type-list mission) scenario
@@ -377,21 +377,32 @@
                (progn
                  (push (list faction-id (list faction-present)) avail-faction-list)))
           finally
-             (loop initially (setf cur-faction-list ())
+             (loop with new-factions = (make-hash-table)
+                   initially (loop for (faction-id faction-present) in cur-faction-list
+                                   when (find-if #'(lambda (f) (and (eq faction-id (first f)) 
+                                                                    (find faction-present (second f)))) 
+                                                 avail-faction-list)
+                                   do
+                                      (setf (gethash faction-id new-factions) faction-present))
                    for (faction-id faction-present-list) in avail-faction-list
                    do
                       (if (and req-faction-id (= faction-id req-faction-id))
-                        (push (list faction-id req-faction-present) cur-faction-list)
-                        (push (list faction-id (nth (random (length faction-present-list)) faction-present-list))
-                              cur-faction-list))
-                   finally (setf cur-faction-list (stable-sort cur-faction-list #'(lambda (a b)
-                                                                                    (if (eq (second a) :mission-faction-present)
-                                                                                      (if (string-lessp (name (get-faction-type-by-id (first a)))
-                                                                                                        (name (get-faction-type-by-id (first b))))
-                                                                                        t
-                                                                                        nil)
-                                                                                      nil))))
-                           (setf (faction-list mission) cur-faction-list)))))
+                          (setf (gethash faction-id new-factions) req-faction-present)
+                          (unless (gethash faction-id new-factions)
+                            (setf (gethash faction-id new-factions) (alexandria:random-elt faction-present-list))))
+                   finally (loop for faction-id being the hash-key 
+                                 using (hash-value faction-present) of new-factions
+                                 collect (list faction-id faction-present) into new-faction-list 
+                                 finally (setf cur-faction-list 
+                                               (stable-sort new-faction-list 
+                                                            #'(lambda (a b)
+                                                                (if (eq (second a) :mission-faction-present)
+                                                                    (if (string-lessp (name (get-faction-type-by-id (first a)))
+                                                                                      (name (get-faction-type-by-id (first b))))
+                                                                        t
+                                                                        nil)
+                                                                    nil))))
+                                         (setf (faction-list mission) cur-faction-list))))))
 
 (defun scenario-adjust-specific-factions (scenario)
   (with-slots (mission cur-faction-list specific-faction-list) scenario

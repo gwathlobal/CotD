@@ -27,8 +27,10 @@
 
 (defun send-msg-to-server (msg)
   (when (not (client-available-p))
+    (log:error "Unable to send msg to client. Client is not available:~%~A" msg)
     (return-from send-msg-to-server nil))
-  
+
+  (log:debug "Sending msg: ~A" msg)
   (wsd:send-text *client* msg))
 
 (defun close-client ()

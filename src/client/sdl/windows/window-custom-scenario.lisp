@@ -44,6 +44,17 @@
       (setf cur-sel cur-mission-type)
   )))
 
+(defmethod initialize-after-set ((win custom-scenario-window))
+  (request-custom-scenario-missions win))
+
+(defun request-custom-scenario-missions (win)
+  (declare (ignore win))
+  (let ((msg (yason:with-output-to-string* ()
+               (yason:with-object ()
+                 (yason:encode-object-element :c :request-scenario-options)
+                 (yason:encode-object-element :request :missions)))))
+    (cotd-sdl/websocket:send-msg-to-server msg)))
+
 (defun adjust-mission-after-change (win)
   (with-slots (scenario cur-mission-type) win
     (with-slots (avail-mission-type-list) scenario
