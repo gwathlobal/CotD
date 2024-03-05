@@ -73,7 +73,6 @@
     :components ((:file "package")
                  (:file "random-scenario")
                  (:file "scenario-generation")))
-   (:file "random-scenario")
    (:file "campaign-effects")
    (:file "campaign-command")
    (:file "init-win-conditions" :depends-on ("win-condition"))

@@ -23,6 +23,23 @@
    (cur-specific-faction :initform 0 :accessor custom-scenario-window/cur-specific-faction :type fixnum)
    ))
 
+(defmethod initialize-after-set ((win custom-scenario-window))
+  ;; ask the server for the options
+  (let ((msg (yason:with-output-to-string* ()
+               (yason:with-object ()
+                 (yason:encode-object-element :c :request-scenario-options)))))
+    (cotd-sdl/websocket:send-msg-to-server msg)))
+
+(defmethod handle-server-message ((win custom-scenario-window) parsed-msg)
+  (let ((cmd (cotd-sdl/websocket:str-to-keyword (gethash :c parsed-msg))))
+    (when (null cmd)
+      (log:error "No command :c in parsed message.")
+      (return-from handle-server-message))
+    
+    (case cmd
+      ;; TODO
+      (:response-scenario-options t))))
+
 (defmethod initialize-instance :after ((win custom-scenario-window) &key)
   (with-slots (scenario cur-mission-type cur-month menu-items cur-sel cur-step) win
     (with-slots (world avail-mission-type-list) scenario
@@ -43,17 +60,6 @@
       (setf menu-items (populate-custom-scenario-win-menu win cur-step))
       (setf cur-sel cur-mission-type)
   )))
-
-(defmethod initialize-after-set ((win custom-scenario-window))
-  (request-custom-scenario-missions win))
-
-(defun request-custom-scenario-missions (win)
-  (declare (ignore win))
-  (let ((msg (yason:with-output-to-string* ()
-               (yason:with-object ()
-                 (yason:encode-object-element :c :request-scenario-options)
-                 (yason:encode-object-element :request :missions)))))
-    (cotd-sdl/websocket:send-msg-to-server msg)))
 
 (defun adjust-mission-after-change (win)
   (with-slots (scenario cur-mission-type) win

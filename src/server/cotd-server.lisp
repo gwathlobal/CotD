@@ -105,48 +105,60 @@ KEY will most likely be a keyword."
         (t (log:warn "Unknown option ~A in :request-faction-options command." option))))))
 
 (defun process-request-mission (client parsed-msg)
+  ;; TODO: is this request neceesary???
   (with-msg-params (:required ((option :option) (player-faction :player-faction))) parsed-msg
     ))
 
 (defun process-request-scenario-options (client parsed-msg)
-  (with-msg-params (:required ((request :request)) 
-                    :optional ((cur-mission-type :cur-mission-type)
+  (with-msg-params (:optional ((cur-mission-type :cur-mission-type)
                                (cur-sector :cur-sector)
                                (cur-month :cur-month)
                                (cur-feats :cur-feats)
                                (cur-factions :cur-factions)
                                (cur-specific-faction :cur-specific-faction)))
       parsed-msg
-    (flet ((missions-scenario-option-func ()
-             (let ((scenario (make-instance 'scenario)))
-               (scenario-create-world scenario)
-               (scenario-set-avail-mission-types scenario)
-               
-               (let ((msg (yason:with-output-to-string* ()
-                            (yason:with-object ()
-                              (yason:encode-object-element :c :response-scenario-options)
-                              (yason:encode-object-element : items)
-                              (yason:encode-object-element :menu-descrs descrs)
-                              (yason:encode-object-element :menu-factions factions)))))
-                 (cotd/websocket:send-msg client msg)))
-             (multiple-value-bind (items funcs descrs factions)
-                 (quick-scenario-menu-items)
-               (declare (ignore funcs))
-               (let ((msg (yason:with-output-to-string* ()
-                            (yason:with-object ()
-                              (yason:encode-object-element :c :response-faction-options)
-                              (yason:encode-object-element :menu-items items)
-                              (yason:encode-object-element :menu-descrs descrs)
-                              (yason:encode-object-element :menu-factions factions)))))
-                 (cotd/websocket:send-msg client msg)))))
-
-      ;; TODO: check through enums?
-      (when (not (or (eq request :missions)))
-        (log:error "Unknown option ~A in :request-scenario-options command." option)
-        (return))
+    
+    (flet ((encode-scenario-options (options &key multiple-current)
+             (yason:with-object ()
+               (when (and (not multiple-current) (getf options :current))
+                 (yason:with-object-element (:current)
+                   (yason:encode-plist (getf options :current))))
+               (loop with opt-types = (if multiple-current
+                                         (list :current :delayed :required :available)
+                                         (list :delayed :required :available))
+                     for opt-type in opt-types
+                     when (getf options opt-type) do
+                        (yason:with-object-element (opt-type)
+                          (yason:with-array ()
+                            (loop with orig-list-encoder = yason:*list-encoder*
+                                  initially (setf yason:*list-encoder* #'yason:encode-plist)
+                                  for single-option in (getf options opt-type)
+                                  do
+                                     (yason:encode-array-element single-option)
+                                  finally (setf yason:*list-encoder* orig-list-encoder))))))))
       
-      (let ((scenario (make-instance 'scenario-gen-class)))
-        ))))
+      (let* ((gen (cotd/scenario:create-scenario-generator :mission-type cur-mission-type
+                                                           :world-sector-type cur-sector
+                                                           :month cur-month
+                                                           :feats cur-feats
+                                                           :factions cur-factions
+                                                           :specific-faction cur-specific-faction))
+             (missions (cotd/scenario:get-available-and-current-mission gen))
+             (sectors (cotd/scenario:get-available-and-current-sector gen))
+             (months (cotd/scenario:get-available-and-current-month gen))
+             (feats (cotd/scenario:get-available-and-current-feats gen))
+             (factions (cotd/scenario:get-available-and-current-factions gen))
+             (specific-factions (cotd/scenario:get-available-and-current-specific-faction gen))
+             (msg (yason:with-output-to-string* ()
+                    (yason:with-object ()
+                      (yason:encode-object-element :c :response-scenario-options)
+                      (yason:with-object-element (:missions) (encode-scenario-options missions))
+                      (yason:with-object-element (:sectors) (encode-scenario-options sectors))
+                      (yason:with-object-element (:months) (encode-scenario-options months))
+                      (yason:with-object-element (:feats) (encode-scenario-options feats :multiple-current t))
+                      (yason:with-object-element (:factions) (encode-scenario-options factions :multiple-current t))
+                      (yason:with-object-element (:specific-factions) (encode-scenario-options specific-factions))))))
+        (cotd/websocket:send-msg client msg)))))
 
 (defun process-client-message (client message)
   (log:info "Raw msg received: " message)
@@ -168,7 +180,9 @@ KEY will most likely be a keyword."
         (:request-faction-options (setf non-blocking (lambda () 
                                                        (process-request-faction-options client parsed-msg))))
         (:request-mission (setf non-blocking (lambda ()
-                                               (process-request-mission client parsed-msg)))))
+                                               (process-request-mission client parsed-msg))))
+        (:request-scenario-options (setf non-blocking (lambda ()
+                                                        (process-request-scenario-options client parsed-msg)))))
       (unless (null write-operation)
          (cotd/websocket:with-write-lock *rwlock*
         ;;   ;; the write lock was released in another thread, and this thread has acquired the lock
