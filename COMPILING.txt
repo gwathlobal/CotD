@@ -114,7 +114,7 @@ The key strings here are:
 - (setq inferior-lisp-program "C:/Lisp/SBCL/1.3.12/sbcl.exe") which sets the path to you SBCL executable file. Change as appropriate.
 - (add-to-list 'load-path "C:/Lisp/libraries/slime-2.15") which sets the path to SLIME. Change as appropriate.
 
-5. Install dependencies
+7. Install dependencies
 
 Download SDL 1.2 runtime library from www.libsdl.org and put SDL.dll into C:\Lisp\SBCL\1.3.12.
 Start Emacs, press Alt + X (M x) and enter the word "slime" (without quotes) to run SLIME.
@@ -133,11 +133,11 @@ Enter the following command to load UIOP
 Enter the following command to load LOG4CL
 (ql:quickload "log4cl")
 
-6. Fetch CotD source files
+8. Fetch CotD source files
 
 Fetch CotD source files from GitHub (clone the repository) and put them to C:\Lisp\libraries.
 
-7. Run CotD 
+9. Run CotD
 
 In Lisp command prompt (SBCL or Emacs SLIME), enter the following commands one after another:
 (asdf:oos 'asdf:load-op :cotd)
