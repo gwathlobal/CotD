@@ -129,11 +129,7 @@
                  )
 
                ))
-                      
-           (bt:with-lock-held ((path-lock *world*))
-             (when (and *path-thread* (bt:thread-alive-p *path-thread*))
-               (bt:destroy-thread *path-thread*)))
-           
+
            (when turn-finished
              (incf (player-game-time (level *world*)))
              (when (check-dead *player*)
@@ -352,14 +348,9 @@
 
     (setf *start-logo* (sdl:load-image (sdl:create-path "data/logo.bmp" *current-dir*)))
     
-    (setf *path-thread* nil)
     (setf *previous-scenario* nil)
     (setf *game-manager* (make-instance 'game-manager))
     (game-state-start->init)))
-
-(defun stop-path-thread ()
-  (when (and *path-thread* (bt:thread-alive-p *path-thread*))
-    (bt:destroy-thread *path-thread*)))
 
 (defun enter-player-name ()
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
@@ -404,13 +395,6 @@
                                                            ))))
   (init-game mission world-sector)
 
-   ;; initialize thread, that will calculate random-movement paths while the system waits for player input
-  (handler-case (setf *path-thread* (bt:make-thread #'(lambda () (thread-path-loop)) :name "Pathing thread"))
-    (t (c)
-      (log:error "MAIN: This system does not support multithreading! Error: ~A~%" c)))
-  
-  (bt:condition-notify (path-cv *world*))
-  
   ;; set the same name for mimics if any
   (setf (name *player*) *player-name*)
   (setf (alive-name *player*) (name *player*))
@@ -589,7 +573,6 @@
      (handler-case
          (progn ,@body)
        (t (c)
-         (stop-path-thread)
          (setf *cotd-logging* :log-option-all)
          (setf *cotd-log-level* :info)
          (setup-log)
@@ -627,7 +610,6 @@
          (loop while t do
            (case (game-manager/game-state *game-manager*)
              (:game-state-main-menu (progn
-                                      (stop-path-thread)
                                       (with-slots (game-slot-id) *game-manager*
                                         (setf game-slot-id nil))
                                       (main-menu)))
@@ -636,7 +618,7 @@
              ((:game-state-campaign-scenario) (scenario-game-loop))
              (:game-state-post-scenario (process-post-scenario))))
        quit-menu-tag
-         (stop-path-thread))
+         nil)
       (log:info "End program~%"))
     nil))
 

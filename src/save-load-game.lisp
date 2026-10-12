@@ -1,6 +1,12 @@
 (in-package :cotd)
 
-(defparameter *save-version* 1)
+;; Bump this whenever a serialized class changes shape. cl-store writes the
+;; slots of *world*, *mobs*, *items*, *lvl-features* and *effects* as they are,
+;; so adding, removing or renaming one makes older saves unreadable; the load
+;; screen refuses a mismatch with a message rather than crashing.
+;;   2 - removed the world's cur-mob-path / path-lock / path-cv slots with the
+;;       speculative pathing thread
+(defparameter *save-version* 2)
 
 (defenum:defenum save-game-type-enum (:save-game-campaign
                                       :save-game-scenario))

@@ -919,8 +919,6 @@ hand-written methods this replaces."
 ;; Multithreading parameters
 ;;--------------------------- 
 
-(defparameter *path-thread* nil)
-(defparameter *fov-thread* nil)
 
 #+windows
 (defun new-line (&optional (on-screen nil))

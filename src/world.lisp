@@ -527,10 +527,6 @@ asked for. set-single-memo-* was 45.9% of a game turn before this."
    
    (game-events :initform () :accessor game-events)
 
-   (cur-mob-path :initform 0 :accessor cur-mob-path)
-   (path-lock :initform (bt:make-lock) :accessor path-lock)
-   (path-cv :initform (bt:make-condition-variable) :accessor path-cv)
-
    (world-map :initform nil :accessor world-map)
    (player-specific-faction :initform nil :accessor world/player-specific-faction)
    (present-missions :initform () :accessor world/present-missions)
