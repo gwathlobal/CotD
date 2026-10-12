@@ -1,17 +1,41 @@
 (in-package :cotd)
 
-(defmacro define-indexed-constants (count-name &body names)
-  "Define each symbol in NAMES as a constant holding its position in the list,
-and COUNT-NAME as how many there are.
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun trait-spec-name (spec)
+    "Name part of a trait spec, which is either NAME or (NAME DEFAULT)."
+    (if (consp spec) (first spec) spec))
 
-Use this wherever a set of small integer ids doubles as an index into a vector
-or array, so that the ids and the size of that index space cannot drift apart:
-adding an entry to the list is the whole change, and the count follows."
+  (defun trait-id-constant (prefix spec)
+    "Constant naming SPEC's id, e.g. TERRAIN-TRAIT + BLOCKS-MOVE
+=> +TERRAIN-TRAIT-BLOCKS-MOVE+."
+    (intern (format nil "+~A-~A+" (symbol-name prefix)
+                    (symbol-name (trait-spec-name spec)))
+            :cotd))
+
+  (defun trait-initarg-var (spec)
+    "Keyword parameter carrying SPEC's value into an initializer,
+e.g. BLOCKS-MOVE => TRAIT-BLOCKS-MOVE, supplied as :trait-blocks-move."
+    (intern (format nil "TRAIT-~A" (symbol-name (trait-spec-name spec)))
+            :cotd)))
+
+(defmacro define-trait-ids (prefix count-name list-name &body specs)
+  "Define a trait id space from SPECS, each either NAME or (NAME DEFAULT).
+
+Defines one constant per spec holding its position in the list, COUNT-NAME as
+how many there are, and LIST-NAME as the spec list - the last bound at compile
+time too, so that an initializer macro can generate matching :trait-NAME
+keyword parameters from the same list.
+
+One list therefore defines the ids, the size of the id space and the initargs,
+so appending a name to it is the whole change needed to add a trait. Order is
+the numbering: append rather than insert."
   `(progn
-     ,@(loop for name in names
+     (eval-when (:compile-toplevel :load-toplevel :execute)
+       (defparameter ,list-name ',specs))
+     ,@(loop for spec in specs
              for index from 0
-             collect `(defconstant ,name ,index))
-     (defconstant ,count-name ,(length names))))
+             collect `(defconstant ,(trait-id-constant prefix spec) ,index))
+     (defconstant ,count-name ,(length specs))))
 
 (declaim (type fixnum *max-x-level* *max-y-level*))
 (declaim (ftype (function (fixnum fixnum fixnum fixnum) single-float) get-distance))
@@ -565,31 +589,32 @@ adding an entry to the list is the whole change, and the count follows."
 (defconstant +level-city-terrain-bush+ 5)
 (defconstant +level-city-terrain-earth+ 6)
 
-;; Terrain trait ids. These index the second axis of *terrain-trait-table*, so
-;; +terrain-trait-count+ is derived from the list rather than written out:
-;; append a trait here and nothing else needs updating. Order is the numbering,
-;; so add to the end rather than inserting.
-(define-indexed-constants +terrain-trait-count+
-  +terrain-trait-blocks-move+
-  +terrain-trait-blocks-vision+
-  +terrain-trait-blocks-projectiles+
-  +terrain-trait-blocks-move-floor+
-  +terrain-trait-slope-up+
-  +terrain-trait-slope-down+
-  +terrain-trait-not-climable+
-  +terrain-trait-light-source+
-  +terrain-trait-blocks-sound+
-  +terrain-trait-blocks-sound-floor+
-  +terrain-trait-water+
-  +terrain-trait-move-cost-factor+
-  +terrain-trait-openable-door+
-  +terrain-trait-openable-window+
-  +terrain-trait-flammable+
-  +terrain-trait-can-jump-over+
-  +terrain-trait-can-have-rune+
-  +terrain-trait-can-switch-light+
-  +terrain-trait-blocks-projectiles-floor+
-  +terrain-trait-blocks-vision-floor+)
+;; The terrain trait space. This list is its single definition: it generates the
+;; +terrain-trait-*+ id constants, +terrain-trait-count+ (the second axis of
+;; *terrain-trait-table*), and terrain-type's :trait-* initargs. Appending a
+;; name here is the whole change needed to add a trait. A (name default) pair
+;; gives that initarg a default value.
+(define-trait-ids terrain-trait +terrain-trait-count+ *terrain-trait-specs*
+  blocks-move
+  blocks-vision
+  blocks-projectiles
+  blocks-move-floor
+  slope-up
+  slope-down
+  not-climable
+  light-source
+  blocks-sound
+  blocks-sound-floor
+  water
+  (move-cost-factor 1)
+  openable-door
+  openable-window
+  flammable
+  can-jump-over
+  can-have-rune
+  can-switch-light
+  blocks-projectiles-floor
+  blocks-vision-floor)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)

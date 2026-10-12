@@ -15,26 +15,8 @@
    ;; TRAIT is the authoritative table, populated by initialize-instance below;
    ;; set-terrain-type mirrors it into *terrain-trait-table* for fast reads.
    (trait :initform (make-hash-table) :initarg :trait :accessor trait)
-   ;; :trait-blocks-move - +terrain-trait-blocks-move+
-   ;; :trait-blocks-move-floor - +terrain-trait-blocks-move-floor+
-   ;; :trait-blocks-vision - +terrain-trait-blocks-vision+
-   ;; :trait-blocks-vision-floor - +terrain-trait-blocks-vision-floor+
-   ;; :trait-blocks-projectiles - +terrain-trait-blocks-projectiles+
-   ;; :trait-blocks-projectiles-floor - +terrain-trait-blocks-projectiles-floor+
-   ;; :trait-slope-up - +terrain-trait-slope-up+
-   ;; :trait-slope-down - +terrain-trait-slope-down+
-   ;; :trait-not-climable - +terrain-trait-not-climable+
-   ;; :trait-light-source - +terrain-trait-light-source+
-   ;; :trait-can-switch-light - +terrain-trait-can-switch-light+
-   ;; :trait-blocks-sound - +terrain-trait-blocks-sound+
-   ;; :trait-blocks-sound-floor - +terrain-trait-blocks-sound-floor+
-   ;; :trait-water - +terrain-trait-water+
-   ;; :trait-move-cost-factor - +terrain-trait-move-cost-factor+
-   ;; :trait-openable-door - +terrain-trait-openable-door+
-   ;; :trait-openable-window - +terrain-trait-openable-window+
-   ;; :trait-flammable - +terrain-trait-flammable+
-   ;; :trait-can-jump-over - +terrain-trait-can-jump-over+
-   ;; :trait-can-have-rune - +terrain-trait-can-have-rune+
+   ;; Valid :trait-* initargs and their ids are generated from
+   ;; *terrain-trait-specs* in globals.lisp; see define-trait-ids there.
    ))
 
 
@@ -62,7 +44,7 @@ the rest of the session."
           do (unless (and (typep key 'fixnum)
                           (< -1 key +terrain-trait-count+))
                (error "Terrain type ~A declares trait id ~A, outside 0..~A. Add it to the ~
-                       define-indexed-constants list in globals.lisp rather than writing ~
+                       define-trait-ids list in globals.lisp rather than writing ~
                        the id directly."
                       id key (1- +terrain-trait-count+)))
              (setf (aref *terrain-trait-table* id key) value))))
@@ -76,51 +58,30 @@ the rest of the session."
 (defun get-terrain-type-by-id (terrain-type-id)
   (aref *terrain-types* terrain-type-id))
 
-(defmethod initialize-instance :after ((terrain-type terrain-type) &key trait-blocks-move trait-blocks-move-floor trait-blocks-vision trait-blocks-vision-floor trait-blocks-projectiles trait-blocks-projectiles-floor
-                                                                        trait-slope-up trait-slope-down trait-not-climable trait-light-source trait-blocks-sound trait-blocks-sound-floor trait-water (trait-move-cost-factor 1)
-                                                                        trait-openable-door trait-openable-window trait-flammable trait-can-jump-over trait-can-have-rune trait-can-switch-light)
-  
-  (when trait-blocks-move
-    (setf (gethash +terrain-trait-blocks-move+ (trait terrain-type)) t))
-  (when trait-blocks-move-floor
-    (setf (gethash +terrain-trait-blocks-move-floor+ (trait terrain-type)) trait-blocks-move-floor))
-  (when trait-blocks-vision
-    (setf (gethash +terrain-trait-blocks-vision+ (trait terrain-type)) trait-blocks-vision))
-  (when trait-blocks-vision-floor
-    (setf (gethash +terrain-trait-blocks-vision-floor+ (trait terrain-type)) trait-blocks-vision-floor))
-  (when trait-blocks-projectiles
-    (setf (gethash +terrain-trait-blocks-projectiles+ (trait terrain-type)) t))
-  (when trait-blocks-projectiles-floor
-    (setf (gethash +terrain-trait-blocks-projectiles-floor+ (trait terrain-type)) t))
-  (when trait-slope-up
-    (setf (gethash +terrain-trait-slope-up+ (trait terrain-type)) t))
-  (when trait-slope-down
-    (setf (gethash +terrain-trait-slope-down+ (trait terrain-type)) t))
-  (when trait-not-climable
-    (setf (gethash +terrain-trait-not-climable+ (trait terrain-type)) t))
-  (when trait-light-source
-    (setf (gethash +terrain-trait-light-source+ (trait terrain-type)) trait-light-source))
-  (when trait-blocks-sound
-    (setf (gethash +terrain-trait-blocks-sound+ (trait terrain-type)) trait-blocks-sound))
-  (when trait-blocks-sound-floor
-    (setf (gethash +terrain-trait-blocks-sound-floor+ (trait terrain-type)) trait-blocks-sound-floor))
-  (when trait-water
-    (setf (gethash +terrain-trait-water+ (trait terrain-type)) trait-water))
-  (when trait-move-cost-factor
-    (setf (gethash +terrain-trait-move-cost-factor+ (trait terrain-type)) trait-move-cost-factor))
-  (when trait-openable-door
-    (setf (gethash +terrain-trait-openable-door+ (trait terrain-type)) trait-openable-door))
-  (when trait-openable-window
-    (setf (gethash +terrain-trait-openable-window+ (trait terrain-type)) trait-openable-window))
-  (when trait-flammable
-    (setf (gethash +terrain-trait-flammable+ (trait terrain-type)) trait-flammable))
-  (when trait-can-jump-over
-    (setf (gethash +terrain-trait-can-jump-over+ (trait terrain-type)) trait-can-jump-over))
-  (when trait-can-have-rune
-    (setf (gethash +terrain-trait-can-have-rune+ (trait terrain-type)) trait-can-have-rune))
-  (when trait-can-switch-light
-    (setf (gethash +terrain-trait-can-switch-light+ (trait terrain-type)) trait-can-switch-light))
-  )
+(defmacro define-terrain-type-trait-initializer ()
+  "Generate terrain-type's initialize-instance :after from *terrain-trait-specs*.
+
+Every trait follows the same rule: when its initarg is supplied and truthy,
+store that value in the trait table under the matching +terrain-trait-*+ id.
+Six traits previously stored a literal T rather than the value; they are only
+ever passed T, so the uniform rule is equivalent.
+
+This exists so that adding a trait is one line in globals.lisp instead of
+three edits in two files - the id, the keyword parameter and the store."
+  `(defmethod initialize-instance :after
+       ((terrain-type terrain-type)
+        &key ,@(loop for spec in *terrain-trait-specs*
+                     collect (if (consp spec)
+                               (list (trait-initarg-var spec) (second spec))
+                               (trait-initarg-var spec))))
+     ,@(loop for spec in *terrain-trait-specs*
+             for var = (trait-initarg-var spec)
+             collect `(when ,var
+                        (setf (gethash ,(trait-id-constant 'terrain-trait spec)
+                                       (trait terrain-type))
+                              ,var)))))
+
+(define-terrain-type-trait-initializer)
 
 (declaim (inline get-terrain-type-trait))
 (defun get-terrain-type-trait (terrain-type-id key)
