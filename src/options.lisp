@@ -43,9 +43,19 @@
         finally (setf (options-player-name options) str))
   )
 
+(defun parse-options-boolean (value)
+  "Coerce a value read from options.cfg into a proper boolean.
+Older config files wrote booleans quoted, as the strings \"T\" and \"NIL\" -
+both of which are truthy when read back - so accept those too and such
+files recover on the next load."
+  (if (stringp value)
+    (not (string-equal value "NIL"))
+    (and value t)))
+
 (defun set-options-ignore-singlemind-messages (s-expr options)
   (log:info "S-EXPR = ~A" s-expr)
-  (setf (options-ignore-singlemind-messages options) (second s-expr)))
+  (setf (options-ignore-singlemind-messages options)
+        (parse-options-boolean (second s-expr))))
 
 (defun create-options-file-string (options)
   (let ((str (create-string)))
@@ -53,6 +63,6 @@
     (format str "(font ~A)~A~%~A~%" (string-downcase (string (options-font options))) (new-line) (new-line))
     (format str ";; NAME: Sets the default name of the player~%;; Format (name \"<player name>\"). Only alphabetical ASCII characters, spaces and minuses are allowed in names.~A~%" (new-line))
     (format str "(name \"~A\")~A~%~A~%" (options-player-name options) (new-line) (new-line))
-    (format str ";; IGNORE-SINGLEMIND-MESSAGES: Defines if the player will see messages that are available through angel's 'singlemind' ability.~%;; Format (ignore-singlemind-messages <value>). <value> can be t (show messages) or nil (do not show messages).~A~%" (new-line))
-    (format str "(ignore-singlemind-messages \"~A\")~A~%~A~%" (options-ignore-singlemind-messages options) (new-line) (new-line))
+    (format str ";; IGNORE-SINGLEMIND-MESSAGES: Defines if the player will see messages that are available through angel's 'singlemind' ability.~%;; Format (ignore-singlemind-messages <value>). <value> can be t (hide the messages) or nil (show them).~A~%" (new-line))
+    (format str "(ignore-singlemind-messages ~A)~A~%~A~%" (options-ignore-singlemind-messages options) (new-line) (new-line))
     str))
