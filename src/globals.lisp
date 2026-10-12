@@ -879,9 +879,12 @@ hand-written methods this replaces."
 (defparameter *previous-scenario* nil)
 
 ;; Connect map indices for various movement types
-(defconstant +connect-map-move-walk+ 0)
-(defconstant +connect-map-move-climb+ 1)
-(defconstant +connect-map-move-fly+ 2)
+;; Movement modes. These index the fourth axis of a connect map, so the count
+;; comes from the list - see define-trait-ids.
+(define-trait-ids connect-map-move move +connect-map-move-count+ *connect-map-move-specs*
+  walk
+  climb
+  fly)
 
 (defenum:defenum log-options-enum (:log-option-all
                                    :log-option-file

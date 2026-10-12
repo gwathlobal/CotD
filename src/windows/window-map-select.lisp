@@ -100,8 +100,12 @@
                   (if *cotd-release* "" (format nil " Light: ~A-~A"
                                                 (get-single-memo-light (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                                                 (get-outdoor-light-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
-                  (if *cotd-release* "" (format nil " ~A" (aref (aref (connect-map (level *world*)) 1) (view-x *player*) (view-y *player*) (view-z *player*))))
-                  (if *cotd-release* "" (format nil " ~A" (aref (aref (connect-map (level *world*)) 3) (view-x *player*) (view-y *player*) (view-z *player*))))
+                  (if *cotd-release* "" (format nil " ~A"
+                                                (loop for mm from 0 below +connect-map-move-count+
+                                                      collect (get-level-connect-map-value (level *world*) (view-x *player*) (view-y *player*) (view-z *player*) 1 mm))))
+                  (if *cotd-release* "" (format nil " ~A"
+                                                (loop for mm from 0 below +connect-map-move-count+
+                                                      collect (get-level-connect-map-value (level *world*) (view-x *player*) (view-y *player*) (view-z *player*) 3 mm))))
                   (if *cotd-release* "" (format nil " ~A" (level-cells-connected-p (level *world*) (x *player*) (y *player*) (z *player*) (view-x *player*) (view-y *player*) (view-z *player*)
                                                                                    (if (riding-mob-id *player*)
                                                                                      (map-size (get-mob-by-id (riding-mob-id *player*)))

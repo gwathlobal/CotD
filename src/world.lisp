@@ -323,47 +323,47 @@
     (setf (aref single-memo 5) light)
     (setf (aref single-memo 6) player)))
 
+;;; A connect map is (simple-array fixnum (max-x max-y max-z +connect-map-move-count+)):
+;;; one connectivity-region id per cell per movement mode, +connect-room-none+
+;;; where none has been assigned.
+;;;
+;;; It used to be a 3D array of NIL or a small *adjustable* vector allocated
+;;; per cell, grown with adjust-array as each of walk/climb/fly was filled in -
+;;; so up to 90,000 allocations plus two reallocations each per level, and
+;;; every read cost a hairy aref, a LENGTH, two bounds tests and a NIL test.
+;;; get-connect-map-value was the hottest function in level generation.
+;;; Flattening keeps the same values: an unset entry still reads as
+;;; +connect-room-none+.
+
+(deftype connect-map () '(simple-array fixnum (* * * #.+connect-map-move-count+)))
+
+(defun make-connect-map (max-x max-y max-z)
+  (declare (type fixnum max-x max-y max-z))
+  (make-array (list max-x max-y max-z +connect-map-move-count+)
+              :element-type 'fixnum
+              :initial-element +connect-room-none+))
+
+(declaim (inline get-connect-map-value set-connect-map-value))
+
 (defun get-connect-map-value (connect-map x y z move-mode)
-  (let ((move-mode-array (aref connect-map x y z)))
-    ;(format t "GET ~A, MOVE-MODE ~A, LENGTH ~A~%" move-mode-array move-mode (length move-mode-array))
-    (unless move-mode-array
-      (return-from get-connect-map-value -1))
-    (when (>= move-mode (length move-mode-array))
-      (return-from get-connect-map-value -1))
-    (unless (aref move-mode-array move-mode)
-      (return-from get-connect-map-value -1))
-    
-    (aref move-mode-array move-mode)
-    ))
+  (declare (type connect-map connect-map) (type fixnum x y z move-mode)
+           (optimize (speed 3)))
+  (aref connect-map x y z move-mode))
+
+(defun set-connect-map-value (connect-map x y z move-mode value)
+  (declare (type connect-map connect-map) (type fixnum x y z move-mode value)
+           (optimize (speed 3)))
+  (setf (aref connect-map x y z move-mode) value))
 
 (defun get-level-connect-map-value (level x y z map-size move-mode)
+  (declare (type fixnum x y z map-size move-mode) (optimize (speed 3)))
   (when (or (zerop map-size)
             (evenp map-size))
     (error "GET-CONNECT-MAP-SIZE: Map size should be an odd number"))
-  (let ((move-mode-array (aref (aref (connect-map level) map-size) x y z)))
-    (unless move-mode-array
-      (return-from get-level-connect-map-value -1))
-    (when (>= move-mode (length move-mode-array))
-      (return-from get-level-connect-map-value -1))
-    (unless (aref move-mode-array move-mode)
-      (return-from get-level-connect-map-value -1))
-    
-    (aref move-mode-array move-mode)
-    ))
-
-(defun set-connect-map-value (connect-map x y z move-mode value)
-
-  ;; we assume that the connect map arrays have been created
-  (unless (aref connect-map x y z)
-    (setf (aref connect-map x y z) (make-array (list (1+ move-mode)) :initial-element -1 :adjustable t)))
-   
-  (let ((move-mode-array (aref connect-map x y z)))
-    (when (>= move-mode (length move-mode-array))
-      (adjust-array move-mode-array (list (1+ move-mode))))
-    ;(format t "SET ~A, MOVE-MODE ~A, LENGTH ~A~%" move-mode-array move-mode (length move-mode-array))
-    (setf (aref move-mode-array move-mode) value)
-    )
-  )
+  (let ((connect-map (aref (connect-map level) map-size)))
+    (if connect-map
+      (aref (the connect-map connect-map) x y z move-mode)
+      +connect-room-none+)))
 
 (defun level-cells-connected-p (level sx sy sz tx ty tz map-size move-mode &key (can-open-doors t))
   (when (or (< sx 0) (< sy 0) (< sz 0) (>= sx (array-dimension (terrain level) 0)) (>= sy (array-dimension (terrain level) 1)) (>= sz (array-dimension (terrain level) 2))
