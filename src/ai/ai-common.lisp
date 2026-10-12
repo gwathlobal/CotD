@@ -306,14 +306,14 @@
                                    (get-mob-move-mode actor) :can-open-doors (can-open-doors actor))
       (log:info "Mob (~A, ~A, ~A) wants to go to (~A, ~A, ~A)" (x actor) (y actor) (z actor) tx ty tz)
       ;;(format t "~%TIME-ELAPSED AI ~A [~A] before AI-PLOT-PATH-TO-DST:: ~A~%" (name actor) (id actor) (- (get-internal-real-time) *time-at-end-of-player-turn*))
-      (setf path (a-star (list (x actor) (y actor) (z actor)) (list tx ty tz) 
+      (setf path (find-path (list (x actor) (y actor) (z actor)) (list tx ty tz)
                          #'(lambda (dx dy dz cx cy cz) 
                              ;; checking for impassable objects
                              (check-move-for-ai actor dx dy dz cx cy cz :final-dst (list tx ty tz))
                              )
                          #'(lambda (dx dy dz)
-                             ;; PATH-DISTANCE (the A* heuristic) is Chebyshev
-                             ;; distance, contributing exactly 1 per diagonal
+                             ;; CHEBYSHEV-DISTANCE (FIND-PATH's heuristic)
+                             ;; contributes exactly 1 per diagonal
                              ;; step. Dividing by +normal-ap+ here normalizes
                              ;; a normal-speed mob on normal terrain to ~1
                              ;; cost per step too, so the heuristic stays a
