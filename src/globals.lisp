@@ -756,6 +756,14 @@
 
 (defparameter *shared-mind-msg-color* (sdl:color :r 0 :g 128 :b 128))
 
+;; Colours used per-cell while updating the player's field of view. These are
+;; read-only and shared: sdl:color is a CLOS object wrapping a CFFI-allocated
+;; SDL_Color with a finalizer, so constructing them inline once per cell per
+;; sweep (update-visible-area walks the entire memo array) was pure garbage.
+(defparameter *fov-deep-water-color* (sdl:color :r 0 :g 0 :b 128))
+(defparameter *fov-dim-light-color* (sdl:color :r 25 :g 25 :b 112))
+(defparameter *memo-remembered-color* (sdl:color :r 50 :g 50 :b 50))
+
 (defparameter *water-move-factor* 1.5)
 
 (defconstant +connect-room-none+ -1)

@@ -677,7 +677,7 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
              (get-terrain-type-trait (get-terrain-* level map-x map-y (1- map-z)) +terrain-trait-water+))
       (progn
         (setf glyph-idx (glyph-idx (get-terrain-type-by-id (get-terrain-* level map-x map-y (1- map-z)))))
-        (setf glyph-color (sdl:color :r 0 :g 0 :b 128))
+        (setf glyph-color *fov-deep-water-color*)
         (setf back-color (back-color (get-terrain-type-by-id (get-terrain-* level map-x map-y (1- map-z))))))
       (progn
         (setf glyph-idx (glyph-idx (get-terrain-type-by-id (get-terrain-* level map-x map-y map-z))))
@@ -685,7 +685,7 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
         (setf back-color (back-color (get-terrain-type-by-id (get-terrain-* level map-x map-y map-z))))
         (when (< (get-single-memo-light (get-memo-* level map-x map-y map-z))
                  *mob-visibility-threshold*)
-          (setf glyph-color (sdl:color :r 25 :g 25 :b 112)))))
+          (setf glyph-color *fov-dim-light-color*))))
     
     ;; then feature, if any
     (if (and (or (eq (get-terrain-* level map-x map-y map-z) +terrain-floor-air+)
@@ -712,7 +712,7 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
               (setf glyph-color (glyph-color (get-feature-type-by-id (feature-type ftr))))
               (when (< (get-single-memo-light (get-memo-* level map-x map-y map-z))
                        *mob-visibility-threshold*)
-                (setf glyph-color (sdl:color :r 25 :g 25 :b 112))))
+                (setf glyph-color *fov-dim-light-color*)))
             (when (back-color (get-feature-type-by-id (feature-type ftr)))
               (setf back-color (back-color (get-feature-type-by-id (feature-type ftr)))))
             ))))
@@ -726,7 +726,7 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
         (setf back-color (back-color vitem))
         (when (< (get-single-memo-light (get-memo-* level map-x map-y map-z))
                  *mob-visibility-threshold*)
-                (setf glyph-color (sdl:color :r 25 :g 25 :b 112)))
+                (setf glyph-color *fov-dim-light-color*))
         ))
     
     ;; finally mob, if any
@@ -822,7 +822,7 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
     (dotimes (y1 (array-dimension (memo (level *world*)) 1))
       (dotimes (z1 (array-dimension (memo (level *world*)) 2))
         (if (get-single-memo-revealed (get-memo-* level x1 y1 z1))
-          (set-single-memo-* level x1 y1 z1 :glyph-color (sdl:color :r 50 :g 50 :b 50) :back-color sdl:*black* :visibility nil)
+          (set-single-memo-* level x1 y1 z1 :glyph-color *memo-remembered-color* :back-color sdl:*black* :visibility nil)
           (set-single-memo-* level x1 y1 z1 :visibility nil))
       )))
 
