@@ -292,13 +292,20 @@
       (progn
         (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :input)
           (handler-case
-              (loop for s-expr = (read file nil) 
-                    while s-expr do
-                      (read-options s-expr *options*))
-            (t (c)
-              (log:error "OPTIONS.CFG: Error occured while reading the options.cfg: ~A. Overwriting with defaults.~%" c)
-              (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
-                (format file "~A" (create-options-file-string *options*)))))))   
+              ;; *read-eval* is bound off so that a #. in the config file cannot
+              ;; run code. options.cfg is the player's own file, so this is not
+              ;; much of a threat, but reading it is no reason to evaluate it.
+              (let ((*read-eval* nil))
+                (loop for s-expr = (read file nil)
+                      while s-expr do
+                        (read-options s-expr *options*)))
+            (error (c)
+              ;; Keep whatever was parsed before the error and carry on with
+              ;; defaults for the rest. Do NOT rewrite the file: it is hand
+              ;; editable, and throwing away someone's settings because one line
+              ;; of them is malformed is worse than ignoring that line. The
+              ;; settings window rewrites it properly on exit.
+              (log:error "OPTIONS.CFG: error while reading options.cfg: ~A. Ignoring the rest of the file; it has been left alone." c)))))
       (progn 
         (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output)
           (format file "~A" (create-options-file-string *options*))))
@@ -572,7 +579,7 @@
   `(if *cotd-release*
      (handler-case
          (progn ,@body)
-       (t (c)
+       (error (c)
          (setf *cotd-logging* :log-option-all)
          (setf *cotd-log-level* :info)
          (setup-log)

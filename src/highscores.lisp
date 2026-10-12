@@ -18,7 +18,7 @@
   (handler-case
       (let ((file-pathname (merge-pathnames (make-pathname :name *highscores-filename*) *current-dir*)))
         (cl-store:store *highscores* file-pathname))
-    (t (c)
+    (error (c)
       (log:info (format nil "~%SAVE-HIGHSCORES-TO-DISK: Error occured while saving to file: ~A.~%~%" c))))
   nil)
 
@@ -31,7 +31,7 @@
             (log:info (format nil "~%LOAD-HIGHSCORES-FROM-DISK: No file ~A to read the highscores from. Overwriting with defaults.~%~%" file-pathname))
             (save-highscores-to-disk)
             nil))
-      (t (c)
+      (error (c)
         (log:info (format nil "~%LOAD-HIGHSCORES-FROM-DISK: Error occured while reading the highscores from file ~A: ~A. Overwriting with defaults.~%~%" file-pathname c))
         (save-highscores-to-disk)
         nil)))

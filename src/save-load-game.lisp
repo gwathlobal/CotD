@@ -85,7 +85,7 @@
           do
              (handler-case
                  (setf final-num (parse-integer (string-left-trim *save-final-base-dirname* last-dir)))
-               (t (c)
+               (error (c)
                  (log:error "~A in ~A does not end with an integer - ignored. Error: ~A" last-dir pathname c)))
              (when final-num
                (push final-num save-slots))
@@ -127,7 +127,7 @@
         (ensure-directories-exist dir-pathname)
         (cl-store:store serialized-save-descr descr-file-pathname)
         (cl-store:store serialized-game game-file-pathname))
-    (t (c)
+    (error (c)
       (log:error "Error occured while saving to file: ~A" c)))
   nil
   )
@@ -145,7 +145,7 @@
           (progn
             (log:error "No file ~A to read the save description from." descr-pathname)
             nil))
-      (t (c)
+      (error (c)
         (log:error "Error occured while reading the save description from file ~A: ~A." descr-pathname c)
         nil))
     (when saved-descr
@@ -166,7 +166,7 @@
           (progn
             (log:error "No file ~A to read the saved game from." game-pathname)
             nil))
-      (t (c)
+      (error (c)
         (log:error "Error occured while reading the saved game from file ~A: ~A." game-pathname c)
         nil))
     (when saved-game
@@ -197,7 +197,7 @@
         (progn
           (log:error "No file ~A to remove the saved description." descr-pathname)
           nil))
-    (t (c)
+    (error (c)
       (log:error "Error occured while deleting the saved description from file ~A: ~A." descr-pathname c)
       nil)))
 
@@ -213,7 +213,7 @@
         (progn
           (log:error "No file ~A to remove the saved game." game-pathname)
           nil))
-    (t (c)
+    (error (c)
       (log:error "Error occured while deleting the saved game from file ~A: ~A." game-pathname c)
       nil)))
 
@@ -229,6 +229,6 @@
         (progn
           (log:error "No directory ~A to remove." dir-pathname)
           nil))
-    (t (c)
+    (error (c)
       (log:error "Error occured while deleting the directory ~A: ~A." dir-pathname c)
       nil)))
