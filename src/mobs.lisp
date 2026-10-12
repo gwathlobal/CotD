@@ -6,8 +6,8 @@
 
 (defclass mob-type ()
   ((glyph-idx :initform 0 :initarg :glyph-idx :accessor glyph-idx :type fixnum)
-   (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
-   (back-color :initform sdl:*black* :initarg :back-color :accessor back-color :type sdl:color)
+   (glyph-color :initform +color-white+ :initarg :glyph-color :accessor glyph-color :type packed-color)
+   (back-color :initform +color-black+ :initarg :back-color :accessor back-color :type packed-color)
    (name :initform "No name mob" :initarg :name :accessor name)
    
    (faction :initform +faction-type-none+ :initarg :faction :accessor faction)

@@ -802,8 +802,8 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                       (not (get-terrain-type-trait (get-terrain-* level (x mob) (y mob) (1+ (z mob))) +terrain-trait-blocks-move-floor+))
                       )
              (if (get-faction-relation (faction *player*) (get-visible-faction mob))
-               (set-single-memo-* (level *world*) (x mob) (y mob) (1+ (z mob)) :back-color sdl:*blue*)
-               (set-single-memo-* (level *world*) (x mob) (y mob) (1+ (z mob)) :back-color sdl:*red*))))
+               (set-single-memo-* (level *world*) (x mob) (y mob) (1+ (z mob)) :back-color +color-blue+)
+               (set-single-memo-* (level *world*) (x mob) (y mob) (1+ (z mob)) :back-color +color-red+))))
   
   )
 
@@ -822,7 +822,7 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
     (dotimes (y1 (array-dimension (memo (level *world*)) 1))
       (dotimes (z1 (array-dimension (memo (level *world*)) 2))
         (if (get-single-memo-revealed (get-memo-* level x1 y1 z1))
-          (set-single-memo-* level x1 y1 z1 :glyph-color *memo-remembered-color* :back-color sdl:*black* :visibility nil)
+          (set-single-memo-* level x1 y1 z1 :glyph-color *memo-remembered-color* :back-color +color-black+ :visibility nil)
           (set-single-memo-* level x1 y1 z1 :visibility nil))
       )))
 

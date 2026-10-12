@@ -9,32 +9,32 @@
 ;;--------------------
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-border-floor+ :name "dirt"
-                                               :glyph-idx 95 :glyph-color (sdl:color :r 205 :g 103 :b 63) :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color (rgb 205 103 63) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision t :trait-blocks-vision-floor t :trait-blocks-projectiles t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound t :trait-blocks-sound-floor t :trait-not-climable t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-border-floor-snow+ :name "snow"
-                                               :glyph-idx 95 :glyph-color sdl:*white* :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color +color-white+ :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision t :trait-blocks-vision-floor t :trait-blocks-projectiles t :trait-blocks-projectiles-floor t
                                                :trait-not-climable t :trait-blocks-sound t :trait-blocks-sound-floor t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-border-water+ :name "water"
-                                               :glyph-idx +glyph-id-tilda+ :glyph-color sdl:*blue* :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-tilda+ :glyph-color +color-blue+ :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-projectiles t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 10 :trait-blocks-sound-floor 10 :trait-not-climable t :trait-water t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-border-grass+ :name "grass"
-                                               :glyph-idx 95 :glyph-color (sdl:color :r 0 :g 100 :b 0) :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color (rgb 0 100 0) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision t :trait-blocks-vision-floor t :trait-blocks-projectiles t :trait-blocks-projectiles-floor t
                                                :trait-not-climable t :trait-blocks-sound t :trait-blocks-sound-floor t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-border-air+ :name "air"
-                                               :glyph-idx 96 :glyph-color sdl:*cyan* :back-color sdl:*black* 
+                                               :glyph-idx 96 :glyph-color +color-cyan+ :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-projectiles t :trait-blocks-projectiles-floor t
                                                :trait-not-climable t :trait-blocks-sound t :trait-blocks-sound-floor t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-border-creep+ :name "creep"
-                                               :glyph-idx 95 :glyph-color (sdl:color :r 100 :g 0 :b 100) :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color (rgb 100 0 100) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision t :trait-blocks-vision-floor t :trait-blocks-projectiles t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound t :trait-blocks-sound-floor t :trait-not-climable t))
 
@@ -44,78 +44,78 @@
 ;;--------------------
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-stone+ :name "stone floor"
-                                               :glyph-idx +glyph-id-solid-floor+ :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-solid-floor+ :glyph-color (rgb 200 200 200) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-glass+ :name "transparent floor"
-                                               :glyph-idx +glyph-id-solid-floor+ :glyph-color sdl:*cyan* :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-solid-floor+ :glyph-color +color-cyan+ :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-grass+ :name "grass"
-                                               :glyph-idx 95 :glyph-color (sdl:color :r 0 :g 100 :b 0) :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color (rgb 0 100 0) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20 :trait-flammable 3))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-dirt+ :name "dirt"
-                                               :glyph-idx 95 :glyph-color (sdl:color :r 205 :g 103 :b 63) :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color (rgb 205 103 63) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-dirt-bright+ :name "dirt"
-                                               :glyph-idx 95 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color (rgb 139 69 19) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-snow+ :name "snow"
-                                               :glyph-idx 95 :glyph-color sdl:*white* :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color +color-white+ :back-color +color-black+ 
                                                :on-step #'(lambda (mob x y z)
                                                             (when (not (mob-ability-p mob +mob-abil-float+))
                                                               (set-terrain-* (level *world*) x y z +terrain-floor-snow-prints+)))
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-snow-prints+ :name "snow"
-                                               :glyph-idx 95 :glyph-color (sdl:color :r 80 :g 80 :b 155) :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color (rgb 80 80 155) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-bridge+ :name "bridge"
-                                               :glyph-idx 96 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* 
+                                               :glyph-idx 96 :glyph-color (rgb 150 150 150) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 10))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-pier+ :name "pier"
-                                               :glyph-idx 96 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black*
+                                               :glyph-idx 96 :glyph-color (rgb 150 150 150) :back-color +color-black+
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 10))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-ash+ :name "ash"
-                                               :glyph-idx 95 :glyph-color (sdl:color :r 70 :g 70 :b 70) :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color (rgb 70 70 70) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-sign-church-catholic+ :name "sign \"The Catholic Church of the One\""
-                                               :glyph-idx 122 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx 122 :glyph-color (rgb 139 69 19) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-sign-church-orthodox+ :name "sign \"The Orthodox Church of the One\""
-                                               :glyph-idx 122 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx 122 :glyph-color (rgb 139 69 19) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-sign-library+ :name "sign \"The Library of His Imperial Majesty\""
-                                               :glyph-idx 122 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx 122 :glyph-color (rgb 139 69 19) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-sign-prison+ :name "sign \"City Prison\""
-                                               :glyph-idx 122 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx 122 :glyph-color (rgb 139 69 19) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-sign-bank+ :name "sign \"Bank of Morozov and Sons\""
-                                               :glyph-idx 122 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx 122 :glyph-color (rgb 139 69 19) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep+ :name "creep"
-                                               :glyph-idx 95 :glyph-color (sdl:color :r 100 :g 0 :b 100) :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color (rgb 100 0 100) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-bright+ :name "creep"
-                                               :glyph-idx 95 :glyph-color (sdl:color :r 255 :g 0 :b 255) :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color (rgb 255 0 255) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-dreadtubes+ :name "dreadtubes"
-                                               :glyph-idx 129 :glyph-color (sdl:color :r 105 :g 50 :b 255) :back-color sdl:*black* 
+                                               :glyph-idx 129 :glyph-color (rgb 105 50 255) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20
                                                :on-step #'(lambda (mob x y z)
                                                             (when (< (random 100) 20)
@@ -154,7 +154,7 @@
                                                               ))))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-spores+ :name "sludgeshrooms"
-                                               :glyph-idx 130 :glyph-color (sdl:color :r 155 :g 50 :b 0) :back-color sdl:*black* 
+                                               :glyph-idx 130 :glyph-color (rgb 155 50 0) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20
                                                :on-step #'(lambda (mob x y z)
                                                             (when (< (random 100) 20)
@@ -178,7 +178,7 @@
                                                                                             ))))))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-irradiated+ :name "glowing creep"
-                                               :glyph-idx 95 :glyph-color (sdl:color :r 200 :g 50 :b 100) :back-color sdl:*black* 
+                                               :glyph-idx 95 :glyph-color (rgb 200 50 100) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20
                                                :on-step #'(lambda (mob x y z)
                                                             (declare (ignore x y z))
@@ -196,7 +196,7 @@
                                                                 (set-mob-effect mob :effect-type-id +mob-effect-irradiated+ :actor-id nil :cd t :param1 (+ 2 (random 3))))))))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-slime+ :name "slime"
-                                               :glyph-idx +glyph-id-tilda+ :glyph-color sdl:*yellow* :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-tilda+ :glyph-color +color-yellow+ :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20
                                                :on-step #'(lambda (mob x y z)
                                                             (declare (ignore x y z))
@@ -212,49 +212,49 @@
 ;;--------------------
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-stone+ :name "stone wall"
-                                               :glyph-idx +glyph-id-wall+ :glyph-color sdl:*white* :back-color sdl:*white* 
+                                               :glyph-idx +glyph-id-wall+ :glyph-color +color-white+ :back-color +color-white+ 
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 25 :trait-blocks-sound-floor 20 :trait-blocks-move-floor t
                                                :trait-can-have-rune t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-barricade+ :name "barricade"
-                                               :glyph-idx +glyph-id-hash+ :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-hash+ :glyph-color (rgb 139 69 19) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 10  :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-earth+ :name "earth"
-                                               :glyph-idx +glyph-id-wall+ :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color (sdl:color :r 185 :g 83 :b 43)
+                                               :glyph-idx +glyph-id-wall+ :glyph-color (rgb 185 83 43) :back-color (rgb 185 83 43)
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 40 :trait-blocks-sound-floor 40))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-compressed-bones+ :name "compressed bones"
-                                               :glyph-idx +glyph-id-wall+ :glyph-color (sdl:color :r 189 :g 183 :b 107) :back-color (sdl:color :r 189 :g 183 :b 107)
+                                               :glyph-idx +glyph-id-wall+ :glyph-color (rgb 189 183 107) :back-color (rgb 189 183 107)
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 40 :trait-blocks-sound-floor 40))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-raw-flesh+ :name "raw flesh"
-                                               :glyph-idx +glyph-id-percent+ :glyph-color sdl:*magenta* :back-color sdl:*black*
+                                               :glyph-idx +glyph-id-percent+ :glyph-color +color-magenta+ :back-color +color-black+
                                                :trait-blocks-move t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 20 :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-bush+ :name "bush"
-                                               :glyph-idx +glyph-id-hash+ :glyph-color sdl:*green* :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-hash+ :glyph-color +color-green+ :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20 :trait-flammable 3 :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-grave+ :name "grave"
-                                               :glyph-idx 121 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* 
+                                               :glyph-idx 121 :glyph-color (rgb 150 150 150) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20 :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-gloomtwigs+ :name "gloomtwigs"
-                                               :glyph-idx +glyph-id-hash+ :glyph-color (sdl:color :r 255 :g 0 :b 255) :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-hash+ :glyph-color (rgb 255 0 255) :back-color +color-black+ 
                                                :trait-blocks-vision 60 :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-corrupted+ :name "bone wall"
-                                               :glyph-idx +glyph-id-wall+ :glyph-color (sdl:color :r 189 :g 183 :b 107) :back-color (sdl:color :r 189 :g 183 :b 107) 
+                                               :glyph-idx +glyph-id-wall+ :glyph-color (rgb 189 183 107) :back-color (rgb 189 183 107) 
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 25 :trait-blocks-sound-floor 20 :trait-can-have-rune t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-razorthorns+ :name "razorthorns"
-                                               :glyph-idx +glyph-id-hash+ :glyph-color (sdl:color :r 100 :g 0 :b 0) :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-hash+ :glyph-color (rgb 100 0 0) :back-color +color-black+ 
                                                :trait-blocks-vision 60 :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20
                                                :on-step #'(lambda (mob x y z)
                                                             (declare (ignore x y z))
@@ -275,63 +275,63 @@
 ;;--------------------
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-birch+ :name "young birch tree"
-                                               :glyph-idx 52 :glyph-color sdl:*green* :back-color sdl:*black* 
+                                               :glyph-idx 52 :glyph-color +color-green+ :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-birch-snow+ :name "snow-covered birch tree"
-                                               :glyph-idx 52 :glyph-color sdl:*white* :back-color sdl:*black* 
+                                               :glyph-idx 52 :glyph-color +color-white+ :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-branches+ :name "tree branch"
-                                               :glyph-idx 3 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* 
+                                               :glyph-idx 3 :glyph-color (rgb 185 83 43) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-projectiles-floor t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-leaves+ :name "tree leaves"
-                                               :glyph-idx 3 :glyph-color sdl:*green* :back-color sdl:*black* 
+                                               :glyph-idx 3 :glyph-color +color-green+ :back-color +color-black+ 
                                                :trait-blocks-vision 60))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-leaves-snow+ :name "snow-covered tree leaves"
-                                               :glyph-idx 3 :glyph-color sdl:*white* :back-color sdl:*black* 
+                                               :glyph-idx 3 :glyph-color +color-white+ :back-color +color-black+ 
                                                :trait-blocks-vision 60))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-birch-trunk+ :name "mature birch"
-                                               :glyph-idx 16 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* 
+                                               :glyph-idx 16 :glyph-color (rgb 185 83 43) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 10 :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-oak-trunk-nw+ :name "mature oak"
-                                               :glyph-idx 104 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* 
+                                               :glyph-idx 104 :glyph-color (rgb 185 83 43) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 15 :trait-blocks-sound-floor 15))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-oak-trunk-ne+ :name "mature oak"
-                                               :glyph-idx 105 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* 
+                                               :glyph-idx 105 :glyph-color (rgb 185 83 43) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 15 :trait-blocks-sound-floor 15))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-oak-trunk-se+ :name "mature oak"
-                                               :glyph-idx 106 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* 
+                                               :glyph-idx 106 :glyph-color (rgb 185 83 43) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 15 :trait-blocks-sound-floor 15))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-oak-trunk-sw+ :name "mature oak"
-                                               :glyph-idx 107 :glyph-color (sdl:color :r 185 :g 83 :b 43) :back-color sdl:*black* 
+                                               :glyph-idx 107 :glyph-color (rgb 185 83 43) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 15 :trait-blocks-sound-floor 15))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-twintube+ :name "young twintube"
-                                               :glyph-idx 57 :glyph-color (sdl:color :r 255 :g 0 :b 255) :back-color sdl:*black* 
+                                               :glyph-idx 57 :glyph-color (rgb 255 0 255) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound-floor 20 :trait-blocks-move-floor t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-tree-twintube-trunk+ :name "mature twintube"
-                                               :glyph-idx 16 :glyph-color (sdl:color :r 100 :g 0 :b 100) :back-color sdl:*black* 
+                                               :glyph-idx 16 :glyph-color (rgb 100 0 100) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound 10 :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-twintube-branches+ :name "twintube branch"
-                                               :glyph-idx 3 :glyph-color (sdl:color :r 100 :g 0 :b 100) :back-color sdl:*black* 
+                                               :glyph-idx 3 :glyph-color (rgb 100 0 100) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-projectiles-floor t))
 
 ;;--------------------
@@ -339,27 +339,27 @@
 ;;--------------------
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-chair+ :name "chair"
-                                               :glyph-idx 100 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx 100 :glyph-color (rgb 139 69 19) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20 :trait-flammable 6))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-table+ :name "table"
-                                               :glyph-idx 101 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx 101 :glyph-color (rgb 139 69 19) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20 :trait-flammable 10  :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-bed+ :name "bed"
-                                               :glyph-idx 102 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx 102 :glyph-color (rgb 139 69 19) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20 :trait-flammable 12 :trait-can-jump-over t))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-cabinet+ :name "cabinet"
-                                               :glyph-idx 103 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx 103 :glyph-color (rgb 139 69 19) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20 :trait-flammable 8))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-crate+ :name "crate"
-                                               :glyph-idx 103 :glyph-color (sdl:color :r 112 :g 128 :b 144) :back-color sdl:*black*
+                                               :glyph-idx 103 :glyph-color (rgb 112 128 144) :back-color +color-black+
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-bookshelf+ :name "bookshelf"
-                                               :glyph-idx 103 :glyph-color (sdl:color :r 165 :g 42 :b 42) :back-color sdl:*black* 
+                                               :glyph-idx 103 :glyph-color (rgb 165 42 42) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-vision t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound-floor 20 :trait-flammable 8))
 
@@ -368,7 +368,7 @@
 ;;--------------------
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-window+ :name "window"
-                                               :glyph-idx 13 :glyph-color (sdl:color :r 0 :g 0 :b 200) :back-color sdl:*black* 
+                                               :glyph-idx 13 :glyph-color (rgb 0 0 200) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-projectiles t :trait-blocks-projectiles-floor t :trait-blocks-vision 30 :trait-blocks-vision-floor t 
                                                :trait-blocks-sound 20 :trait-blocks-sound-floor 20 :trait-openable-window t
                                                :on-use #'(lambda (mob x y z)
@@ -391,7 +391,7 @@
                                                                       nil))))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-window-opened+ :name "opened window"
-                                               :glyph-idx 15 :glyph-color (sdl:color :r 0 :g 0 :b 200) :back-color sdl:*black* 
+                                               :glyph-idx 15 :glyph-color (rgb 0 0 200) :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 10 :trait-openable-window t
                                                :on-use #'(lambda (mob x y z)
                                                            (declare (ignore mob))
@@ -406,7 +406,7 @@
                                                            )))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-door-open+ :name "open door"
-                                               :glyph-idx 7 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black*
+                                               :glyph-idx 7 :glyph-color (rgb 139 69 19) :back-color +color-black+
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 10 :trait-openable-door t
                                                :on-use #'(lambda (mob x y z)
                                                            (declare (ignore mob))
@@ -436,7 +436,7 @@
                                                            )))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-door-closed+ :name "closed door"
-                                               :glyph-idx 11 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* 
+                                               :glyph-idx 11 :glyph-color (rgb 139 69 19) :back-color +color-black+ 
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-vision t :trait-blocks-projectiles-floor t :trait-blocks-projectiles t
                                                :trait-blocks-sound 15 :trait-blocks-sound-floor 20 :trait-openable-door t
                                                :on-use #'(lambda (mob x y z)
@@ -478,25 +478,25 @@
 ;;--------------------
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-liquid+ :name "water"
-                                               :glyph-idx +glyph-id-tilda+ :glyph-color sdl:*blue* :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-tilda+ :glyph-color +color-blue+ :back-color +color-black+ 
                                                :trait-not-climable t :trait-blocks-sound-floor 10 :trait-blocks-sound 10 :trait-water t :trait-move-cost-factor *water-move-factor*
                                                :on-step #'(lambda (mob x y z)
                                                             (declare (ignore x y z))
                                                             (set-mob-effect mob :effect-type-id +mob-effect-wet+ :actor-id (id mob) :cd 4))))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-ice+ :name "ice"
-                                               :glyph-idx +glyph-id-tilda+ :glyph-color (sdl:color :r 0 :g 150 :b 255) :back-color sdl:*black*
+                                               :glyph-idx +glyph-id-tilda+ :glyph-color (rgb 0 150 255) :back-color +color-black+
                                                :trait-blocks-move-floor t :trait-blocks-projectiles-floor t :trait-blocks-sound-floor 20))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-water-liquid-nofreeze+ :name "water"
-                                               :glyph-idx +glyph-id-tilda+ :glyph-color sdl:*blue* :back-color sdl:*black* 
+                                               :glyph-idx +glyph-id-tilda+ :glyph-color +color-blue+ :back-color +color-black+ 
                                                :trait-blocks-sound-floor 10 :trait-blocks-sound 10 :trait-water t :trait-move-cost-factor *water-move-factor*
                                                :on-step #'(lambda (mob x y z)
                                                             (declare (ignore x y z))
                                                             (set-mob-effect mob :effect-type-id +mob-effect-wet+ :actor-id (id mob) :cd 4))))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-ice+ :name "ice"
-                                               :glyph-idx +glyph-id-wall+ :glyph-color (sdl:color :r 0 :g 150 :b 255) :back-color (sdl:color :r 0 :g 150 :b 255) 
+                                               :glyph-idx +glyph-id-wall+ :glyph-color (rgb 0 150 255) :back-color (rgb 0 150 255) 
                                                :trait-blocks-move t :trait-blocks-projectiles t :trait-blocks-move-floor t :trait-blocks-projectiles-floor t
                                                :trait-blocks-sound 25 :trait-blocks-sound-floor 20))
 
@@ -505,7 +505,7 @@
 ;;--------------------
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-air+ :name "air"
-                                               :glyph-idx 96 :glyph-color sdl:*cyan* :back-color sdl:*black* ))
+                                               :glyph-idx 96 :glyph-color +color-cyan+ :back-color +color-black+ ))
 
 
 ;;--------------------
@@ -513,11 +513,11 @@
 ;;--------------------
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-slope-stone-up+ :name "slope up"
-                                               :glyph-idx 118 :glyph-color sdl:*white* :back-color sdl:*black* 
+                                               :glyph-idx 118 :glyph-color +color-white+ :back-color +color-black+ 
                                                :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-slope-up t :trait-blocks-sound-floor 10))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-slope-stone-down+ :name "slope down"
-                                               :glyph-idx 119 :glyph-color sdl:*white* :back-color sdl:*black* 
+                                               :glyph-idx 119 :glyph-color +color-white+ :back-color +color-black+ 
                                                :trait-slope-down t))
 
 ;;--------------------
@@ -525,7 +525,7 @@
 ;;--------------------
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-lantern+ :name "lantern"
-                                               :glyph-idx 92 :glyph-color sdl:*yellow* :back-color sdl:*black*
+                                               :glyph-idx 92 :glyph-color +color-yellow+ :back-color +color-black+
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-light-source 6 :trait-can-switch-light t :trait-blocks-sound 20 :trait-blocks-sound-floor 20
                                                :on-use #'(lambda (mob x y z)
@@ -550,7 +550,7 @@
 
 ;; light sources that are off, but can be toggled on - should have the +terrain-trait-light-source+ set to 0, as opposed to non-light-sources, where it is set to nil
 (set-terrain-type (make-instance 'terrain-type :id +terrain-wall-lantern-off+ :name "lantern (off)"
-                                               :glyph-idx 92 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black*
+                                               :glyph-idx 92 :glyph-color (rgb 150 150 150) :back-color +color-black+
                                                :trait-blocks-move t :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t
                                                :trait-light-source 0 :trait-can-switch-light t :trait-blocks-sound 20 :trait-blocks-sound-floor 20
                                                :on-use #'(lambda (mob x y z)
@@ -573,5 +573,5 @@
                                                                       nil))))
 
 (set-terrain-type (make-instance 'terrain-type :id +terrain-floor-creep-glowshroom+ :name "glowshroom"
-                                               :glyph-idx 130 :glyph-color sdl:*yellow* :back-color sdl:*black*
+                                               :glyph-idx 130 :glyph-color +color-yellow+ :back-color +color-black+
                                                :trait-blocks-move nil :trait-blocks-move-floor t :trait-blocks-vision-floor t :trait-blocks-projectiles-floor t :trait-light-source 4 :trait-can-switch-light nil :trait-blocks-sound-floor 20))

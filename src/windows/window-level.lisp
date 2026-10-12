@@ -428,8 +428,8 @@
                                                                        (draw-glyph x1
                                                                                    y1
                                                                                    31
-                                                                                   :front-color sdl:*white*
-                                                                                   :back-color sdl:*black*))
+                                                                                   :front-color +color-white+
+                                                                                   :back-color +color-black+))
                                                             ))
     
     (show-abilities-on-cooldown 10 (- *window-height* *msg-box-window-height* 20 (* (sdl:char-height sdl:*default-font*) 2)))

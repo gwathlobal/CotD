@@ -2084,7 +2084,7 @@
           (= (faction *player*) (faction mob)))
      (glyph-color (get-mob-type-by-id (mob-type mob))))
     ((mob-effect-p mob +mob-effect-blessed+)
-     sdl:*blue*)
+     +color-blue+)
     (t (glyph-color (get-mob-type-by-id (face-mob-type-id mob))))))
 
 (defun get-current-mob-back-color (mob)

@@ -3,33 +3,33 @@
 (set-item-type (make-instance 'item-type :id +item-type-body-part-limb+
                                          :name "body part" :plural-name "body parts"
                                          :flavor-quote (format nil "\"The dead man lay, as dead men always lie, in a specially heavy way, his rigid limbs sunk in the soft cushions of the coffin, with the head forever bowed on the pillow. <...> He was much changed and grown even thinner since Peter Ivanovich had last seen him, but, as is always the case with the dead, his face was handsomer and above all more dignified than when he was alive.\"~%Leo Tolstoy. Death of Ivan Ilych.")
-                                         :glyph-idx +glyph-id-percent+ :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 1))
+                                         :glyph-idx +glyph-id-percent+ :glyph-color +color-red+ :back-color +color-black+ :abil-corpse 1))
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-half+
                                          :name "body part" :plural-name "body parts"
                                          :flavor-quote (format nil "\"The dead man lay, as dead men always lie, in a specially heavy way, his rigid limbs sunk in the soft cushions of the coffin, with the head forever bowed on the pillow. <...> He was much changed and grown even thinner since Peter Ivanovich had last seen him, but, as is always the case with the dead, his face was handsomer and above all more dignified than when he was alive.\"~%Leo Tolstoy. Death of Ivan Ilych.")
-                                         :glyph-idx +glyph-id-percent+ :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 2))
+                                         :glyph-idx +glyph-id-percent+ :glyph-color +color-red+ :back-color +color-black+ :abil-corpse 2))
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-body+
                                          :name "body part" :plural-name "body parts"
                                          :flavor-quote (format nil "\"The dead man lay, as dead men always lie, in a specially heavy way, his rigid limbs sunk in the soft cushions of the coffin, with the head forever bowed on the pillow. <...> He was much changed and grown even thinner since Peter Ivanovich had last seen him, but, as is always the case with the dead, his face was handsomer and above all more dignified than when he was alive.\"~%Leo Tolstoy. Death of Ivan Ilych.")
-                                         :glyph-idx +glyph-id-percent+ :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 3))
+                                         :glyph-idx +glyph-id-percent+ :glyph-color +color-red+ :back-color +color-black+ :abil-corpse 3))
 
 (set-item-type (make-instance 'item-type :id +item-type-body-part-full+
                                          :name "body part" :plural-name "body parts"
                                          :flavor-quote (format nil "\"The dead man lay, as dead men always lie, in a specially heavy way, his rigid limbs sunk in the soft cushions of the coffin, with the head forever bowed on the pillow. <...> He was much changed and grown even thinner since Peter Ivanovich had last seen him, but, as is always the case with the dead, his face was handsomer and above all more dignified than when he was alive.\"~%Leo Tolstoy. Death of Ivan Ilych.")
-                                         :glyph-idx +glyph-id-percent+ :glyph-color sdl:*red* :back-color sdl:*black* :abil-corpse 4))
+                                         :glyph-idx +glyph-id-percent+ :glyph-color +color-red+ :back-color +color-black+ :abil-corpse 4))
 
 (set-item-type (make-instance 'item-type :id +item-type-coin+
                                          :name "coin" :plural-name "coins"
                                          :flavor-quote (format nil "\"I have money and so I can do whatever I like; I have money and so I will not perish and will not have to ask help from anyone; not having to ask for anyone's help is the highest freedom. Yet in essence this is not freedom but slavery once again, a slavery that comes from money.\"~%Fyodor Dostoevsky. A Writer's Diary.")
-                                         :glyph-idx 4 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 10000 :value 1))
+                                         :glyph-idx 4 :glyph-color +color-yellow+ :back-color +color-black+ :max-stack-num 10000 :value 1))
 
 (set-item-type (make-instance 'item-type :id +item-type-medkit+
                                          :name "medkit" :plural-name "medkits"
                                          :descr "A medkit that can heal 3-5 HP. Usable by humans only. Unusable underwater."
                                          :flavor-quote (format nil "\"There was a large wound in his stomach. The King washed it as best he could, and bandaged it with his handkerchief and with a towel the hermit had. But the blood would not stop flowing, and the King again and again removed the bandage soaked with warm blood, and washed and rebandaged the wound. When at last the blood ceased flowing, the man revived and asked for something to drink.\"~%Leo Tolstoy. Three Questions.")
-                                         :glyph-idx +glyph-id-exclamation-mark+ :glyph-color sdl:*green* :back-color sdl:*black* :max-stack-num 10 :value 10
+                                         :glyph-idx +glyph-id-exclamation-mark+ :glyph-color +color-green+ :back-color +color-black+ :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore item target))
                                                      (let ((heal-pwr (+ 3 (random 3))))
@@ -73,7 +73,7 @@
                                          :name "smoke bomb" :plural-name "smoke bombs"
                                          :descr "A bomb that emits clouds of smoke to conceal you. Usable only by humans. Can not be used in water."
                                          :flavor-quote (format nil "\"All smoke and steam, he thought; all seems for ever changing, on all sides new forms, phantoms flying after phantoms, while in reality it is all the same and the same again; everything hurrying, flying towards something, and everything vanishing without a trace, attaining to nothing; another wind blows, and all is dashing in the opposite direction, and there again the same untiring, restless - and useless gambols!\"~%Ivan Turgenev. Smoke.")
-                                         :glyph-idx 1 :glyph-color (sdl:color :r 200 :g 200 :b 200) :back-color sdl:*black* :max-stack-num 10 :value 10
+                                         :glyph-idx 1 :glyph-color (rgb 200 200 200) :back-color +color-black+ :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore target item))
                                                      (when (not (get-terrain-type-trait (get-terrain-* (level *world*) (x actor) (y actor) (z actor)) +terrain-trait-water+))
@@ -136,13 +136,13 @@
 (set-item-type (make-instance 'item-type :id +item-type-clothing+
                                          :name "civilian costume" :plural-name "civilian costumes"
                                          :flavor-quote (format nil "\"And what fine eyes he has, and how fine his whole face is!.. He is even better looking than Dounia... But, good heavens, what a suit - how terribly he's dressed! ... Vasya, the messenger boy in Afanasy Ivanitch's shop, is better dressed!\"~%Fyodor Dostoevsky. Crime and Punishment.")
-                                         :glyph-idx 59 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 10 :value 5))
+                                         :glyph-idx 59 :glyph-color +color-yellow+ :back-color +color-black+ :max-stack-num 10 :value 5))
 
 (set-item-type (make-instance 'item-type :id +item-type-disguise+
                                          :name "disguise" :plural-name "disguises"
                                          :descr "A special kit that lets you disguise yourself as an ordinary man or woman. Usable by humans and Malseraph's puppets only."
                                          :flavor-quote (format nil "\"The door opened and a masked corpulent stocky man, wearing a coachman's suit and a hat with peackock's feathers, entered the reading room. He was followed by two masked ladies and a servant holding a tray. On the tray, there stood a bellied bottle of liqueur, three bottles of red wine and several glasses.\"~%Anton Checkov. The Mask.")
-                                         :glyph-idx 59 :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-stack-num 10 :value 10
+                                         :glyph-idx 59 :glyph-color (rgb 100 100 100) :back-color +color-black+ :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore target item))
                                                      
@@ -170,7 +170,7 @@
                                          :name "deck of war" :plural-name "decks of war"
                                          :descr "A special deck of cards granted by Malseraph, the Demon God of Acting, Gambling and Violent Changes. The deck contains a random number of different cards, all devouted to combat and fighting. Each card has a special effect that will benefit those who use it."
                                          :flavor-quote (format nil "\"As for cards, there was no habit to play cards in those circles (mainly literary ones) where Fyodor Mikhailovich used to move. During our 14 years of marriage, my husband played preferans only once, at my relatives' place; and though he had not touched a card for more than 10 years, he played perfectly and even managed to win several roubles from his partners which embarrassed him greatly.\"~%Anna Dostoevskaya. Dostoevsky: Reminiscences.")
-                                         :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1
+                                         :glyph-idx 1 :glyph-color +color-yellow+ :back-color +color-black+ :max-stack-num 1
                                          :abil-card (list +item-card-curse-other+ +item-card-blindness-other+ +item-card-fear-other+ +item-card-slow-other+ +item-card-silence-other+ +item-card-confuse-other+
                                                           +item-card-polymorph-other+ +item-card-irradiate-other+ +item-card-lignify-other+)
                                          :on-use #'(lambda (actor target item)
@@ -214,7 +214,7 @@
                                          :name "deck of escape" :plural-name "decks of escape"
                                          :descr "A special deck of cards granted by Malseraph, the Demon God of Acting, Gambling and Violent Changes. The deck contains a random number of different cards, all devouted to escapes and trickery. Each card has a special effect that will benefit those who use it."
                                          :flavor-quote (format nil "\"As for cards, there was no habit to play cards in those circles (mainly literary ones) where Fyodor Mikhailovich used to move. During our 14 years of marriage, my husband played preferans only once, at my relatives' place; and though he had not touched a card for more than 10 years, he played perfectly and even managed to win several roubles from his partners which embarrassed him greatly.\"~%Anna Dostoevskaya. Dostoevsky: Reminiscences.")
-                                         :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1
+                                         :glyph-idx 1 :glyph-color +color-yellow+ :back-color +color-black+ :max-stack-num 1
                                          :abil-card (list +item-card-blink+ +item-card-teleport+ +item-card-sprint+ +item-card-flying+ +item-card-disguise+)
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore target))
@@ -254,7 +254,7 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-eater-parasite+
                                          :name "parasite" :plural-name "parasites"
-                                         :glyph-idx 1 :glyph-color sdl:*green* :back-color sdl:*black* :max-stack-num 1000
+                                         :glyph-idx 1 :glyph-color +color-green+ :back-color +color-black+ :max-stack-num 1000
                                          :descr "A living itching creature that can be thrown by the Eater of the dead onto an enemy. A parasited character will have its direct resistances against flesh and acid reduced by 1, as well as always reveal its location to the primordial. Usable by primordials only."
                               :flavor-quote (format nil "\"The neckerchief around the baron's neck was no less remarkable. It was a phenomenon, though, for hygienic and aesthetic purposes, the neckerchief should have been replaced with a more durable and less soiled one. It was made from the remains of the great cape that Ernesto Rossi had donned when conversing with witches in \"Makbeth\". \"My neckerchief smells of King Duncan's blood!\" often said the old baron while looking for parasites in it.\"~%Anton Chekhov. The Baron.")
                                          :start-map-select-func #'player-start-map-select-nearest-hostile
@@ -344,7 +344,7 @@
                                          :name "signal flare" :plural-name "signal flares"
                                          :descr "A flare that gives a signal for the artillery to strike at the selected location. The flare may be used only by humans and only if there are no obstacles above you up to the highest Z level."
                                          :flavor-quote (format nil "\"In one place, a lightning struck a tree and burned it - and thus came fire. In another place, people dropped hay and it burned - and thus came fire. In a third place, trees rubbed its branches against each other - and caught fire. In a fourth place, iron struck against a rock - and sparkled fire.\"~%Leo Tolstoy. Where Did Fire Come From When People Knew No Fire.")
-                                         :glyph-idx 1 :glyph-color sdl:*red* :back-color sdl:*black* :max-stack-num 10 :value 10
+                                         :glyph-idx 1 :glyph-color +color-red+ :back-color +color-black+ :max-stack-num 10 :value 10
                                          :on-use #'(lambda (actor target item)
                                                      (declare (ignore item))
                                                      (let ((x (+ (first target) (- (random 3) 1)))
@@ -447,7 +447,7 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-eater-scarab-egg+
                                          :name "scarab egg" :plural-name "scarab eggs"
-                                         :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1000
+                                         :glyph-idx 1 :glyph-color +color-yellow+ :back-color +color-black+ :max-stack-num 1000
                                          :descr "An egg that can quickly develop into a full-grown creature that will move to the target and explode splashing acid around. Usable by primordials only."
                                          :flavor-quote (format nil "\"Tappity-tappity-tappity,\" went one egg, then another, in the first chamber. In fact, this on-the-spot spectacle of new life being born in a thin shining shell was so intriguing that they all sat for a long time on the upturned empty crates, watching the crimson eggs mature in the mysterious glimmering light.\"~%Mikhail Bulgakov. The Fatal Eggs.")
                                          :start-map-select-func #'player-start-map-select-nearest-hostile
@@ -525,7 +525,7 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-eater-locust-egg+
                                          :name "locust egg" :plural-name "locust eggs"
-                                         :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1000
+                                         :glyph-idx 1 :glyph-color +color-yellow+ :back-color +color-black+ :max-stack-num 1000
                                          :descr "An egg that can spawn a locust next to you. The locust is a small short-lived creature that will attack all enemies in sight until it dies. Usable by primordials only."
                                          :flavor-quote (format nil "\"Tappity-tappity-tappity,\" went one egg, then another, in the first chamber. In fact, this on-the-spot spectacle of new life being born in a thin shining shell was so intriguing that they all sat for a long time on the upturned empty crates, watching the crimson eggs mature in the mysterious glimmering light.\"~%Mikhail Bulgakov. The Fatal Eggs.")
                                          :start-map-select-func #'player-start-map-select-self
@@ -600,7 +600,7 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-eater-larva-egg+
                                          :name "seeker larva egg" :plural-name "seeker larva eggs"
-                                         :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1000
+                                         :glyph-idx 1 :glyph-color +color-yellow+ :back-color +color-black+ :max-stack-num 1000
                                          :descr "An egg that can spawn a larva next to you. The larva is a small fragile creature that will eat corpses and collect their power for you. Usable by primordials only."
                                          :flavor-quote (format nil "\"Tappity-tappity-tappity,\" went one egg, then another, in the first chamber. In fact, this on-the-spot spectacle of new life being born in a thin shining shell was so intriguing that they all sat for a long time on the upturned empty crates, watching the crimson eggs mature in the mysterious glimmering light.\"~%Mikhail Bulgakov. The Fatal Eggs.")
                                          :start-map-select-func #'player-start-map-select-self
@@ -668,7 +668,7 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-eater-colony-egg+
                                          :name "spore colony egg" :plural-name "spore colony eggs"
-                                         :glyph-idx 1 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-stack-num 1000
+                                         :glyph-idx 1 :glyph-color +color-yellow+ :back-color +color-black+ :max-stack-num 1000
                                          :descr "An egg that can spawn a spore colony next to you. The colony is large immobile creature that spits acid at the enemies of the primordial's in sight. Usable by primordials only."
                                          :flavor-quote (format nil "\"Tappity-tappity-tappity,\" went one egg, then another, in the first chamber. In fact, this on-the-spot spectacle of new life being born in a thin shining shell was so intriguing that they all sat for a long time on the upturned empty crates, watching the crimson eggs mature in the mysterious glimmering light.\"~%Mikhail Bulgakov. The Fatal Eggs.")
                                          :start-map-select-func #'player-start-map-select-self
@@ -742,7 +742,7 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-book-of-rituals+
                                          :name "Book of Rituals" :plural-name "Books of Rituals"
-                                         :glyph-idx +glyph-id-book+ :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 300
+                                         :glyph-idx +glyph-id-book+ :glyph-color +color-magenta+ :back-color +color-black+ :max-stack-num 1 :value 300
                                          :descr "A black leather book. It seems to be whispering something to you. In the languages you do not understand. Only the ghost can use it on the sacrificial circle, the place of its creation."
                                          :flavor-quote (format nil "\"He quickly went into a stall, drew a circle round him with his finger, uttered some prayers and formulas for exorcism, and then began to read the prayers for the dead in a loud voice and with the fixed resolution not to look up from the book nor take notice of anything.\"~%Nikolai Gogol. The Viy.")
                                          :on-use #'(lambda (actor target item)
@@ -776,62 +776,62 @@
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-flesh+
                                          :name "scroll with a demonic rune Un" :plural-name "scrolls with a demonic rune Un"
-                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color +color-magenta+ :back-color +color-black+ :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Un inscribed on it. Looking at it makes you feel as if it is looking back at you."
                                          :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-invite+
                                          :name "scroll with a demonic rune Ged" :plural-name "scrolls with a demonic rune Ged"
-                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color +color-magenta+ :back-color +color-black+ :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Ged inscribed on it. Looking at it makes you feel as if it is looking back at you."
                                          :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-away+
                                          :name "scroll with a demonic rune Veh" :plural-name "scrolls with a demonic rune Veh"
-                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color +color-magenta+ :back-color +color-black+ :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Veh inscribed on it. Looking at it makes you feel as if it is looking back at you."
                                          :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-transform+
                                          :name "scroll with a demonic rune Med" :plural-name "scrolls with a demonic rune Med"
-                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color +color-magenta+ :back-color +color-black+ :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Med inscribed on it. Looking at it makes you feel as if it is looking back at you."
                                          :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-barrier+
                                          :name "scroll with a demonic rune Gon" :plural-name "scrolls with a demonic rune Gon"
-                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color +color-magenta+ :back-color +color-black+ :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Gon inscribed on it. Looking at it makes you feel as if it is looking back at you."
                                          :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-decay+
                                          :name "scroll with a demonic rune Drux" :plural-name "scrolls with a demonic rune Drux"
-                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color +color-magenta+ :back-color +color-black+ :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Drux inscribed on it. Looking at it makes you feel as if it is looking back at you."
                                          :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-scroll-demonic-rune-all+
                                          :name "scroll with a demonic rune Tal" :plural-name "scrolls with a demonic rune Tal"
-                                         :glyph-idx 31 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx 31 :glyph-color +color-magenta+ :back-color +color-black+ :max-stack-num 1 :value 50
                                          :descr "A scroll with a demonic rune Tal inscribed on it. Looking at it makes you feel as if it is looking back at you."
                                          :flavor-quote (format nil "\"Then she began to murmur in an undertone, and terrible words escaped her lips - words that sounded like the bubbling of boiling pitch. The philosopher did not know their meaning, but he knew that they signified something terrible, and were intended to counteract his exorcisms.\"~%Nikolai Gogol. The Viy.")
                               ))
 
 (set-item-type (make-instance 'item-type :id +item-type-church-reliс+
                                          :name "relic" :plural-name "relics"
-                                         :glyph-idx +glyph-id-christ-cross+ :glyph-color sdl:*cyan* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx +glyph-id-christ-cross+ :glyph-color +color-cyan+ :back-color +color-black+ :max-stack-num 1 :value 50
                                          :descr "A holy relic. Demons seek it to capture and place under the wards."
                                          :flavor-quote (format nil "\"Our sacred ideals persist not because of their utility but because of our faith in them. We will even refuse to defend any sacred ideals in which we no longer beleove, unlike the ancient priests who, in the twilight of paganism, defended the idols which they had long ceased to consider as gods. Not a single of our sacred ideals is threatened by free inquiry, but this is precisely because they are strong in reality.\"~%Fyodor Dostoevsky. A Writer's Diary.")))
 
 (set-item-type (make-instance 'item-type :id +item-type-bomb+
                                          :name "bomb" :plural-name "bombs"
-                                         :glyph-idx +glyph-id-bomb+ :glyph-color sdl:*white* :back-color sdl:*black* :max-stack-num 1 :value 50
+                                         :glyph-idx +glyph-id-bomb+ :glyph-color +color-white+ :back-color +color-black+ :max-stack-num 1 :value 50
                                          :descr "A bomb. Use it while standing next to the Target bomb location (but not on it). Then run at least 4 tiles away. The bomb will tick for 6 turns and explode, destroying the demonic raw flesh storage. Only humans can use bombs."
                                          :flavor-quote (format nil "\"But perhaps it will not burst,\" he thought, and, with the decision of despair, he tried to open his eyes. But at that instant, through the crevice of his eyelids, his eyes were smitten with a red fire, and something struck him in the centre of the breast, with a frightful crash; he ran off, he knew not whither, stumbled over his sword, which had got between his legs, and fell over on his side.\"~%Leo Tolstoy. Sevastopol in May.")
                                          :on-use #'(lambda (actor target item)

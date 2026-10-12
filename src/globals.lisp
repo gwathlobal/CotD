@@ -1,5 +1,28 @@
 (in-package :cotd)
 
+;; Glyph/back colours are packed as (unsigned-byte 24) #xRRGGBB rather than
+;; sdl:color CLOS objects: nothing in the codebase reads r/g/b components off
+;; a colour, so they only need to be eql-comparable, allocation-free, and
+;; cheap to store in the memo array (100x100x9 cells, two colours each).
+;; sdl-color (windows/window-methods.lisp) is the one place that converts a
+;; packed-color to an sdl:color for rendering.
+(deftype packed-color () '(unsigned-byte 24))
+
+(declaim (inline rgb))
+(defun rgb (r g b)
+  (declare (type (unsigned-byte 8) r g b) (optimize (speed 3)))
+  (logior (ash r 16) (ash g 8) b))
+
+;; Match lispbuilder-sdl's sdl:*white*/*black*/etc. (sdl/default-colors.lisp) exactly.
+(defconstant +color-white+   #xFFFFFF)
+(defconstant +color-black+   #x000000)
+(defconstant +color-red+     #xFF0000)
+(defconstant +color-green+   #x00FF00)
+(defconstant +color-blue+    #x0000FF)
+(defconstant +color-yellow+  #xFFFF00)
+(defconstant +color-cyan+    #x00FFFF)
+(defconstant +color-magenta+ #xFF00FF)
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   ;; A trait spec is one of
   ;;   NAME                 - define the id constant and an initarg
@@ -903,15 +926,16 @@ hand-written methods this replaces."
 (defparameter *min-imps-number* 10)
 (defparameter *max-imps-number* 26)
 
+;; This one is a message-log colour (print-visible-message/add-message, which
+;; draw to the message box via sdl:draw-string-solid-*) - it never reaches a
+;; glyph-color/back-color slot or the memo array, so it stays an sdl:color.
 (defparameter *shared-mind-msg-color* (sdl:color :r 0 :g 128 :b 128))
 
-;; Colours used per-cell while updating the player's field of view. These are
-;; read-only and shared: sdl:color is a CLOS object wrapping a CFFI-allocated
-;; SDL_Color with a finalizer, so constructing them inline once per cell per
-;; sweep (update-visible-area walks the entire memo array) was pure garbage.
-(defparameter *fov-deep-water-color* (sdl:color :r 0 :g 0 :b 128))
-(defparameter *fov-dim-light-color* (sdl:color :r 25 :g 25 :b 112))
-(defparameter *memo-remembered-color* (sdl:color :r 50 :g 50 :b 50))
+;; Colours used per-cell while updating the player's field of view, and
+;; written straight into the memo array - packed-color, not sdl:color.
+(defparameter *fov-deep-water-color* (rgb 0 0 128))
+(defparameter *fov-dim-light-color* (rgb 25 25 112))
+(defparameter *memo-remembered-color* (rgb 50 50 50))
 
 (defparameter *water-move-factor* 1.5)
 

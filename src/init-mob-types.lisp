@@ -9,14 +9,14 @@
 ;;--------------------
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-player+ 
-                                       :glyph-idx 32 :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 20 :max-fp 0
+                                       :glyph-idx 32 :glyph-color +color-white+ :back-color +color-black+ :max-hp 20 :max-fp 0
                                        :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 1 3 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :abil-see-all t :abil-open-close-door t :abil-nameless t))
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-human+ 
                                        :name "human"
-                                       :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 6 :max-fp 0
+                                       :glyph-idx 32 :glyph-color +color-yellow+ :back-color +color-black+ :max-hp 6 :max-fp 0
                                        :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
@@ -26,7 +26,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-man+ 
                                        :name "man"
-                                       :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 6 :max-fp 0
+                                       :glyph-idx 32 :glyph-color +color-yellow+ :back-color +color-black+ :max-hp 6 :max-fp 0
                                        :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
@@ -38,7 +38,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-woman+ 
                                        :name "woman"
-                                       :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 6 :max-fp 0
+                                       :glyph-idx 32 :glyph-color +color-yellow+ :back-color +color-black+ :max-hp 6 :max-fp 0
                                        :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
@@ -50,7 +50,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-child+ 
                                        :name "child"
-                                       :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 5 :max-fp 0
+                                       :glyph-idx 32 :glyph-color +color-yellow+ :back-color +color-black+ :max-hp 5 :max-fp 0
                                        :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 0 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
@@ -61,7 +61,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-clerk+ 
                                        :name "clerk"
-                                       :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 6 :max-fp 0
+                                       :glyph-idx 32 :glyph-color +color-yellow+ :back-color +color-black+ :max-hp 6 :max-fp 0
                                        :faction +faction-type-civilians+
                                        :weapon (list "Fists" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
@@ -73,7 +73,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-criminal+ 
                                        :name "criminal"
-                                       :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 6 :max-fp 0
+                                       :glyph-idx 32 :glyph-color +color-yellow+ :back-color +color-black+ :max-hp 6 :max-fp 0
                                        :faction +faction-type-criminals+
                                        :weapon (list "Knife" (list +weapon-dmg-iron+ 0 2 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
@@ -86,7 +86,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-policeman+ 
                                        :name "police officer"
-                                       :glyph-idx 32 :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 6 :max-fp 0
+                                       :glyph-idx 32 :glyph-color +color-yellow+ :back-color +color-black+ :max-hp 6 :max-fp 0
                                        :faction +faction-type-civilians+
                                        :weapon (list "Police baton" (list +weapon-dmg-iron+ 0 2 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
@@ -103,7 +103,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-priest+ 
                                        :name "priest"
-                                       :glyph-idx 32 :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx 32 :glyph-color +color-white+ :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-church+
                                        :weapon (list "Cross" (list +weapon-dmg-iron+ 0 0 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :strength 1
@@ -119,7 +119,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist+ 
                                        :name "satanist"
-                                       :glyph-idx 32 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 7 :max-fp 0
+                                       :glyph-idx 32 :glyph-color +color-magenta+ :back-color +color-black+ :max-hp 7 :max-fp 0
                                        :faction +faction-type-satanists+
                                        :weapon (list "Vorpal touch" (list +weapon-dmg-vorpal+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :armor (list (list +weapon-dmg-vorpal+ 3 0))
@@ -133,7 +133,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-satanist-empowered+ 
                                        :name "empowered satanist"
-                                       :glyph-idx 36 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 30 :max-fp 0
+                                       :glyph-idx 36 :glyph-color +color-magenta+ :back-color +color-black+ :max-hp 30 :max-fp 0
                                        :faction +faction-type-satanists+
                                        :weapon (list "Vorpal claws" (list +weapon-dmg-vorpal+ 4 8 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -149,7 +149,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-thief+ 
                                        :name "thief"
-                                       :glyph-idx 32 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx 32 :glyph-color (rgb 150 150 150) :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-criminals+
                                        :weapon (list "Knife" (list +weapon-dmg-iron+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 30
                                        :strength 1
@@ -166,7 +166,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-soldier+ 
                                        :name "soldier"
-                                       :glyph-idx 32 :glyph-color sdl:*green* :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx 32 :glyph-color +color-green+ :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
                                        :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 4 +normal-ap+ 1 1 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
@@ -179,7 +179,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-sergeant+ 
                                        :name "sergeant"
-                                       :glyph-idx 32 :glyph-color (sdl:color :r 0 :g 100 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx 32 :glyph-color (rgb 0 100 0) :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
                                        :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
@@ -192,7 +192,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-chaplain+ 
                                        :name "chaplain"
-                                       :glyph-idx 32 :glyph-color (sdl:color :r 85 :g 107 :b 47) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx 32 :glyph-color (rgb 85 107 47) :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
                                        :weapon (list "Revolver" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 1 100 "shoots" ())) :base-dodge 25
                                        :strength 1
@@ -204,7 +204,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gunner+ 
                                        :name "machine-gunner"
-                                       :glyph-idx 32 :glyph-color (sdl:color :r 50 :g 150 :b 50) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx 32 :glyph-color (rgb 50 150 50) :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
                                        :weapon (list "Light machine gun" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 2 3 +normal-ap+ 6 6 6 70 "shoots" ())) :base-dodge 25
                                        :strength 1
@@ -217,7 +217,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-scout+ 
                                        :name "scout"
-                                       :glyph-idx 32 :glyph-color (sdl:color :r 60 :g 179 :b 113) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx 32 :glyph-color (rgb 60 179 113) :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
                                        :weapon (list "Rifle" (list +weapon-dmg-iron+ 1 2 +normal-ap+ 100 ()) (list +weapon-dmg-iron+ 4 6 +normal-ap+ 1 1 1 120 "shoots" ())) :base-dodge 25
                                        :strength 1
@@ -230,7 +230,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-military-bomb-1+ 
                                        :name "bomb"
-                                       :glyph-idx +glyph-id-bomb+ :glyph-color sdl:*yellow* :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx +glyph-id-bomb+ :glyph-color +color-yellow+ :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
                                        :weapon (list "None" nil nil) :base-dodge 0
                                        :armor (list (list +weapon-dmg-flesh+ 1 50) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-mind+ 0 100))
@@ -241,7 +241,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-military-bomb-2+ 
                                        :name "bomb"
-                                       :glyph-idx +glyph-id-bomb+ :glyph-color (sdl:color :r 255 :g 69 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx +glyph-id-bomb+ :glyph-color (rgb 255 69 0) :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
                                        :weapon (list "None" nil nil) :base-dodge 0
                                        :armor (list (list +weapon-dmg-flesh+ 1 50) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-mind+ 0 100))
@@ -252,7 +252,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-military-bomb-3+ 
                                        :name "bomb"
-                                       :glyph-idx +glyph-id-bomb+ :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx +glyph-id-bomb+ :glyph-color +color-red+ :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-military+
                                        :weapon (list "None" nil nil) :base-dodge 0
                                        :armor (list (list +weapon-dmg-flesh+ 1 50) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-mind+ 0 100))
@@ -267,7 +267,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel+
                                        :name "chrome angel"
-                                       :glyph-idx 65 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 18 :max-fp 32
+                                       :glyph-idx 65 :glyph-color +color-cyan+ :back-color +color-black+ :max-hp 18 :max-fp 32
                                        :faction +faction-type-angels+
                                        :weapon (list "Holy fists" (list +weapon-dmg-fire+ 3 6 +normal-ap+ 100 (list :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 3 50))
@@ -280,7 +280,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archangel+
                                        :name "Avatar of Brilliance"
-                                       :glyph-idx +glyph-id-large-a+ :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 36 :max-fp 32
+                                       :glyph-idx +glyph-id-large-a+ :glyph-color +color-cyan+ :back-color +color-black+ :max-hp 36 :max-fp 32
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 6 9 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0) (list +weapon-dmg-fire+ 3 50))
@@ -294,7 +294,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-singer+
                                        :name "star singer"
-                                       :glyph-idx 65 :glyph-color (sdl:color :r 0 :g 128 :b 128) :back-color sdl:*black* :max-hp 14 :max-fp 12
+                                       :glyph-idx 65 :glyph-color (rgb 0 128 128) :back-color +color-black+ :max-hp 14 :max-fp 12
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 3 50))
@@ -308,7 +308,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-gazer+
                                        :name "star gazer"
-                                       :glyph-idx 65 :glyph-color (sdl:color :r 32 :g 170 :b 170) :back-color sdl:*black* :max-hp 14 :max-fp 12
+                                       :glyph-idx 65 :glyph-color (rgb 32 170 170) :back-color +color-black+ :max-hp 14 :max-fp 12
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
@@ -322,7 +322,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-mender+
                                        :name "star mender"
-                                       :glyph-idx 65 :glyph-color (sdl:color :r 127 :g 255 :b 200) :back-color sdl:*black* :max-hp 14 :max-fp 12
+                                       :glyph-idx 65 :glyph-color (rgb 127 255 200) :back-color +color-black+ :max-hp 14 :max-fp 12
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
@@ -336,7 +336,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-singer-mender+
                                        :name "amalgamated angel"
-                                       :glyph-idx +glyph-id-large-a+ :glyph-color (sdl:color :r 127 :g 255 :b 200) :back-color sdl:*black* :max-hp 14 :max-fp 24
+                                       :glyph-idx +glyph-id-large-a+ :glyph-color (rgb 127 255 200) :back-color +color-black+ :max-hp 14 :max-fp 24
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
@@ -351,7 +351,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-singer-gazer+
                                        :name "amalgamated angel"
-                                       :glyph-idx +glyph-id-large-a+ :glyph-color (sdl:color :r 127 :g 255 :b 200) :back-color sdl:*black* :max-hp 14 :max-fp 24
+                                       :glyph-idx +glyph-id-large-a+ :glyph-color (rgb 127 255 200) :back-color +color-black+ :max-hp 14 :max-fp 24
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
@@ -364,7 +364,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-gazer-mender+
                                        :name "amalgamated angel"
-                                       :glyph-idx +glyph-id-large-a+ :glyph-color (sdl:color :r 127 :g 255 :b 200) :back-color sdl:*black* :max-hp 14 :max-fp 24
+                                       :glyph-idx +glyph-id-large-a+ :glyph-color (rgb 127 255 200) :back-color +color-black+ :max-hp 14 :max-fp 24
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
@@ -377,7 +377,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-star-singer-gazer-mender+
                                        :name "amalgamated angel"
-                                       :glyph-idx +glyph-id-large-a+ :glyph-color (sdl:color :r 0 :g 128 :b 128) :back-color sdl:*black* :max-hp 14 :max-fp 36
+                                       :glyph-idx +glyph-id-large-a+ :glyph-color (rgb 0 128 128) :back-color +color-black+ :max-hp 14 :max-fp 36
                                        :faction +faction-type-angels+
                                        :weapon (list "Flaming sword" (list +weapon-dmg-fire+ 3 5 +normal-ap+ 100 (list :chops-body-parts :is-fire)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 0) (list +weapon-dmg-fire+ 3 50))
@@ -390,7 +390,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-angel-image+
                                        :name "stellar image"
-                                       :glyph-idx 65 :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 1 :max-fp 0
+                                       :glyph-idx 65 :glyph-color +color-white+ :back-color +color-black+ :max-hp 1 :max-fp 0
                                        :faction +faction-type-angels+
                                        :weapon (list "Illusory fire" nil nil) :base-dodge 35
                                        :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-fire+ 0 100))
@@ -404,7 +404,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-imp+
                                        :name "crimson imp"
-                                       :glyph-idx 73 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 12 :max-fp 5
+                                       :glyph-idx 73 :glyph-color +color-red+ :back-color +color-black+ :max-hp 12 :max-fp 5
                                        :faction +faction-type-demons+ :evolve-mob-id +mob-type-demon+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 5 +normal-ap+ 100 ()) nil) :base-dodge 35 :move-spd (truncate (* +normal-ap+ 0.8))
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -417,7 +417,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon+
                                        :name "crimson demon"
-                                       :glyph-idx 68 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 20 :max-fp 12
+                                       :glyph-idx 68 :glyph-color +color-red+ :back-color +color-black+ :max-hp 20 :max-fp 12
                                        :faction +faction-type-demons+ :evolve-mob-id +mob-type-archdemon+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 4 7 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -430,7 +430,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-archdemon+
                                        :name "archdemon"
-                                       :glyph-idx +glyph-id-large-d+ :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 40 :max-fp 16
+                                       :glyph-idx +glyph-id-large-d+ :glyph-color +color-red+ :back-color +color-black+ :max-hp 40 :max-fp 16
                                        :faction +faction-type-demons+
                                        :weapon (list "Chains of Shattering" (list +weapon-dmg-vorpal+ 5 10 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -444,7 +444,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-imp+
                                        :name "shadow imp"
-                                       :glyph-idx 73 :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-hp 14 :max-fp 5
+                                       :glyph-idx 73 :glyph-color (rgb 100 100 100) :back-color +color-black+ :max-hp 14 :max-fp 5
                                        :faction +faction-type-demons+ :evolve-mob-id +mob-type-shadow-demon+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 5 +normal-ap+ 100 ()) nil) :base-dodge 35 :move-spd (truncate (* +normal-ap+ 0.9))
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -457,7 +457,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-demon+
                                        :name "shadow demon"
-                                       :glyph-idx 68 :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-hp 22 :max-fp 12
+                                       :glyph-idx 68 :glyph-color (rgb 100 100 100) :back-color +color-black+ :max-hp 22 :max-fp 12
                                        :faction +faction-type-demons+ :evolve-mob-id +mob-type-shadow-devil+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 4 7 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -470,7 +470,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-shadow-devil+
                                        :name "shadow devil"
-                                       :glyph-idx +glyph-id-large-d+ :glyph-color (sdl:color :r 100 :g 100 :b 100) :back-color sdl:*black* :max-hp 32 :max-fp 16
+                                       :glyph-idx +glyph-id-large-d+ :glyph-color (rgb 100 100 100) :back-color +color-black+ :max-hp 32 :max-fp 16
                                        :faction +faction-type-demons+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 5 8 +normal-ap+ 100 ()) nil) :base-dodge 20
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -484,7 +484,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-malseraph-puppet+
                                        :name "Malseraph's puppet"
-                                       :glyph-idx 68 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 22 :max-fp 12
+                                       :glyph-idx 68 :glyph-color +color-magenta+ :back-color +color-black+ :max-hp 22 :max-fp 12
                                        :faction +faction-type-demons+
                                        :weapon (list "Falchion" (list +weapon-dmg-vorpal+ 4 7 +normal-ap+ 100 (list :chops-body-parts)) nil) :base-dodge 25
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -498,7 +498,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon-sigil+
                                        :name "demonic sigil"
-                                       :glyph-idx 128 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 25 :max-fp 12
+                                       :glyph-idx 128 :glyph-color +color-red+ :back-color +color-black+ :max-hp 25 :max-fp 12
                                        :faction +faction-type-demons+
                                        :weapon (list "None" nil nil) :base-dodge 0
                                        :armor (list (list +weapon-dmg-flesh+ 1 50) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 100) (list +weapon-dmg-mind+ 0 100))
@@ -511,7 +511,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-demon-machine+
                                        :name "demonic machine"
-                                       :glyph-idx +glyph-id-machine+ :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 25 :max-fp 0
+                                       :glyph-idx +glyph-id-machine+ :glyph-color +color-white+ :back-color +color-black+ :max-hp 25 :max-fp 0
                                        :faction +faction-type-demons+
                                        :weapon (list "None" nil nil) :base-dodge 0
                                        :armor (list (list +weapon-dmg-flesh+ 1 50) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 0 100) (list +weapon-dmg-mind+ 0 100))
@@ -526,7 +526,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-1+
                                        :name "reanimated body"
-                                       :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 6 :max-fp 0
+                                       :glyph-idx 90 :glyph-color (rgb 150 150 150) :back-color +color-black+ :max-hp 6 :max-fp 0
                                        :faction +faction-type-demons+
                                        :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 1 3 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -538,7 +538,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-2+
                                        :name "reanimated body"
-                                       :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 7 :max-fp 0
+                                       :glyph-idx 90 :glyph-color (rgb 150 150 150) :back-color +color-black+ :max-hp 7 :max-fp 0
                                        :faction +faction-type-demons+
                                        :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -550,7 +550,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-3+
                                        :name "reanimated body"
-                                       :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx 90 :glyph-color (rgb 150 150 150) :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-demons+
                                        :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 2 4 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -562,7 +562,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-pwr-4+
                                        :name "reanimated body"
-                                       :glyph-idx 90 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 9 :max-fp 0
+                                       :glyph-idx 90 :glyph-color (rgb 150 150 150) :back-color +color-black+ :max-hp 9 :max-fp 0
                                        :faction +faction-type-demons+
                                        :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd (truncate (* +normal-ap+ 1.2))
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -574,7 +574,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-reanimated-empowered+
                                        :name "empowered corpse"
-                                       :glyph-idx 58 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 15 :max-fp 0
+                                       :glyph-idx 58 :glyph-color (rgb 150 150 150) :back-color +color-black+ :max-hp 15 :max-fp 0
                                        :faction +faction-type-demons+
                                        :weapon (list "Claws & fangs" (list +weapon-dmg-flesh+ 4 6 +normal-ap+ 100 ()) nil) :base-dodge 0 :move-spd +normal-ap+
                                        :armor (list (list +weapon-dmg-flesh+ 3 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -590,7 +590,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-eater-of-the-dead+
                                        :name "eater of the dead"
-                                       :glyph-idx 37 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color sdl:*black* :max-hp 12 :max-fp 24
+                                       :glyph-idx 37 :glyph-color (rgb 255 165 0) :back-color +color-black+ :max-hp 12 :max-fp 24
                                        :faction +faction-type-eater+
                                        :weapon (list "Tentacles" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts)) nil) :base-dodge 15
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
@@ -606,7 +606,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-locust+
                                        :name "locust"
-                                       :glyph-idx 69 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx 69 :glyph-color (rgb 255 165 0) :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-eater+
                                        :weapon (list "Claws" (list +weapon-dmg-flesh+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 15
                                        :armor ()
@@ -617,7 +617,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-acid-locust+
                                        :name "acid locust"
-                                       :glyph-idx 69 :glyph-color (sdl:color :r 150 :g 165 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0
+                                       :glyph-idx 69 :glyph-color (rgb 150 165 0) :back-color +color-black+ :max-hp 8 :max-fp 0
                                        :faction +faction-type-eater+
                                        :weapon (list "Claws" (list +weapon-dmg-acid+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 15
                                        :armor ()
@@ -628,7 +628,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-scarab+
                                        :name "scarab"
-                                       :glyph-idx 69 :glyph-color (sdl:color :r 0 :g 255 :b 0) :back-color sdl:*black* :max-hp 8 :max-fp 0 :move-spd (truncate (* +normal-ap+ 1.2))
+                                       :glyph-idx 69 :glyph-color (rgb 0 255 0) :back-color +color-black+ :max-hp 8 :max-fp 0 :move-spd (truncate (* +normal-ap+ 1.2))
                                        :faction +faction-type-eater+
                                        :weapon () :base-dodge 15
                                        :armor ()
@@ -639,7 +639,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-fast-scarab+
                                        :name "fast scarab"
-                                       :glyph-idx 69 :glyph-color (sdl:color :r 0 :g 255 :b 100) :back-color sdl:*black* :max-hp 8 :max-fp 0 :move-spd (truncate (* +normal-ap+ 0.8))
+                                       :glyph-idx 69 :glyph-color (rgb 0 255 100) :back-color +color-black+ :max-hp 8 :max-fp 0 :move-spd (truncate (* +normal-ap+ 0.8))
                                        :faction +faction-type-eater+
                                        :weapon () :base-dodge 15
                                        :armor ()
@@ -650,7 +650,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-seeker-larva+
                                        :name "seeker larva"
-                                       :glyph-idx 69 :glyph-color (sdl:color :r 150 :g 150 :b 150) :back-color sdl:*black* :max-hp 6 :max-fp 0
+                                       :glyph-idx 69 :glyph-color (rgb 150 150 150) :back-color +color-black+ :max-hp 6 :max-fp 0
                                        :faction +faction-type-eater+
                                        :weapon () :base-dodge 15
                                        :armor ()
@@ -661,7 +661,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-spore-colony+
                                        :name "spore colony"
-                                       :glyph-idx 37 :glyph-color (sdl:color :r 150 :g 165 :b 0) :back-color sdl:*black* :max-hp 18 :max-fp 0
+                                       :glyph-idx 37 :glyph-color (rgb 150 165 0) :back-color +color-black+ :max-hp 18 :max-fp 0
                                        :faction +faction-type-eater+
                                        :weapon (list "Tentacles & Acid spit" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 (list :constricts)) (list +weapon-dmg-acid+ 1 4 +normal-ap+ 1 0 1 100 "spits at" (list :no-charges :corrodes)))
                                        :base-dodge 0
@@ -678,7 +678,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-skinchanger-melee+
                                        :name "butcher"
-                                       :glyph-idx 51 :glyph-color (sdl:color :r 255 :g 165 :b 0) :back-color sdl:*black* :max-hp 12 :max-fp 24
+                                       :glyph-idx 51 :glyph-color (rgb 255 165 0) :back-color +color-black+ :max-hp 12 :max-fp 24
                                        :faction +faction-type-eater+
                                        :weapon (list "Claws" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100) nil) :base-dodge 15
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
@@ -691,7 +691,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-skinchanger-ranged+
                                        :name "ravager"
-                                       :glyph-idx 51 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :max-hp 12 :max-fp 24
+                                       :glyph-idx 51 :glyph-color (rgb 139 69 19) :back-color +color-black+ :max-hp 12 :max-fp 24
                                        :faction +faction-type-eater+
                                        :weapon (list "Acid spit" (list +weapon-dmg-acid+ 1 3 +normal-ap+ 100 (list :corrodes)) (list +weapon-dmg-acid+ 1 3 +normal-ap+ 1 0 1 100 "spits at" (list :no-charges :corrodes)))
                                        :base-dodge 15
@@ -705,7 +705,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-skinchanger-flyer+
                                        :name "corruptor"
-                                       :glyph-idx 51 :glyph-color (sdl:color :r 128 :g 0 :b 0) :back-color sdl:*black* :max-hp 12 :max-fp 24
+                                       :glyph-idx 51 :glyph-color (rgb 128 0 0) :back-color +color-black+ :max-hp 12 :max-fp 24
                                        :faction +faction-type-eater+
                                        :weapon (list "Spines" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 nil) nil) :base-dodge 15
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))
@@ -718,7 +718,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-skinchanger-turret+
                                        :name "spore colony"
-                                       :glyph-idx 51 :glyph-color (sdl:color :r 150 :g 165 :b 0) :back-color sdl:*black* :max-hp 18 :max-fp 24
+                                       :glyph-idx 51 :glyph-color (rgb 150 165 0) :back-color +color-black+ :max-hp 18 :max-fp 24
                                        :faction +faction-type-eater+
                                        :weapon (list "Claws & Acid spit" (list +weapon-dmg-flesh+ 2 3 +normal-ap+ 100 ()) (list +weapon-dmg-acid+ 1 5 +normal-ap+ 1 0 1 100 "spits at" (list :no-charges :corrodes)))
                                        :base-dodge 0
@@ -736,7 +736,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-ghost+
                                        :name "lost soul"
-                                       :glyph-idx 71 :glyph-color (sdl:color :r 153 :g 204 :b 255) :back-color sdl:*black* :max-hp 1 :max-fp 0
+                                       :glyph-idx 71 :glyph-color (rgb 153 204 255) :back-color +color-black+ :max-hp 1 :max-fp 0
                                        :faction +faction-type-ghost+
                                        :weapon (list "Ghostly touch" (list +weapon-dmg-vorpal+ 1 2 +normal-ap+ 100 ()) ())
                                        :base-dodge 15
@@ -754,7 +754,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-horse+ 
                                        :name "horse"
-                                       :glyph-idx 72 :glyph-color (sdl:color :r 139 :g 69 :b 19) :back-color sdl:*black* :max-hp 12 :max-fp 0
+                                       :glyph-idx 72 :glyph-color (rgb 139 69 19) :back-color +color-black+ :max-hp 12 :max-fp 0
                                        :faction +faction-type-animals+
                                        :weapon (list "Hooves" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
@@ -764,7 +764,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-sheep+ 
                                        :name "sheep"
-                                       :glyph-idx 72 :glyph-color sdl:*white* :back-color sdl:*black* :max-hp 12 :max-fp 0
+                                       :glyph-idx 72 :glyph-color +color-white+ :back-color +color-black+ :max-hp 12 :max-fp 0
                                        :faction +faction-type-animals+
                                        :weapon (list "Hooves" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 25
                                        :strength 0
@@ -774,7 +774,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-tree+ 
                                        :name "tree"
-                                       :glyph-idx 52 :glyph-color sdl:*magenta* :back-color sdl:*black* :max-hp 30 :max-fp 0
+                                       :glyph-idx 52 :glyph-color +color-magenta+ :back-color +color-black+ :max-hp 30 :max-fp 0
                                        :faction +faction-type-animals+
                                        :weapon (list "Branches" (list +weapon-dmg-flesh+ 0 1 +normal-ap+ 100 ()) nil) :base-dodge 0
                                        :armor (list (list +weapon-dmg-flesh+ 0 100) (list +weapon-dmg-fire+ -1 0) (list +weapon-dmg-iron+ 0 50) (list +weapon-dmg-mind+ 0 100) (list +weapon-dmg-radiation+ 0 100))
@@ -785,7 +785,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-fiend+ 
                                        :name "fiend"
-                                       :glyph-idx 70 :glyph-color sdl:*red* :back-color sdl:*black* :max-hp 12 :max-fp 0
+                                       :glyph-idx 70 :glyph-color +color-red+ :back-color +color-black+ :max-hp 12 :max-fp 0
                                        :faction +faction-type-outsider-beasts+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 3 4 +normal-ap+ 100 ()) nil) :base-dodge 35
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 2 0))
@@ -796,7 +796,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-gargantaur+ 
                                        :name "gargantaur"
-                                       :glyph-idx 39 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 25 :max-fp 2
+                                       :glyph-idx 39 :glyph-color +color-cyan+ :back-color +color-black+ :max-hp 25 :max-fp 2
                                        :faction +faction-type-outsider-beasts+
                                        :weapon (list "Claws" (list +weapon-dmg-vorpal+ 6 10 +normal-ap+ 100 ()) nil) :base-dodge 0
                                        :armor (list (list +weapon-dmg-flesh+ 4 0) (list +weapon-dmg-iron+ 2 0) (list +weapon-dmg-vorpal+ 4 0) (list +weapon-dmg-fire+ 4 0))
@@ -808,7 +808,7 @@
 
 (set-mob-type (make-instance 'mob-type :mob-type +mob-type-wisp+
                                        :name "wisp"
-                                       :glyph-idx 87 :glyph-color sdl:*cyan* :back-color sdl:*black* :max-hp 12 :max-fp 5
+                                       :glyph-idx 87 :glyph-color +color-cyan+ :back-color +color-black+ :max-hp 12 :max-fp 5
                                        :faction +faction-type-outsider-wisps+
                                        :weapon (list "Stellar touch" (list +weapon-dmg-fire+ 2 3 +normal-ap+ 100 ()) nil) :base-dodge 40 :move-spd +normal-ap+
                                        :armor (list (list +weapon-dmg-flesh+ 1 0) (list +weapon-dmg-iron+ 1 0) (list +weapon-dmg-vorpal+ 1 0) (list +weapon-dmg-fire+ 1 0))

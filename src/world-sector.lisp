@@ -3,7 +3,7 @@
 (defclass world-sector-type ()
   ((wtype :initform nil :initarg :wtype :accessor wtype)
    (glyph-idx :initform 0 :initarg :glyph-idx :accessor glyph-idx :type fixnum)
-   (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
+   (glyph-color :initform +color-white+ :initarg :glyph-color :accessor glyph-color :type packed-color)
    (name :initform "" :initarg :name :accessor name :type string)
    (general-type :initform :world-sector-normal :initarg :general-type :accessor general-type :type world-sector-general-type)
    (faction-list-func :initform nil :initarg :faction-list-func :accessor faction-list-func) ;; funcation that returns a list of (list <faction type id> <mission faction status id>)

@@ -6,7 +6,7 @@
 
 (set-world-sector-type :wtype :world-sector-test
                        :glyph-idx +glyph-id-large-t+
-                       :glyph-color sdl:*white*
+                       :glyph-color +color-white+
                        :name "A test district"
                        :general-type :world-sector-normal
                        :faction-list-func #'(lambda ()
@@ -24,7 +24,7 @@
 
 (set-world-sector-type :wtype :world-sector-normal-residential
                        :glyph-idx 40
-                       :glyph-color sdl:*white*
+                       :glyph-color +color-white+
                        :name "An ordinary district"
                        :general-type :world-sector-normal
                        :faction-list-func #'(lambda ()
@@ -59,7 +59,7 @@
 
 (set-world-sector-type :wtype :world-sector-normal-port
                        :glyph-idx 48
-                       :glyph-color sdl:*white*
+                       :glyph-color +color-white+
                        :name "A seaport district"
                        :general-type :world-sector-normal
                        :faction-list-func #'(lambda ()
@@ -125,7 +125,7 @@
 
 (set-world-sector-type :wtype :world-sector-normal-forest
                        :glyph-idx 38
-                       :glyph-color sdl:*white*
+                       :glyph-color +color-white+
                        :name "The outskirts of the city"
                        :general-type :world-sector-normal
                        :faction-list-func #'(lambda ()
@@ -166,7 +166,7 @@
 
 (set-world-sector-type :wtype :world-sector-normal-lake
                        :glyph-idx 44
-                       :glyph-color sdl:*white*
+                       :glyph-color +color-white+
                        :name "A district upon a lake"
                        :general-type :world-sector-normal
                        :faction-list-func #'(lambda ()
@@ -206,13 +206,13 @@
 
 (set-world-sector-type :wtype :world-sector-normal-sea
                        :glyph-idx 51
-                       :glyph-color sdl:*white*
+                       :glyph-color +color-white+
                        :name "Sea"
                        :general-type :world-sector-sea)
 
 (set-world-sector-type :wtype :world-sector-normal-island
                        :glyph-idx 41
-                       :glyph-color sdl:*white*
+                       :glyph-color +color-white+
                        :name "An island district"
                        :general-type :world-sector-normal
                        :faction-list-func #'(lambda ()
@@ -252,7 +252,7 @@
 
 (set-world-sector-type  :wtype :world-sector-abandoned-residential
                         :glyph-idx 40
-                        :glyph-color (sdl:color :r 150 :g 150 :b 150)
+                        :glyph-color (rgb 150 150 150)
                         :name "An abandoned residential district"
                         :general-type :world-sector-abandoned
                         :faction-list-func #'(lambda ()
@@ -291,7 +291,7 @@
 
 (set-world-sector-type :wtype :world-sector-abandoned-port
                        :glyph-idx 48
-                       :glyph-color (sdl:color :r 150 :g 150 :b 150)
+                       :glyph-color (rgb 150 150 150)
                        :name "An abandoned seaport district"
                        :general-type :world-sector-abandoned
                        :faction-list-func #'(lambda ()
@@ -362,7 +362,7 @@
 
 (set-world-sector-type :wtype :world-sector-abandoned-forest
                        :glyph-idx 38
-                       :glyph-color (sdl:color :r 150 :g 150 :b 150)
+                       :glyph-color (rgb 150 150 150)
                        :name "The abandoned outskirts of the city"
                        :general-type :world-sector-abandoned
                        :faction-list-func #'(lambda ()
@@ -408,7 +408,7 @@
 
 (set-world-sector-type :wtype :world-sector-abandoned-lake
                        :glyph-idx 44
-                       :glyph-color (sdl:color :r 150 :g 150 :b 150)
+                       :glyph-color (rgb 150 150 150)
                        :name "An abandoned district upon a lake"
                        :general-type :world-sector-abandoned
                        :faction-list-func #'(lambda ()
@@ -456,7 +456,7 @@
 
 (set-world-sector-type :wtype :world-sector-abandoned-island
                        :glyph-idx 41
-                       :glyph-color (sdl:color :r 150 :g 150 :b 150)
+                       :glyph-color (rgb 150 150 150)
                        :name "An abandoned island district"
                        :general-type :world-sector-abandoned
                        :faction-list-func #'(lambda ()
@@ -500,7 +500,7 @@
 
 (set-world-sector-type :wtype :world-sector-corrupted-residential
                        :glyph-idx 40
-                       :glyph-color sdl:*magenta*
+                       :glyph-color +color-magenta+
                        :name "A corrupted residential district"
                        :general-type :world-sector-corrupted
                        :faction-list-func #'(lambda ()
@@ -570,7 +570,7 @@
 
 (set-world-sector-type :wtype :world-sector-corrupted-port
                        :glyph-idx 48
-                       :glyph-color sdl:*magenta*
+                       :glyph-color +color-magenta+
                        :name "A corrupted seaport district"
                        :general-type :world-sector-corrupted
                        :faction-list-func #'(lambda ()
@@ -668,7 +668,7 @@
 
 (set-world-sector-type :wtype :world-sector-corrupted-forest
                        :glyph-idx 38
-                       :glyph-color sdl:*magenta*
+                       :glyph-color +color-magenta+
                        :name "The corrupted outskirts of the city"
                        :general-type :world-sector-corrupted
                        :faction-list-func #'(lambda ()
@@ -740,7 +740,7 @@
 
 (set-world-sector-type :wtype :world-sector-corrupted-lake
                        :glyph-idx 44
-                       :glyph-color sdl:*magenta*
+                       :glyph-color +color-magenta+
                        :name "A corrupted district upon a lake"
                        :general-type :world-sector-corrupted
                        :faction-list-func #'(lambda ()
@@ -810,7 +810,7 @@
 
 (set-world-sector-type :wtype :world-sector-corrupted-island
                        :glyph-idx 41
-                       :glyph-color sdl:*magenta*
+                       :glyph-color +color-magenta+
                        :name "A corrupted island district"
                        :general-type :world-sector-corrupted
                        :faction-list-func #'(lambda ()
@@ -884,7 +884,7 @@
 
 (set-world-sector-type :wtype :world-sector-hell-jungle
                        :glyph-idx 40
-                       :glyph-color sdl:*magenta*
+                       :glyph-color +color-magenta+
                        :name "A hell jungle"
                        :general-type :world-sector-hell
                        :faction-list-func #'(lambda ()

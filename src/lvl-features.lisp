@@ -7,8 +7,8 @@
 (defclass feature-type ()
   ((id :initarg :id :accessor id :type fixnum)
    (glyph-idx :initform 0 :initarg :glyph-idx :accessor glyph-idx)
-   (glyph-color :initform sdl:*white* :initarg :glyph-color :accessor glyph-color :type sdl:color)
-   (back-color :initform sdl:*black* :initarg :back-color :accessor back-color :type sdl:color)
+   (glyph-color :initform +color-white+ :initarg :glyph-color :accessor glyph-color :type packed-color)
+   (back-color :initform +color-black+ :initarg :back-color :accessor back-color :type packed-color)
    (name :initform "No name feature" :initarg :name :accessor name)
    (trait :initform (make-hash-table) :initarg :trait :accessor trait)
    ;; Valid :trait-* initargs and their ids are generated from
