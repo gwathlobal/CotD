@@ -128,4 +128,5 @@
      (:file "init-ability-types" :depends-on ("base-methods" "windows"))
      (:file "init-effect-types" :depends-on ("base-methods" "windows"))
      (:file "cotd")
+     (:file "headless-test" :depends-on ("cotd"))
      ))

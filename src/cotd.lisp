@@ -161,22 +161,21 @@
              ))
   )
   
-(defun init-game (mission world-sector)
+(defun init-game (mission world-sector &key (screen-update-func #'(lambda (str)
+                                                                     (when (and str
+                                                                                (subtypep (type-of *current-window*) 'loading-window))
+                                                                       (setf (cur-str *current-window*) str))
+                                                                     (make-output *current-window*))))
   (setf *mobs* (make-array (list 0) :adjustable t))
   (setf *lvl-features* (make-array (list 0) :adjustable t))
   (setf *items* (make-array (list 0) :adjustable t))
-  
+
   (setf *cur-angel-names* (copy-list *init-angel-names*))
   (setf *cur-demon-names* (copy-list *init-demon-names*))
   (setf *cur-human-names* (copy-list *init-human-names*))
   (setf *cur-human-surnames* (copy-list *init-human-surnames*))
 
-  (setf *update-screen-closure* #'(lambda (str)
-                                    (when (and str
-                                               (subtypep (type-of *current-window*) 'loading-window))
-                                      (setf (cur-str *current-window*) str))
-                                    (make-output *current-window*)
-				    ))
+  (setf *update-screen-closure* screen-update-func)
 
   (let ((sector-level-gen-func (sector-level-gen-func (get-world-sector-type-by-id (wtype world-sector))))
         (level-template-pre-process-func-list ())
