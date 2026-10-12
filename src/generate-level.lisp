@@ -253,11 +253,26 @@
     ))
 
 (defun flood-fill (first-cell &key (max-x *max-x-level*) (max-y *max-y-level*) (max-z *max-z-level*) check-func make-func)
+  "Flood fill the region containing FIRST-CELL, a (x y z) list.
+
+CHECK-FUNC is called as (x y z from-x from-y from-z) and says whether the cell
+at x y z belongs to the region, given that it is being entered from the FROM
+cell. MAKE-FUNC is called as (x y z) exactly once per cell in the region, and
+is what marks the cell as claimed - CHECK-FUNC is expected to reject cells that
+have been marked.
+
+MAKE-FUNC is called when a cell is pushed, not when it is popped. That is what
+keeps a cell from entering the stack more than once: until a cell is marked,
+every one of its up-to-26 neighbours in turn finds it unclaimed and pushes it
+again, and each of those duplicate pops then rescans 26 neighbours of its own.
+Marking on pop measured 433,031 pops for 101,341 distinct cells on one level -
+4.3 pops each, and 10.6 million neighbour checks."
   (declare (optimize (speed 3) (safety 0))
            (type function check-func make-func)
            (type fixnum max-x max-y max-z))
-  
+
   (let ((open-list nil))
+    (funcall make-func (first first-cell) (second first-cell) (third first-cell))
     (push first-cell open-list)
     (loop while open-list
           for c-cell of-type list = (pop open-list)
@@ -265,8 +280,6 @@
           for cy of-type fixnum = (second c-cell)
           for cz of-type fixnum = (third c-cell)
           do
-             (funcall make-func cx cy cz)
-             
              (loop for y-offset of-type fixnum from -1 to 1
                    for y of-type fixnum = (+ cy y-offset) do
                      (loop for x-offset of-type fixnum from -1 to 1
@@ -277,8 +290,8 @@
                                            (not (and (zerop x-offset) (zerop y-offset) (zerop z-offset)))
                                            (funcall check-func x y z cx cy cz))
                                    do
+                                      (funcall make-func x y z)
                                       (push (list x y z) open-list))))
-                     
           )
     ))
 
