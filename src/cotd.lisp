@@ -289,7 +289,7 @@
 (defun cotd-init ()
   (let ((tiles-path))
     ;; create default options
-    (setf *options* (make-options :tiles 'large))
+    (setf *options* (make-options))
     
     ;; get options from file if possible
     (if (probe-file (merge-pathnames "options.cfg" *current-dir*))
@@ -309,9 +309,7 @@
       )
     
     ;; set parameters depending on options
-    ;; tiles
-    (cond
-      (t (setf *glyph-w* 15 *glyph-h* 15 tiles-path "data/font_large.bmp")))
+    (setf *glyph-w* 15 *glyph-h* 15 tiles-path "data/font_large.bmp")
     ;; font
     (cond
       ((equal (options-font *options*) 'font-6x13) (sdl:initialise-default-font sdl:*font-6x13*))

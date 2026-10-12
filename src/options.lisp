@@ -1,8 +1,6 @@
 (in-package :cotd)
 
 (defstruct options
-  (tiles 'large) ;;; 'large - use small tiles 
-                 ;;; 'small - use large tiles
   (font 'font-8x13) ;;; 'font-6x13 - use small font
                     ;;; 'font-8x13 - use large font
   (player-name "Player") ;;; default name of the player
@@ -15,16 +13,11 @@
     (return-from read-options nil))
   
   (cond
-    ((equal (first s-expr) 'tiles) (set-options-tiles s-expr options))
     ((equal (first s-expr) 'font) (set-options-font s-expr options))
     ((equal (first s-expr) 'name) (set-options-name s-expr options))
     ((equal (first s-expr) 'ignore-singlemind-messages) (set-options-ignore-singlemind-messages s-expr options))
     )
   )
-
-(defun set-options-tiles (s-expr options)
-  (log:info "S-EXPR = ~A" s-expr)
-  (setf (options-tiles options) (second s-expr)))
 
 (defun set-options-font (s-expr options)
   (log:info "S-EXPR = ~A" s-expr)

@@ -252,18 +252,6 @@
     t
     ))
 
-(defun prepare-gen-build-id-list (max-building-types &optional increased-build-type-id)
-  ;; a hack to make houses appear 3 times more frequently
-  (append (loop repeat 3
-                collect (prepare-spec-build-id-list increased-build-type-id))
-          (loop for gen-build-type-id being the hash-key in max-building-types
-                collect (prepare-spec-build-id-list gen-build-type-id))))
-
-(defun prepare-spec-build-id-list (gen-build-type-id)
-  (loop for spec-build-type being the hash-value in *building-types*
-        when (= (building-type spec-build-type) gen-build-type-id)
-          collect (building-id spec-build-type)))
-
 (defun flood-fill (first-cell &key (max-x *max-x-level*) (max-y *max-y-level*) (max-z *max-z-level*) check-func make-func)
   (declare (optimize (speed 3) (safety 0))
            (type function check-func make-func)
