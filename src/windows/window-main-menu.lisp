@@ -15,9 +15,11 @@
     (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
       (sdl:fill-surface sdl:*black* :template a-rect))
     
-    (sdl:draw-string-solid-* "City of the Damned" (truncate *window-width* 2) 10 :justify :center :color sdl:*white*)
+    ;;(sdl:draw-string-solid-* "City of the Damned" (truncate *window-width* 2) 10 :justify :center :color sdl:*white*)
+
+    (sdl:draw-surface-at-* *start-logo* (- (truncate *window-width* 2) (truncate (sdl:width *start-logo*) 2)) 10 :surface sdl:*default-surface*)
     
-    (sdl:draw-string-solid-* "Whoever wins... We lose" (- *window-width* 20) (+ 10 30 (sdl:char-height sdl:*default-font*)) :justify :right :color sdl:*white*)
+    (sdl:draw-string-solid-* "Whoever wins... We lose" (- *window-width* 20) (+ 10 10 (sdl:height *start-logo*)) :justify :right :color sdl:*white*)
     
     ;; drawing selection list
     (loop with color-list = ()
@@ -26,7 +28,7 @@
               (push sdl:*yellow* color-list)
               (push sdl:*white* color-list))
           finally (setf color-list (reverse color-list))
-                  (draw-selection-list menu-strs cur-sel (length menu-strs) 20 (+ 10 30 20 (sdl:char-height sdl:*default-font*) (sdl:char-height sdl:*default-font*)) :color-list color-list :use-letters t))
+                  (draw-selection-list menu-strs cur-sel (length menu-strs) 20 (+ 10 10 (sdl:height *start-logo*) (sdl:char-height sdl:*default-font*) (sdl:char-height sdl:*default-font*)) :color-list color-list :use-letters t))
         
     (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Exit game")
                              10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))

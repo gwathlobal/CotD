@@ -1,5 +1,75 @@
 (in-package :cotd)
 
+;;; ------------------------------------------------------------------
+;;; Per-sweep memoization of a cell's terrain+feature vision-blocking
+;;; power.
+;;;
+;;; A single FOV/LOS sweep (one DRAW-FOV call, or one mob's vision
+;;; update) fires many overlapping LINE-OF-SIGHT rays that all pass
+;;; through the same cells near the origin. Each such visit used to
+;;; redo the same GET-TERRAIN-TYPE-TRAIT hash lookups and walk the same
+;;; feature list again. Since a cell's *own* blocking power doesn't
+;;; depend on which ray is passing through it (only the floor-crossing
+;;; check in CHECK-LOS-PROPAGATE depends on PREV-CELL), it's safe to
+;;; cache it for the duration of one sweep.
+;;;
+;;; *VISION-BLOCK-CACHE* must be rebound fresh (via WITH-VISION-BLOCK-CACHE)
+;;; for every independent sweep and never reused across them -- it goes
+;;; stale the instant terrain or features change (e.g. a door opens).
+;;; ------------------------------------------------------------------
+
+(defvar *vision-block-cache* nil)
+
+;;; Overlapping rays in one sweep also keep re-revealing the same map
+;;; cell to the player (REVEAL-CELL-ON-MAP is considerably heavier than
+;;; the vision-block check -- it looks up terrain/feature/item/mob
+;;; glyphs), and its result for a given cell can't change mid-sweep for
+;;; the same reason CHECK-LOS-PROPAGATE's terrain/feature computation
+;;; can't. *REVEALED-CELL-CACHE* dedupes those calls the same way.
+(defvar *revealed-cell-cache* nil)
+
+(defmacro with-vision-block-cache (() &body body)
+  `(let ((*vision-block-cache* (make-hash-table :test 'eql))
+         (*revealed-cell-cache* (make-hash-table :test 'eql)))
+     ,@body))
+
+(declaim (inline vision-cache-key))
+(defun vision-cache-key (x y z)
+  (declare (type fixnum x y z))
+  ;; Masks each axis to 20 bits -- comfortably covers any realistic
+  ;; level, and stays well inside a 62-bit fixnum on 64-bit SBCL.
+  (the fixnum (logior (ash (logand x #xFFFFF) 40)
+                       (ash (logand y #xFFFFF) 20)
+                       (logand z #xFFFFF))))
+
+(defun compute-vision-block-power-of-cell (level dx dy dz)
+  "Combined terrain+feature vision-blocking power of a single cell.
+Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
+  (let ((terrain (get-terrain-* level dx dy dz))
+        (vision-block-power 0))
+    (when (get-terrain-type-trait terrain +terrain-trait-blocks-vision+)
+      (if (eq (get-terrain-type-trait terrain +terrain-trait-blocks-vision+) t)
+        (incf vision-block-power 100)
+        (incf vision-block-power (get-terrain-type-trait terrain +terrain-trait-blocks-vision+))))
+    (loop for feature-id in (get-features-* level dx dy dz)
+          for lvl-feature = (get-feature-by-id feature-id)
+          when (get-feature-type-trait lvl-feature +feature-trait-blocks-vision+)
+            do
+               (if (eq (get-feature-type-trait lvl-feature +feature-trait-blocks-vision+) t)
+                 (incf vision-block-power 100)
+                 (incf vision-block-power (get-feature-type-trait lvl-feature +feature-trait-blocks-vision+))))
+    vision-block-power))
+
+(defun vision-block-power-of-cell (level dx dy dz)
+  (declare (type fixnum dx dy dz))
+  (if *vision-block-cache*
+    (multiple-value-bind (cached foundp) (gethash (vision-cache-key dx dy dz) *vision-block-cache*)
+      (if foundp
+        cached
+        (setf (gethash (vision-cache-key dx dy dz) *vision-block-cache*)
+              (compute-vision-block-power-of-cell level dx dy dz))))
+    (compute-vision-block-power-of-cell level dx dy dz)))
+
 (defun get-distance (sx sy tx ty)
   (declare (type fixnum sx sy tx ty))
   (sqrt (+ (* (- sx tx) (- sx tx)) (* (- sy ty) (- sy ty)))))
@@ -10,8 +80,7 @@
 
 (defun check-LOS-propagate (dx dy dz prev-cell &key (check-move nil) (check-vision nil) (check-projectile nil) (player-reveal-cell nil) (check-sound nil))
   ;(declare (optimize (speed 3)))
-  (let ((terrain)
-        (vision-block-power 0))
+  (let ((terrain))
     (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
               (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
               (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
@@ -44,10 +113,14 @@
                  (<= (abs (- (y *player*) dy)) 5)
                  (/= (z *player*) dz))
         (pushnew dz (visible-z-list *player*)))
-      (reveal-cell-on-map (level *world*) dx dy dz :reveal-mob (if (or (null (get-mob-* (level *world*) dx dy dz))
-                                                                       (eq (get-mob-* (level *world*) dx dy dz) *player*))
-                                                                 t
-                                                                 (check-mob-visible (get-mob-* (level *world*) dx dy dz) :observer *player*))))
+      (let ((key (vision-cache-key dx dy dz)))
+        (unless (and *revealed-cell-cache* (gethash key *revealed-cell-cache*))
+          (when *revealed-cell-cache*
+            (setf (gethash key *revealed-cell-cache*) t))
+          (reveal-cell-on-map (level *world*) dx dy dz :reveal-mob (if (or (null (get-mob-* (level *world*) dx dy dz))
+                                                                           (eq (get-mob-* (level *world*) dx dy dz) *player*))
+                                                                     t
+                                                                     (check-mob-visible (get-mob-* (level *world*) dx dy dz) :observer *player*))))))
     
     (setf terrain (get-terrain-* (level *world*) dx dy dz))
     (unless terrain
@@ -56,13 +129,7 @@
     (when (and check-move
                (get-terrain-type-trait terrain +terrain-trait-blocks-move+))
       (return-from check-LOS-propagate nil))
-    
-    (when (and check-vision
-               (get-terrain-type-trait terrain +terrain-trait-blocks-vision+))
-      (if (eq (get-terrain-type-trait terrain +terrain-trait-blocks-vision+) t)
-        (incf vision-block-power 100)
-        (incf vision-block-power (get-terrain-type-trait terrain +terrain-trait-blocks-vision+))))
-    
+
     (when (and check-projectile
                (get-terrain-type-trait terrain +terrain-trait-blocks-projectiles+))
       (return-from check-LOS-propagate nil))
@@ -72,19 +139,9 @@
                    (eq (get-terrain-type-trait terrain +terrain-trait-blocks-sound+) 100)))
       (return-from check-LOS-propagate nil))
 
-    (loop for feature-id in (get-features-* (level *world*) dx dy dz)
-          for lvl-feature = (get-feature-by-id feature-id)
-          when (and check-vision
-                    (get-feature-type-trait lvl-feature +feature-trait-blocks-vision+))
-            do
-               (if (eq (get-feature-type-trait lvl-feature +feature-trait-blocks-vision+) t)
-                 (incf vision-block-power 100)
-                 (incf vision-block-power (get-feature-type-trait lvl-feature +feature-trait-blocks-vision+)))
-          )
-
     (when check-vision
-      (return-from check-LOS-propagate vision-block-power))
-    
+      (return-from check-LOS-propagate (vision-block-power-of-cell (level *world*) dx dy dz)))
+
     t))
 
 (defun calculate-single-tile-brightness (level x y z &key (calc-for-player nil))
@@ -225,6 +282,7 @@
 
 (defun update-visible-mobs-normal (mob)
   (declare (optimize (speed 3) (safety 0)))
+  (with-vision-block-cache ()
   (setf (brightness mob) 0)
   (setf (darkness mob) 0)
   (when (eq mob *player*)
@@ -467,7 +525,7 @@
     (setf (brightness mob) 0))
   
   (setf (visible-mobs mob) (append (proper-visible-mobs mob) (shared-visible-mobs mob)))
-  (setf (visible-mobs mob) (remove-duplicates (visible-mobs mob))))
+  (setf (visible-mobs mob) (remove-duplicates (visible-mobs mob)))))
 
 (defun update-visible-mobs-fov (mob)
   (declare (optimize (speed 3)))
@@ -523,8 +581,9 @@
 
 (defun update-visible-items (mob)
   (declare (optimize (speed 3) (safety 0)))
+  (with-vision-block-cache ()
   (setf (visible-items mob) nil)
-  
+
   (loop for item-id in (loop with result = ()
                              for (qx qy) of-type (fixnum fixnum) in '((-1 -1) (-1 0) (-1 1) (0 -1) (0 0) (0 1) (1 -1) (1 0) (1 1))
                              when (and (>= (+ (truncate (x mob) 10) qx) 0) (>= (+ (truncate (y mob) 10) qy) 0)
@@ -567,7 +626,7 @@
                                       (return))
                                     )
                                   exit-result))))
-  (log:info "~A [~A] sees ~A" (name mob) (id mob) (visible-items mob)))
+  (log:info "~A [~A] sees ~A" (name mob) (id mob) (visible-items mob))))
 
 (defun update-visible-items-player ()
   (setf (visible-items *player*) nil)
@@ -784,6 +843,7 @@
   (declare (optimize (speed 3)))
   (declare (type fixnum cx cy cz r)
            (type function func LOS-start-func))
+  (with-vision-block-cache ()
   (let ((target-cells nil)
         (max-z (if limit-z
                  (if (>= (+ cz r) (array-dimension (terrain (level *world*)) 2))
@@ -832,8 +892,8 @@
     (loop for (tx ty tz) in target-cells do
       (funcall LOS-start-func)
       (line-of-sight cx cy cz tx ty tz func))
-    
-    ))
+
+    )))
 
 (defun draw-fov-old (cx cy cz r func)
   (declare (optimize (speed 3)))

@@ -6,6 +6,7 @@
 (defvar *window-height*)
 (defparameter *temp-rect* nil)
 (defparameter *msg-box-window-height* (* 13 5))
+(defvar *start-logo*)
 
 (defun draw-glyph (x y n &key (surface sdl:*default-surface*) front-color back-color)
   "Drawing a glyph from 'font.bmp' at a certain point of the surface."

@@ -350,6 +350,8 @@
     (setf *glyph-front* (sdl:load-image (sdl:create-path tiles-path *current-dir*) 
                                         :color-key sdl:*white*))
     (setf *glyph-temp* (sdl:create-surface *glyph-w* *glyph-h* :color-key sdl:*black*))
+
+    (setf *start-logo* (sdl:load-image (sdl:create-path "data/logo.bmp" *current-dir*)))
     
     (setf *path-thread* nil)
     (setf *previous-scenario* nil)
@@ -701,4 +703,4 @@
 
 #+(and sbcl unix) 
 (defun make-exec ()
-  (sb-ext:save-lisp-and-die "cotd" :toplevel #'cotd-exec :executable t :compression t))
+  (sb-ext:save-lisp-and-die "cotd" :toplevel #'cotd-exec :executable t :compression nil))
