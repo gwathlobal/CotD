@@ -43,13 +43,17 @@
 Terrain types are all registered at load time and their trait tables are never
 touched afterwards, so this runs once per type and the table is read-only for
 the rest of the session."
-  (let ((id (id terrain-type)))
-    ;; grow the table if this id does not fit yet
-    (when (or (>= id (array-dimension *terrain-trait-table* 0))
-              (/= (array-dimension *terrain-trait-table* 1) +terrain-trait-count+))
-      (let ((new (make-array (list (1+ id) +terrain-trait-count+) :initial-element nil)))
-        (dotimes (i (min (1+ id) (array-dimension *terrain-trait-table* 0)))
-          (dotimes (k (min +terrain-trait-count+ (array-dimension *terrain-trait-table* 1)))
+  (let* ((id (id terrain-type))
+         (rows (array-dimension *terrain-trait-table* 0))
+         (cols (array-dimension *terrain-trait-table* 1)))
+    ;; grow the table if this id does not fit yet, or if the trait count has
+    ;; changed. Never shrink: types do not register in id order, so (1+ id) can
+    ;; be smaller than the rows already filled in.
+    (when (or (>= id rows) (/= cols +terrain-trait-count+))
+      (let* ((new-rows (max (1+ id) rows))
+             (new (make-array (list new-rows +terrain-trait-count+) :initial-element nil)))
+        (dotimes (i rows)
+          (dotimes (k (min cols +terrain-trait-count+))
             (setf (aref new i k) (aref *terrain-trait-table* i k))))
         (setf *terrain-trait-table* new)))
     (dotimes (k +terrain-trait-count+)
@@ -57,7 +61,9 @@ the rest of the session."
     (loop for key being the hash-key in (trait terrain-type) using (hash-value value)
           do (unless (and (typep key 'fixnum)
                           (< -1 key +terrain-trait-count+))
-               (error "Terrain type ~A declares trait id ~A, outside 0..~A. Bump +terrain-trait-count+."
+               (error "Terrain type ~A declares trait id ~A, outside 0..~A. Add it to the ~
+                       define-indexed-constants list in globals.lisp rather than writing ~
+                       the id directly."
                       id key (1- +terrain-trait-count+)))
              (setf (aref *terrain-trait-table* id key) value))))
 

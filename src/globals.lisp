@@ -1,5 +1,18 @@
 (in-package :cotd)
 
+(defmacro define-indexed-constants (count-name &body names)
+  "Define each symbol in NAMES as a constant holding its position in the list,
+and COUNT-NAME as how many there are.
+
+Use this wherever a set of small integer ids doubles as an index into a vector
+or array, so that the ids and the size of that index space cannot drift apart:
+adding an entry to the list is the whole change, and the count follows."
+  `(progn
+     ,@(loop for name in names
+             for index from 0
+             collect `(defconstant ,name ,index))
+     (defconstant ,count-name ,(length names))))
+
 (declaim (type fixnum *max-x-level* *max-y-level*))
 (declaim (ftype (function (fixnum fixnum fixnum fixnum) single-float) get-distance))
 
@@ -552,32 +565,31 @@
 (defconstant +level-city-terrain-bush+ 5)
 (defconstant +level-city-terrain-earth+ 6)
 
-(defconstant +terrain-trait-blocks-move+ 0)
-(defconstant +terrain-trait-blocks-vision+ 1)
-(defconstant +terrain-trait-blocks-projectiles+ 2)
-(defconstant +terrain-trait-blocks-move-floor+ 3)
-(defconstant +terrain-trait-slope-up+ 4)
-(defconstant +terrain-trait-slope-down+ 5)
-(defconstant +terrain-trait-not-climable+ 6)
-(defconstant +terrain-trait-light-source+ 7)
-(defconstant +terrain-trait-blocks-sound+ 8)
-(defconstant +terrain-trait-blocks-sound-floor+ 9)
-(defconstant +terrain-trait-water+ 10)
-(defconstant +terrain-trait-move-cost-factor+ 11)
-(defconstant +terrain-trait-openable-door+ 12)
-(defconstant +terrain-trait-openable-window+ 13)
-(defconstant +terrain-trait-flammable+ 14)
-(defconstant +terrain-trait-can-jump-over+ 15)
-(defconstant +terrain-trait-can-have-rune+ 16)
-(defconstant +terrain-trait-can-switch-light+ 17)
-(defconstant +terrain-trait-blocks-projectiles-floor+ 18)
-(defconstant +terrain-trait-blocks-vision-floor+ 19)
-
-;; Number of distinct terrain traits. Must cover every +terrain-trait-*+ id
-;; above; terrain-type's initializer signals an error at load time if a trait
-;; id reaches this bound, so adding a trait without bumping this fails loudly
-;; rather than silently dropping the trait.
-(defconstant +terrain-trait-count+ 20)
+;; Terrain trait ids. These index the second axis of *terrain-trait-table*, so
+;; +terrain-trait-count+ is derived from the list rather than written out:
+;; append a trait here and nothing else needs updating. Order is the numbering,
+;; so add to the end rather than inserting.
+(define-indexed-constants +terrain-trait-count+
+  +terrain-trait-blocks-move+
+  +terrain-trait-blocks-vision+
+  +terrain-trait-blocks-projectiles+
+  +terrain-trait-blocks-move-floor+
+  +terrain-trait-slope-up+
+  +terrain-trait-slope-down+
+  +terrain-trait-not-climable+
+  +terrain-trait-light-source+
+  +terrain-trait-blocks-sound+
+  +terrain-trait-blocks-sound-floor+
+  +terrain-trait-water+
+  +terrain-trait-move-cost-factor+
+  +terrain-trait-openable-door+
+  +terrain-trait-openable-window+
+  +terrain-trait-flammable+
+  +terrain-trait-can-jump-over+
+  +terrain-trait-can-have-rune+
+  +terrain-trait-can-switch-light+
+  +terrain-trait-blocks-projectiles-floor+
+  +terrain-trait-blocks-vision-floor+)
 
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
