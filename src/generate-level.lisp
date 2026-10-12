@@ -215,7 +215,7 @@
 (defun create-level (&key (max-x *max-x-level*) (max-y *max-y-level*) (max-z *max-z-level*))
   (let ((level))
     (setf level (make-instance 'level))
-    (setf (terrain level) (make-array (list max-x max-y max-z) :initial-element +terrain-floor-stone+))
+    (setf (terrain level) (make-array (list max-x max-y max-z) :element-type 'fixnum :initial-element +terrain-floor-stone+))
     (setf (mobs level) (make-array (list max-x max-y max-z) :initial-element nil))
     (setf (items level) (make-array (list max-x max-y max-z) :initial-element nil))
     (setf (features level) (make-array (list max-x max-y max-z) :initial-element nil))

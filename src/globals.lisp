@@ -573,6 +573,12 @@
 (defconstant +terrain-trait-blocks-projectiles-floor+ 18)
 (defconstant +terrain-trait-blocks-vision-floor+ 19)
 
+;; Number of distinct terrain traits. Must cover every +terrain-trait-*+ id
+;; above; terrain-type's initializer signals an error at load time if a trait
+;; id reaches this bound, so adding a trait without bumping this fails loudly
+;; rather than silently dropping the trait.
+(defconstant +terrain-trait-count+ 20)
+
 (defconstant +terrain-border-floor+ 0)
 (defconstant +terrain-floor-stone+ 1)
 (defconstant +terrain-wall-stone+ 2)
@@ -670,6 +676,14 @@
 (defparameter *ability-types* (make-array (list 0) :adjustable t))
 (defparameter *feature-types* (make-array (list 0) :adjustable t))
 (defparameter *terrain-types* (make-array (list 0) :adjustable t))
+
+;; Flat [terrain-type-id][trait-id] mirror of every terrain type's trait table,
+;; maintained by set-terrain-type and read by get-terrain-type-trait. A simple
+;; array rather than a slot on terrain-type reached through *terrain-types*:
+;; *terrain-types* is adjustable, so an aref on it cannot be open-coded, and
+;; that lookup dominated the trait read. ~360 call sites, all of them inside
+;; the FOV, pathfinding and connectivity-map loops.
+(defparameter *terrain-trait-table* (make-array (list 0 0)))
 (defparameter *mob-types* (make-array (list 0) :adjustable t))
 (defparameter *item-types* (make-array (list 0) :adjustable t))
 (defparameter *effect-types* (make-array (list 0) :adjustable t))
