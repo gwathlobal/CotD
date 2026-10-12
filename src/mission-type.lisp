@@ -77,6 +77,32 @@
       (second faction-abilities)
       nil)))
 
+(defun mission-ability-sets (mission-type-id)
+  "Table from faction id to the set of abilities MISSION-TYPE-ID grants it.
+
+Built once per mission type and memoized in *mission-ability-sets*. Mission
+types are static data defined at load time, so the result cannot go stale -
+unlike a cache hung off the current level or mission, which would have to be
+rebuilt on mission start and on loading a save."
+  (or (gethash mission-type-id *mission-ability-sets*)
+      (setf (gethash mission-type-id *mission-ability-sets*)
+            (let ((by-faction (make-hash-table)))
+              (loop for (faction-id abilities) in (ability-list (get-mission-type-by-id mission-type-id))
+                    do (let ((set (make-hash-table)))
+                         (dolist (ability-type-id abilities)
+                           (setf (gethash ability-type-id set) t))
+                         (setf (gethash faction-id by-faction) set)))
+              by-faction))))
+
+(defun mission-grants-ability-p (faction-id mission-type-id ability-type-id)
+  "Whether MISSION-TYPE-ID grants FACTION-ID the ability ABILITY-TYPE-ID.
+
+Two gethashes. Only three of the mission types grant anything at all, and for
+the rest the first lookup answers NIL immediately - which is the common case on
+mob-ability-p's miss path, its hottest path by far."
+  (let ((set (gethash faction-id (mission-ability-sets mission-type-id))))
+    (if (and set (gethash ability-type-id set)) t nil)))
+
 (defun setup-win-conditions (mission level)
   (loop for (faction-id game-event-id) in (win-condition-list (get-mission-type-by-id (mission-type-id mission)))
         when (find-if #'(lambda (a)

@@ -499,11 +499,20 @@
   (gethash effect-type-id (effects mob)))
 
 (defun mob-ability-p (mob ability-type-id)
+  "Whether MOB has ABILITY-TYPE-ID, from its own abilities or from the mission.
+
+The hottest predicate in the game - around 590 call sites, in the FOV and AI
+inner loops. The level and mission are bound rather than re-read: the previous
+version evaluated (level *world*) three times and (mission ...) twice per call,
+each a generic slot accessor."
   (if (or (gethash ability-type-id (abilities mob))
-          (and *world*
-               (level *world*)
-               (mission (level *world*))
-               (find ability-type-id (get-abilities-based-on-faction (faction mob) (mission-type-id (mission (level *world*)))))))
+          (let ((level (and *world* (level *world*))))
+            (when level
+              (let ((mission (mission level)))
+                (when mission
+                  (mission-grants-ability-p (faction mob)
+                                            (mission-type-id mission)
+                                            ability-type-id))))))
     t
     nil))
 
@@ -514,12 +523,14 @@
     nil))
 
 (defun mob-is-ability-mission (mob ability-type-id)
-  (if (and *world*
-           (level *world*)
-           (mission (level *world*))
-           (find ability-type-id (get-abilities-based-on-faction (faction mob) (mission-type-id (mission (level *world*))))))
-    t
-    nil))
+  "Whether ABILITY-TYPE-ID comes from the current mission rather than the mob."
+  (let ((level (and *world* (level *world*))))
+    (when level
+      (let ((mission (mission level)))
+        (when mission
+          (mission-grants-ability-p (faction mob)
+                                    (mission-type-id mission)
+                                    ability-type-id))))))
 
 (defun mob-ability-value (mob ability-type-id)
   (if (gethash ability-type-id (abilities mob))

@@ -45,4 +45,9 @@
                                             :world-sector-hell))
 
 (defparameter *mission-types* (make-hash-table))
+
+;; Memo for mission-ability-sets: mission type id -> (faction id -> set of the
+;; abilities that mission grants that faction). Mission types are static data
+;; built once at load time, so this can never go stale.
+(defparameter *mission-ability-sets* (make-hash-table))
 (defparameter *campaign-effect-types* (make-hash-table))
