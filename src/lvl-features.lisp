@@ -11,13 +11,8 @@
    (back-color :initform sdl:*black* :initarg :back-color :accessor back-color :type sdl:color)
    (name :initform "No name feature" :initarg :name :accessor name)
    (trait :initform (make-hash-table) :initarg :trait :accessor trait)
-   ;; :trait-blocks-vision - +feature-trait-blocks-vision+
-   ;; :trait-smoke - +feature-trait-smoke+
-   ;; :trait-no-gravity - +feature-trait-no-gravity+
-   ;; :trait-fire - +feature-trait-fire+
-   ;; :trait-remove-on-dungeon-generation - +feature-trait-remove-on-dungeon-generation+
-   ;; :trait-can-have-rune - +feature-trait-can-have-rune+
-   ;; :trait-demonic-rune - +feature-trait-demonic-rune+ (takes item-type-id that will be later used in deciphering the rune into an item)
+   ;; Valid :trait-* initargs and their ids are generated from
+   ;; *feature-trait-specs* in globals.lisp; see define-trait-ids there.
    (can-merge-func :initform #'(lambda (level feature-new)
                                  (let ((result nil))
                                    (loop for feat-old-id in (aref (features level) (x feature-new) (y feature-new) (z feature-new))
@@ -51,21 +46,9 @@
     (adjust-array *feature-types* (list (1+ (id feature-type)))))
   (setf (aref *feature-types* (id feature-type)) feature-type))
 
-(defmethod initialize-instance :after ((feature-type feature-type) &key trait-blocks-vision trait-smoke trait-no-gravity trait-fire trait-remove-on-dungeon-generation trait-demonic-rune)
-  
-  (when trait-blocks-vision
-    (setf (gethash +feature-trait-blocks-vision+ (trait feature-type)) trait-blocks-vision))
-  (when trait-smoke
-    (setf (gethash +feature-trait-smoke+ (trait feature-type)) trait-smoke))
-  (when trait-no-gravity
-    (setf (gethash +feature-trait-no-gravity+ (trait feature-type)) trait-no-gravity))
-  (when trait-fire
-    (setf (gethash +feature-trait-fire+ (trait feature-type)) trait-fire))
-  (when trait-remove-on-dungeon-generation
-    (setf (gethash +feature-trait-remove-on-dungeon-generation+ (trait feature-type)) trait-remove-on-dungeon-generation))
-  (when trait-demonic-rune
-    (setf (gethash +feature-trait-demonic-rune+ (trait feature-type)) trait-demonic-rune))
-  )
+(define-trait-initializer feature-type
+    ((*feature-trait-specs* trait feature-trait trait))
+    ())
 
 ;;--------------------
 ;; FEATURE

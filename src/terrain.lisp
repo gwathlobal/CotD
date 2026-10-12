@@ -58,30 +58,9 @@ the rest of the session."
 (defun get-terrain-type-by-id (terrain-type-id)
   (aref *terrain-types* terrain-type-id))
 
-(defmacro define-terrain-type-trait-initializer ()
-  "Generate terrain-type's initialize-instance :after from *terrain-trait-specs*.
-
-Every trait follows the same rule: when its initarg is supplied and truthy,
-store that value in the trait table under the matching +terrain-trait-*+ id.
-Six traits previously stored a literal T rather than the value; they are only
-ever passed T, so the uniform rule is equivalent.
-
-This exists so that adding a trait is one line in globals.lisp instead of
-three edits in two files - the id, the keyword parameter and the store."
-  `(defmethod initialize-instance :after
-       ((terrain-type terrain-type)
-        &key ,@(loop for spec in *terrain-trait-specs*
-                     collect (if (consp spec)
-                               (list (trait-initarg-var spec) (second spec))
-                               (trait-initarg-var spec))))
-     ,@(loop for spec in *terrain-trait-specs*
-             for var = (trait-initarg-var spec)
-             collect `(when ,var
-                        (setf (gethash ,(trait-id-constant 'terrain-trait spec)
-                                       (trait terrain-type))
-                              ,var)))))
-
-(define-terrain-type-trait-initializer)
+(define-trait-initializer terrain-type
+    ((*terrain-trait-specs* trait terrain-trait trait))
+    ())
 
 (declaim (inline get-terrain-type-trait))
 (defun get-terrain-type-trait (terrain-type-id key)

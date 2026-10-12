@@ -1,9 +1,20 @@
 (in-package :cotd)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
+  ;; A trait spec is one of
+  ;;   NAME                 - define the id constant and an initarg
+  ;;   (NAME DEFAULT)       - as above, with a default value for the initarg
+  ;;   (NAME :no-initarg)   - define the id constant only, for ids that are
+  ;;                          granted some other way (mutations, missions,
+  ;;                          effects) and are not settable on the type
   (defun trait-spec-name (spec)
-    "Name part of a trait spec, which is either NAME or (NAME DEFAULT)."
     (if (consp spec) (first spec) spec))
+
+  (defun trait-spec-initarg-p (spec)
+    (not (and (consp spec) (eq (second spec) :no-initarg))))
+
+  (defun trait-spec-default-p (spec)
+    (and (consp spec) (not (eq (second spec) :no-initarg))))
 
   (defun trait-id-constant (prefix spec)
     "Constant naming SPEC's id, e.g. TERRAIN-TRAIT + BLOCKS-MOVE
@@ -12,30 +23,63 @@
                     (symbol-name (trait-spec-name spec)))
             :cotd))
 
-  (defun trait-initarg-var (spec)
+  (defun trait-initarg-var (prefix spec)
     "Keyword parameter carrying SPEC's value into an initializer,
-e.g. BLOCKS-MOVE => TRAIT-BLOCKS-MOVE, supplied as :trait-blocks-move."
-    (intern (format nil "TRAIT-~A" (symbol-name (trait-spec-name spec)))
+e.g. TRAIT + BLOCKS-MOVE => TRAIT-BLOCKS-MOVE, supplied as :trait-blocks-move."
+    (intern (format nil "~A-~A" (symbol-name prefix)
+                    (symbol-name (trait-spec-name spec)))
             :cotd)))
 
-(defmacro define-trait-ids (prefix count-name list-name &body specs)
-  "Define a trait id space from SPECS, each either NAME or (NAME DEFAULT).
+(defmacro define-trait-ids (const-prefix param-prefix count-name list-name &body specs)
+  "Define an id space from SPECS (see trait-spec-name above for their forms).
 
 Defines one constant per spec holding its position in the list, COUNT-NAME as
 how many there are, and LIST-NAME as the spec list - the last bound at compile
-time too, so that an initializer macro can generate matching :trait-NAME
+time too, so define-trait-initializer can generate matching PARAM-PREFIX-NAME
 keyword parameters from the same list.
 
 One list therefore defines the ids, the size of the id space and the initargs,
-so appending a name to it is the whole change needed to add a trait. Order is
-the numbering: append rather than insert."
+so appending a name to it is the whole change needed to add one. Order is the
+numbering, and for mob abilities the ids are keys in saved games, so append
+rather than insert."
+  (declare (ignore param-prefix))
   `(progn
      (eval-when (:compile-toplevel :load-toplevel :execute)
        (defparameter ,list-name ',specs))
      ,@(loop for spec in specs
              for index from 0
-             collect `(defconstant ,(trait-id-constant prefix spec) ,index))
+             collect `(defconstant ,(trait-id-constant const-prefix spec) ,index))
      (defconstant ,count-name ,(length specs))))
+
+(defmacro define-trait-initializer (class groups extra-keys &body body)
+  "Generate CLASS's initialize-instance :after method from spec lists.
+
+Each group is (SPECS-VAR TABLE-ACCESSOR CONST-PREFIX PARAM-PREFIX). Every spec
+in SPECS-VAR that takes an initarg becomes a keyword parameter named
+PARAM-PREFIX-NAME; when that argument is truthy its value is stored in
+(TABLE-ACCESSOR CLASS) under +CONST-PREFIX-NAME+.
+
+EXTRA-KEYS are further keyword parameters the method needs, and BODY runs
+before the generated stores. The instance is bound to CLASS, matching the
+hand-written methods this replaces."
+  `(defmethod initialize-instance :after ((,class ,class)
+                                          &key ,@extra-keys
+                                            ,@(loop for (specs-var nil nil param-prefix) in groups
+                                                    append (loop for spec in (symbol-value specs-var)
+                                                                 when (trait-spec-initarg-p spec)
+                                                                   collect (if (trait-spec-default-p spec)
+                                                                             (list (trait-initarg-var param-prefix spec)
+                                                                                   (second spec))
+                                                                             (trait-initarg-var param-prefix spec)))))
+     ,@body
+     ,@(loop for (specs-var table const-prefix param-prefix) in groups
+             append (loop for spec in (symbol-value specs-var)
+                          when (trait-spec-initarg-p spec)
+                            collect (let ((var (trait-initarg-var param-prefix spec)))
+                                      `(when ,var
+                                         (setf (gethash ,(trait-id-constant const-prefix spec)
+                                                        (,table ,class))
+                                               ,var)))))))
 
 (declaim (type fixnum *max-x-level* *max-y-level*))
 (declaim (ftype (function (fixnum fixnum fixnum fixnum) single-float) get-distance))
@@ -196,218 +240,228 @@ the numbering: append rather than insert."
 (defconstant +specific-faction-type-ghost+ 11)
 (defconstant +specific-faction-type-skinchanger+ 12)
 
-(defconstant +ai-package-coward+ 0)
-(defconstant +ai-package-horde+ 1)
-(defconstant +ai-package-wants-bless+ 2)
-(defconstant +ai-package-takes-valuable-items+ 3)
-(defconstant +ai-package-curious+ 4)
-(defconstant +ai-package-kleptomaniac+ 5)
-(defconstant +ai-package-cautious+ 6)
-(defconstant +ai-package-trinity-mimic+ 7)
-(defconstant +ai-package-split-soul+ 8)
-(defconstant +ai-package-search-corpses+ 9)
-(defconstant +ai-package-use-ability+ 10)
-(defconstant +ai-package-use-item+ 11)
-(defconstant +ai-package-reload-ranged-weapon+ 12)
-(defconstant +ai-package-shoot-enemy+ 13)
-(defconstant +ai-package-follow-leader+ 14)
-(defconstant +ai-package-approach-target+ 15)
-(defconstant +ai-package-attack-nearest-enemy+ 16)
-(defconstant +ai-package-find-random-location+ 17)
-(defconstant +ai-package-patrol-district+ 18)
-(defconstant +ai-package-avoid-possession+ 19)
-(defconstant +ai-package-avoid-melee+ 20)
-(defconstant +ai-package-pick-corpses+ 21)
-(defconstant +ai-package-return-corpses-to-portal+ 22)
-(defconstant +ai-package-search-relic+ 23)
-(defconstant +ai-package-pick-relic+ 24)
-(defconstant +ai-package-return-relic-to-portal+ 25)
-(defconstant +ai-package-find-sigil+ 26)
-(defconstant +ai-package-escape-with-relic+ 27)
-(defconstant +ai-package-swim-up+ 28)
-(defconstant +ai-package-find-machine+ 29)
-(defconstant +ai-package-find-bomb-plant-location+ 30)
+;; The AI package id space - see define-trait-ids. Appending a name here is the
+;; whole change needed to add one; (name :no-initarg) is for packages granted
+;; by a mission rather than set on the mob type.
+(define-trait-ids ai-package ai +ai-package-count+ *ai-package-specs*
+  coward
+  horde
+  wants-bless
+  takes-valuable-items
+  curious
+  kleptomaniac
+  cautious
+  trinity-mimic
+  split-soul
+  search-corpses
+  use-ability
+  use-item
+  reload-ranged-weapon
+  shoot-enemy
+  follow-leader
+  approach-target
+  attack-nearest-enemy
+  find-random-location
+  (patrol-district :no-initarg)
+  avoid-possession
+  avoid-melee
+  (pick-corpses :no-initarg)
+  (return-corpses-to-portal :no-initarg)
+  (search-relic :no-initarg)
+  (pick-relic :no-initarg)
+  (return-relic-to-portal :no-initarg)
+  (find-sigil :no-initarg)
+  (escape-with-relic :no-initarg)
+  swim-up
+  (find-machine :no-initarg)
+  (find-bomb-plant-location :no-initarg))
 
 (defconstant +ai-priority-never+ 0)
 (defconstant +ai-priority-always+ 10)
 
-(defconstant +mob-abil-heal-self+ 0)
-(defconstant +mob-abil-conceal-divine+ 1)
-(defconstant +mob-abil-reveal-divine+ 2)
-(defconstant +mob-abil-detect-good+ 3)
-(defconstant +mob-abil-detect-evil+ 4)
-(defconstant +mob-abil-possessable+ 5)
-(defconstant +mob-abil-can-possess+ 6)
-(defconstant +mob-abil-purging-touch+ 7)
-(defconstant +mob-abil-blessing-touch+ 8)
-(defconstant +mob-abil-can-be-blessed+ 9)
-(defconstant +mob-abil-unholy+ 10)
-(defconstant +mob-abil-angel+ 11)
-(defconstant +mob-abil-demon+ 12)
-(defconstant +mob-abil-human+ 13)
-(defconstant +mob-abil-see-all+ 14)
-(defconstant +mob-abil-lifesteal+ 15)
-(defconstant +mob-abil-call-for-help+ 16)
-(defconstant +mob-abil-answer-the-call+ 17)
-(defconstant +mob-abil-loves-infighting+ 18)
-(defconstant +mob-abil-prayer-bless+ 19)
-(defconstant +mob-abil-free-call+ 20)
-(defconstant +mob-abil-prayer-shield+ 21)
-(defconstant +mob-abil-curse+ 22)
-(defconstant +mob-abil-keen-senses+ 23)
-(defconstant +mob-abil-prayer-reveal+ 24)
-(defconstant +mob-abil-military-follow-me+ 25)
-(defconstant +mob-abil-blindness+ 26)
-(defconstant +mob-abil-instill-fear+ 27)
-(defconstant +mob-abil-charge+ 28)
-(defconstant +mob-abil-momentum+ 29)
-(defconstant +mob-abil-animal+ 30)
-(defconstant +mob-abil-horseback-riding+ 31)
-(defconstant +mob-abil-horse-can-be-ridden+ 32)
-(defconstant +mob-abil-dismount+ 33)
-(defconstant +mob-abil-dominate-fiend+ 34)
-(defconstant +mob-abil-fiend-can-be-ridden+ 35)
-(defconstant +mob-abil-starts-with-horse+ 36)
-(defconstant +mob-abil-independent+ 37)
-(defconstant +mob-abil-eagle-eye+ 38)
-(defconstant +mob-abil-facing+ 39)
-(defconstant +mob-abil-immovable+ 40)
-(defconstant +mob-abil-mind-burn+ 41)
-(defconstant +mob-abil-gargantaur-teleport+ 42)
-(defconstant +mob-abil-dominate-gargantaur+ 43)
-(defconstant +mob-abil-gargantaurs-mind-burn+ 44)
-(defconstant +mob-abil-death-from-above+ 45)
-(defconstant +mob-abil-climbing+ 46)
-(defconstant +mob-abil-no-breathe+ 47)
-(defconstant +mob-abil-open-close-door+ 48)
-(defconstant +mob-abil-toggle-light+ 49)
-(defconstant +mob-abil-open-close-window+ 50)
-(defconstant +mob-abil-can-possess-toggle+ 51)
-(defconstant +mob-abil-sacrifice-host+ 52)
-(defconstant +mob-abil-reanimate-corpse+ 53)
-(defconstant +mob-abil-undead+ 54)
-(defconstant +mob-abil-shared-minds+ 55)
-(defconstant +mob-abil-empower-undead+ 56)
-(defconstant +mob-abil-ignite-the-fire+ 57)
-(defconstant +mob-abil-avatar-of-brilliance+ 58)
-(defconstant +mob-abil-gravity-chains+ 59)
-(defconstant +mob-abil-flying+ 60)
-(defconstant +mob-abil-no-corpse+ 61)
-(defconstant +mob-abil-smite+ 62)
-(defconstant +mob-abil-slow+ 63)
-(defconstant +mob-abil-prayer-wrath+ 64)
-(defconstant +mob-abil-shadow-step+ 65)
-(defconstant +mob-abil-extinguish-light+ 66)
-(defconstant +mob-abil-umbral-aura+ 67)
-(defconstant +mob-abil-trinity-mimic+ 68)
-(defconstant +mob-abil-merge+ 69)
-(defconstant +mob-abil-unmerge+ 70)
-(defconstant +mob-abil-heal-other+ 71)
-(defconstant +mob-abil-righteous-fury+ 72)
-(defconstant +mob-abil-pain-link+ 73)
-(defconstant +mob-abil-soul-reinforcement+ 74)
-(defconstant +mob-abil-silence+ 75)
-(defconstant +mob-abil-confuse+ 76)
-(defconstant +mob-abil-split-soul+ 77)
-(defconstant +mob-abil-restore-soul+ 78)
-(defconstant +mob-abil-resurrection+ 79)
-(defconstant +mob-abil-sprint+ 80)
-(defconstant +mob-abil-jump+ 81)
-(defconstant +mob-abil-bend-space+ 82)
-(defconstant +mob-abil-cast-shadow+ 83)
-(defconstant +mob-abil-cannibalize+ 84)
-(defconstant +mob-abil-primordial+ 85)
-(defconstant +mob-abil-make-disguise+ 86)
-(defconstant +mob-abil-remove-disguise+ 87)
-(defconstant +mob-abil-constriction+ 88)
-(defconstant +mob-abil-irradiate+ 89)
-(defconstant +mob-abil-fission+ 90)
-(defconstant +mob-abil-adrenal-gland+ 91)
-(defconstant +mob-abil-mutate-acid-spit+ 92)
-(defconstant +mob-abil-mutate-corroding-secretion+ 93)
-(defconstant +mob-abil-acid-spit+ 94)
-(defconstant +mob-abil-corroding-secretion+ 95)
-(defconstant +mob-abil-mutate-corrosive-bile+ 96)
-(defconstant +mob-abil-mutate-accurate-bile+ 97)
-(defconstant +mob-abil-corrosive-bile+ 98)
-(defconstant +mob-abil-accurate-bile+ 99)
-(defconstant +mob-abil-mutate-clawed-tentacle+ 100)
-(defconstant +mob-abil-mutate-piercing-needles+ 101)
-(defconstant +mob-abil-clawed-tentacle+ 102)
-(defconstant +mob-abil-piercing-needles+ 103)
-(defconstant +mob-abil-mutate-chitinous-plating+ 104)
-(defconstant +mob-abil-mutate-thick-carapace+ 105)
-(defconstant +mob-abil-chitinous-plating+ 106)
-(defconstant +mob-abil-thick-carapace+ 107)
-(defconstant +mob-abil-mutate-metabolic-boost+ 108)
-(defconstant +mob-abil-mutate-jump+ 109)
-(defconstant +mob-abil-metabolic-boost+ 110)
-(defconstant +mob-abil-mutate-retracting-spines+ 111)
-(defconstant +mob-abil-mutate-acidic-tips+ 112)
-(defconstant +mob-abil-retracting-spines+ 113)
-(defconstant +mob-abil-acidic-tips+ 114)
-(defconstant +mob-abil-mutate-ovipositor+ 115)
-(defconstant +mob-abil-oviposit+ 116)
-(defconstant +mob-abil-create-parasites+ 117)
-(defconstant +mob-abil-mutate-spawn-locusts+ 118)
-(defconstant +mob-abil-spawn-locusts+ 119)
-(defconstant +mob-abil-mutate-spawn-scarabs+ 120)
-(defconstant +mob-abil-spawn-scarabs+ 121)
-(defconstant +mob-abil-acid-explosion+ 122)
-(defconstant +mob-abil-mutate-acid-locusts+ 123)
-(defconstant +mob-abil-mutate-fast-scarabs+ 124)
-(defconstant +mob-abil-mutate-oviposit-more-eggs+ 125)
-(defconstant +mob-abil-mutate-tougher-locusts+ 126)
-(defconstant +mob-abil-oviposit-more-eggs+ 127)
-(defconstant +mob-abil-tougher-locusts+ 128)
-(defconstant +mob-abil-acid-locusts+ 129)
-(defconstant +mob-abil-fast-scarabs+ 130)
-(defconstant +mob-abil-regenerate+ 131)
-(defconstant +mob-abil-casts-light+ 132)
-(defconstant +mob-abil-vulnerable-to-vorpal+ 133)
-(defconstant +mob-abil-vulnerable-to-fire+ 134)
-(defconstant +mob-abil-cure-mutation+ 135)
-(defconstant +mob-abil-mutate-hooks-and-suckers+ 136)
-(defconstant +mob-abil-mutate-disguise-as-human+ 137)
-(defconstant +mob-abil-disguise-as-human+ 138)
-(defconstant +mob-abil-mutate-spawn-larva+ 139)
-(defconstant +mob-abil-spawn-larva+ 140)
-(defconstant +mob-abil-mutate-spore-colony+ 141)
-(defconstant +mob-abil-spore-colony+ 142)
-(defconstant +mob-abil-immobile+ 143)
-(defconstant +mob-abil-float+ 144)
-(defconstant +mob-abil-ghost-possess+ 145)
-(defconstant +mob-abil-invisibility+ 146)
-(defconstant +mob-abil-passwall+ 147)
-(defconstant +mob-abil-ghost-release+ 148)
-(defconstant +mob-abil-decipher-rune+ 149)
-(defconstant +mob-abil-demon-word-flesh+ 150)
-(defconstant +mob-abil-demon-word-knockback+ 151)
-(defconstant +mob-abil-demon-word-invasion+ 152)
-(defconstant +mob-abil-demon-word-darkness+ 153)
-(defconstant +mob-abil-demon-word-plague+ 154)
-(defconstant +mob-abil-demon-word-power+ 155)
-(defconstant +mob-abil-soul+ 156)
-(defconstant +mob-abil-detect-unnatural+ 157)
-(defconstant +mob-abil-throw-corpse-into-portal+ 158)
-(defconstant +mob-abil-throw-relic-into-portal+ 159)
-(defconstant +mob-abil-create-demon-sigil+ 160)
-(defconstant +mob-abil-skinchange-to-melee+ 161)
-(defconstant +mob-abil-skinchange-to-ranged+ 162)
-(defconstant +mob-abil-skinchange-to-flyer+ 163)
-(defconstant +mob-abil-mutate-skin-ranged-to-turret+ 164)
-(defconstant +mob-abil-skinchange-to-turret+ 165)
-(defconstant +mob-abil-mutate-charge+ 166)
-(defconstant +mob-abil-mutate-explosive-glands+ 167)
-(defconstant +mob-abil-explosive-glands+ 168)
-(defconstant +mob-abil-mutate-poisoning-glands+ 169)
-(defconstant +mob-abil-poisoning-glands+ 170)
-(defconstant +mob-abil-purge-rune+ 171)
-(defconstant +mob-abil-civilian+ 172)
-(defconstant +mob-abil-deep-breath+ 173)
-(defconstant +mob-abil-nameless+ 174)
-(defconstant +mob-abil-strength-in-numbers+ 175)
-(defconstant +mob-abil-coward+ 176)
+;; The mob ability id space - see define-trait-ids. Appending a name here is
+;; the whole change needed to add an ability; (name :no-initarg) is for
+;; abilities granted by a mutation, mission or effect rather than set on the
+;; mob type. These ids are hash keys inside saved games, so APPEND, never
+;; insert or reorder.
+(define-trait-ids mob-abil abil +mob-abil-count+ *mob-abil-specs*
+  heal-self
+  conceal-divine
+  reveal-divine
+  detect-good
+  detect-evil
+  possessable
+  can-possess
+  purging-touch
+  blessing-touch
+  can-be-blessed
+  unholy
+  angel
+  demon
+  human
+  see-all
+  lifesteal
+  call-for-help
+  answer-the-call
+  loves-infighting
+  prayer-bless
+  free-call
+  prayer-shield
+  curse
+  keen-senses
+  prayer-reveal
+  military-follow-me
+  blindness
+  instill-fear
+  charge
+  momentum
+  animal
+  horseback-riding
+  horse-can-be-ridden
+  dismount
+  dominate-fiend
+  fiend-can-be-ridden
+  starts-with-horse
+  independent
+  eagle-eye
+  facing
+  immovable
+  mind-burn
+  gargantaur-teleport
+  dominate-gargantaur
+  gargantaurs-mind-burn
+  death-from-above
+  climbing
+  no-breathe
+  open-close-door
+  toggle-light
+  open-close-window
+  can-possess-toggle
+  sacrifice-host
+  reanimate-corpse
+  undead
+  shared-minds
+  empower-undead
+  ignite-the-fire
+  avatar-of-brilliance
+  gravity-chains
+  flying
+  no-corpse
+  smite
+  slow
+  prayer-wrath
+  shadow-step
+  extinguish-light
+  umbral-aura
+  trinity-mimic
+  merge
+  unmerge
+  heal-other
+  righteous-fury
+  pain-link
+  soul-reinforcement
+  silence
+  confuse
+  split-soul
+  restore-soul
+  resurrection
+  sprint
+  jump
+  bend-space
+  cast-shadow
+  cannibalize
+  primordial
+  make-disguise
+  remove-disguise
+  constriction
+  irradiate
+  fission
+  adrenal-gland
+  mutate-acid-spit
+  mutate-corroding-secretion
+  acid-spit
+  corroding-secretion
+  mutate-corrosive-bile
+  mutate-accurate-bile
+  corrosive-bile
+  accurate-bile
+  mutate-clawed-tentacle
+  mutate-piercing-needles
+  clawed-tentacle
+  piercing-needles
+  mutate-chitinous-plating
+  mutate-thick-carapace
+  chitinous-plating
+  thick-carapace
+  mutate-metabolic-boost
+  mutate-jump
+  metabolic-boost
+  mutate-retracting-spines
+  mutate-acidic-tips
+  retracting-spines
+  acidic-tips
+  mutate-ovipositor
+  oviposit
+  create-parasites
+  mutate-spawn-locusts
+  spawn-locusts
+  mutate-spawn-scarabs
+  spawn-scarabs
+  acid-explosion
+  mutate-acid-locusts
+  mutate-fast-scarabs
+  mutate-oviposit-more-eggs
+  mutate-tougher-locusts
+  oviposit-more-eggs
+  tougher-locusts
+  acid-locusts
+  fast-scarabs
+  (regenerate :no-initarg)
+  (casts-light :no-initarg)
+  (vulnerable-to-vorpal :no-initarg)
+  (vulnerable-to-fire :no-initarg)
+  cure-mutation
+  mutate-hooks-and-suckers
+  mutate-disguise-as-human
+  disguise-as-human
+  mutate-spawn-larva
+  spawn-larva
+  mutate-spore-colony
+  spore-colony
+  immobile
+  float
+  ghost-possess
+  invisibility
+  passwall
+  ghost-release
+  decipher-rune
+  demon-word-flesh
+  demon-word-knockback
+  demon-word-invasion
+  demon-word-darkness
+  demon-word-plague
+  demon-word-power
+  soul
+  detect-unnatural
+  throw-corpse-into-portal
+  throw-relic-into-portal
+  create-demon-sigil
+  skinchange-to-melee
+  skinchange-to-ranged
+  skinchange-to-flyer
+  mutate-skin-ranged-to-turret
+  (skinchange-to-turret :no-initarg)
+  mutate-charge
+  mutate-explosive-glands
+  (explosive-glands :no-initarg)
+  mutate-poisoning-glands
+  (poisoning-glands :no-initarg)
+  purge-rune
+  civilian
+  deep-breath
+  nameless
+  strength-in-numbers
+  coward)
 
 (defconstant +mob-effect-possessed+ 0)
 (defconstant +mob-effect-blessed+ 1)
@@ -522,12 +576,15 @@ the numbering: append rather than insert."
 ;; FEATURE-TYPE Constants
 ;;-------------------- 
 
-(defconstant +feature-trait-blocks-vision+ 0)
-(defconstant +feature-trait-smoke+ 1)
-(defconstant +feature-trait-no-gravity+ 2)
-(defconstant +feature-trait-fire+ 3)
-(defconstant +feature-trait-remove-on-dungeon-generation+ 4)
-(defconstant +feature-trait-demonic-rune+ 5)
+;; The feature trait space - see define-trait-ids. Appending a name here is the
+;; whole change needed to add a feature trait.
+(define-trait-ids feature-trait trait +feature-trait-count+ *feature-trait-specs*
+  blocks-vision
+  smoke
+  no-gravity
+  fire
+  remove-on-dungeon-generation
+  demonic-rune)
 
 (defconstant +feature-blood-fresh+ 0)
 (defconstant +feature-blood-old+ 1)
@@ -594,7 +651,7 @@ the numbering: append rather than insert."
 ;; *terrain-trait-table*), and terrain-type's :trait-* initargs. Appending a
 ;; name here is the whole change needed to add a trait. A (name default) pair
 ;; gives that initarg a default value.
-(define-trait-ids terrain-trait +terrain-trait-count+ *terrain-trait-specs*
+(define-trait-ids terrain-trait trait +terrain-trait-count+ *terrain-trait-specs*
   blocks-move
   blocks-vision
   blocks-projectiles
