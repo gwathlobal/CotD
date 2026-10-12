@@ -144,3 +144,45 @@ In Lisp command prompt (SBCL or Emacs SLIME), enter the following commands one a
 (cotd:cotd-main)
 
 The first one loads the game to Lisp. The second one runs the game.
+
+
+HOW TO BUILD A STANDALONE EXECUTABLE
+
+The steps above run the game from a Lisp prompt. To instead produce a single executable that runs without SBCL or Emacs, use one of the build scripts in the repository root:
+
+ - Windows:         build.bat
+ - Linux and macOS: ./build.sh
+
+Both do the same thing: change into src/, then run
+
+sbcl --non-interactive --load ../build.lisp
+
+build.lisp loads the cotd system and calls (cotd:make-exec). It is shared by both scripts so that the two cannot drift apart, and you can equally well run that one command by hand from src/.
+
+All the dependencies from the "Install dependencies" step above have to be installed first, since the build loads the whole system. On Windows SDL.dll has to be findable as well, exactly as it is when running from the REPL.
+
+If sbcl is not on PATH - the Emacs and SLIME setup above does not put it there, it only tells Emacs where SBCL lives - point the SBCL variable at it before running the script:
+
+ Windows:         set "SBCL=C:\Lisp\SBCL\1.3.12\sbcl.exe"
+ Linux and macOS: export SBCL=/usr/local/bin/sbcl
+
+The executable is written into src/, alongside data/ and help/:
+
+ - src/cotd.exe on Windows. It is built with :application-type :gui, so it opens no console window.
+ - src/cotd on Linux and macOS.
+
+Leave it there, or copy data/ and help/ along with it: a release build resolves its asset directory from the executable's own location rather than from the current directory, so it can be started from anywhere, but the data has to sit next to it. Saves, options.cfg, log.txt, highscores and morgue dumps are deliberately kept somewhere else - in the directory (uiop:xdg-data-home "cotd/") resolves to - so that an install into a read-only location still works.
+
+
+NOTES FOR LINUX AND MACOS
+
+The instructions above are written for Windows, but nothing in the game is Windows-specific. The shape is the same: install SBCL, install Quicklisp and run (ql:add-to-init-file), install SDL 1.2, put the repository somewhere ASDF can find it (~/common-lisp/ is searched by default), then (asdf:load-system :cotd) and (cotd:cotd-main).
+
+Instead of the environment variables in step 3 ("Set up Environmental Variables"), the usual places for configuration are ~/.config/common-lisp/source-registry.conf for the source registry and ~/.sbclrc for the Quicklisp init.
+
+macOS is UNTESTED. What follows is what to expect, not a verified recipe - if you get it working, corrections are welcome.
+
+ - SBCL is available from www.sbcl.org or via "brew install sbcl".
+ - SDL 1.2 has been end-of-life for years and is no longer a normal Homebrew formula. "brew install sdl12-compat", which reimplements SDL 1.2 on top of SDL 2, is the thing to try first. A Homebrew dylib lives under /opt/homebrew/lib on Apple silicon or /usr/local/lib on Intel, which may have to be added to cffi:*foreign-library-directories* or to DYLD_LIBRARY_PATH before CFFI will find it. A release build looks for the SDL framework first and then for libSDL (see cotd-exec in src/cotd.lisp); running from the REPL instead relies on lispbuilder-sdl's own lookup.
+ - The likeliest real obstacle is threading. On macOS, Cocoa insists that a window and its event loop live on the process's main thread, while the game drives SDL from code that also uses bordeaux-threads. Expect that to need work rather than to just run.
+ - build.sh itself is portable - plain bash, no GNU-only constructs - and writes src/cotd there the same way it does on Linux.

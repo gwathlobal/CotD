@@ -15,3 +15,7 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+
+# Windows batch scripts need CRLF in the working tree, whatever the platform
+# they are checked out on. Stored LF in the repository, as usual.
+*.bat text eol=crlf
