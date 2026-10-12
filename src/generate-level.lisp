@@ -65,7 +65,7 @@
         (funcall level-template-pre-process-func template-level world-sector mission world))
 
       ;; adjusting the progress bar : 1
-      (incf *cur-progress-bar*)
+      (bump-progress-bar)
       (funcall *update-screen-closure* nil)
       
       ;; produce terrain level from template using the supplied function
@@ -80,7 +80,7 @@
       (setf (level world) level)
 
       ;; adjusting the progress bar : 2
-      (incf *cur-progress-bar*)
+      (bump-progress-bar)
       (funcall *update-screen-closure* nil)
 
       (setf (mob-quadrant-map level) (make-array (list (ceiling (array-dimension (terrain level) 0) 10)
@@ -109,7 +109,7 @@
                (add-feature-to-level-list level (make-instance 'feature :feature-type feature-type-id :x x :y y :z z)))
 
       ;; adjusting the progress bar : 3
-      (incf *cur-progress-bar*)
+      (bump-progress-bar)
       (funcall *update-screen-closure* nil)
       
       ;; post process actual level (demonic portals, blood spatter, irradiated spots, etc)
@@ -118,75 +118,86 @@
       )
     
     ;; check map for connectivity : 4
-    (incf *cur-progress-bar*)
+    (bump-progress-bar)
     (funcall *update-screen-closure* "Creating connectivity maps")
 
     (setf *time-at-end-of-player-turn* (get-internal-real-time))
     
     ;; generate connectivity maps
-    (let* ((size-1-thread (bt:make-thread #'(lambda ()
-                                              (let ((start-time (get-internal-real-time)))
-                                                (create-connect-map-walk level 1)
-                                                (incf *cur-progress-bar*)
-                                                (funcall *update-screen-closure* nil)
-                                                (log:info "TIME-ELAPSED AFTER WALK 1: ~A" (- (get-internal-real-time) start-time))
-                                                )
+    (let* ((workers-done (bt:make-semaphore :count 0))
+           (size-1-thread (bt:make-thread #'(lambda ()
+                                            (unwind-protect
+                                                 (progn
+                                                  (let ((start-time (get-internal-real-time)))
+                                                    (create-connect-map-walk level 1)
+                                                    (bump-progress-bar)
+                                                    (log:info "TIME-ELAPSED AFTER WALK 1: ~A" (- (get-internal-real-time) start-time))
+                                                    )
 
-                                              (let ((start-time (get-internal-real-time)))
-                                                (create-connect-map-climb level 1)
-                                                (incf *cur-progress-bar*)
-                                                (funcall *update-screen-closure* nil)
-                                                (log:info "TIME-ELAPSED AFTER CLIMB 1: ~A" (- (get-internal-real-time) start-time))
-                                                )
+                                                  (let ((start-time (get-internal-real-time)))
+                                                    (create-connect-map-climb level 1)
+                                                    (bump-progress-bar)
+                                                    (log:info "TIME-ELAPSED AFTER CLIMB 1: ~A" (- (get-internal-real-time) start-time))
+                                                    )
 
-                                              (let ((start-time (get-internal-real-time)))
-                                                (create-connect-map-fly level 1)
-                                                (incf *cur-progress-bar*)
-                                                (funcall *update-screen-closure* nil)
-                                                (log:info "TIME-ELAPSED AFTER FLY 1: ~A" (- (get-internal-real-time) start-time))
-                                                )
+                                                  (let ((start-time (get-internal-real-time)))
+                                                    (create-connect-map-fly level 1)
+                                                    (bump-progress-bar)
+                                                    (log:info "TIME-ELAPSED AFTER FLY 1: ~A" (- (get-internal-real-time) start-time))
+                                                    )
                                               
-                                              (let ((start-time (get-internal-real-time)))
-                                                (create-connect-map-aux level)
-                                                (incf *cur-progress-bar*)
-                                                (funcall *update-screen-closure* nil)
-                                                (log:info "TIME-ELAPSED AFTER CLIMB 1: ~A" (- (get-internal-real-time) start-time))
-                                                )
+                                                  (let ((start-time (get-internal-real-time)))
+                                                    (create-connect-map-aux level)
+                                                    (bump-progress-bar)
+                                                    (log:info "TIME-ELAPSED AFTER CLIMB 1: ~A" (- (get-internal-real-time) start-time))
+                                                    )
                                               
-                                              )
+                                                  )
+                                              (bt:signal-semaphore workers-done)))
                                         :name "Connectivity map (size 1) thread"))
            (size-3-thread (bt:make-thread #'(lambda ()
-                                              (let ((start-time (get-internal-real-time)))
-                                                (create-connect-map-walk level 3)
-                                                (incf *cur-progress-bar*)
-                                                (funcall *update-screen-closure* nil)
-                                                (log:info "TIME-ELAPSED AFTER WALK 3: ~A" (- (get-internal-real-time) start-time))
-                                                )
+                                            (unwind-protect
+                                                 (progn
+                                                  (let ((start-time (get-internal-real-time)))
+                                                    (create-connect-map-walk level 3)
+                                                    (bump-progress-bar)
+                                                    (log:info "TIME-ELAPSED AFTER WALK 3: ~A" (- (get-internal-real-time) start-time))
+                                                    )
                                               
-                                              (let ((start-time (get-internal-real-time)))
-                                                (create-connect-map-climb level 3)
-                                                (incf *cur-progress-bar*)
-                                                (funcall *update-screen-closure* nil)
-                                                (log:info "TIME-ELAPSED AFTER CLIMB 3: ~A" (- (get-internal-real-time) start-time))
-                                                )
+                                                  (let ((start-time (get-internal-real-time)))
+                                                    (create-connect-map-climb level 3)
+                                                    (bump-progress-bar)
+                                                    (log:info "TIME-ELAPSED AFTER CLIMB 3: ~A" (- (get-internal-real-time) start-time))
+                                                    )
 
-                                              ;;(let ((start-time (get-internal-real-time)))
-                                              ;;  (create-connect-map-fly (level world) 3)
-                                              ;;  (incf *cur-progress-bar*)
-                                              ;;  (funcall *update-screen-closure* nil)
-                                              ;;  (format out "TIME-ELAPSED AFTER FLY 3: ~A~%" (- (get-internal-real-time) start-time))
-                                              ;;  )
-                                              )
+                                                  ;;(let ((start-time (get-internal-real-time)))
+                                                  ;;  (create-connect-map-fly (level world) 3)
+                                                  ;;  (bump-progress-bar)
+                                                  ;;  (funcall *update-screen-closure* nil)
+                                                  ;;  (format out "TIME-ELAPSED AFTER FLY 3: ~A~%" (- (get-internal-real-time) start-time))
+                                                  ;;  )
+                                                  )
+                                              (bt:signal-semaphore workers-done)))
                                          :name "Connectivity map (size 3) thread"))
            )
+      ;; Redraw from this thread while the workers run. They only bump the
+      ;; progress counter; SDL 1.2 rendering is not thread-safe, and having both
+      ;; workers blit and flip concurrently is undefined behaviour. Waiting on a
+      ;; semaphore rather than polling thread-alive-p means the wait ends the
+      ;; moment a worker finishes, instead of up to one poll interval later.
+      (loop repeat 2
+            do (loop until (bt:wait-on-semaphore workers-done :timeout 0.03)
+                     do (funcall *update-screen-closure* nil)))
+      ;; join anyway, so that an error inside a worker is signalled here
       (bt:join-thread size-1-thread)
       (log:info "SIZE 1 CREATION FINISHED")
       (bt:join-thread size-3-thread)
       (log:info "SIZE 3 CREATION FINISHED")
+      (funcall *update-screen-closure* nil)
       )
 
     ;; adjusting the progress bar : 10
-    (incf *cur-progress-bar*)
+    (bump-progress-bar)
     (funcall *update-screen-closure* "Finalizing")
     
     (push +game-event-adjust-outdoor-light+ (game-events level))

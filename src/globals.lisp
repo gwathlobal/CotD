@@ -826,6 +826,18 @@ hand-written methods this replaces."
 (defvar *cur-progress-bar*)
 (defvar *max-progress-bar*)
 
+;; *cur-progress-bar* is bumped from the connectivity-map worker threads during
+;; level generation, so the increment needs guarding - two unsynchronised incfs
+;; lose updates. The workers must not draw: SDL 1.2 rendering is not
+;; thread-safe, so only the thread that owns the screen calls
+;; *update-screen-closure*.
+(defparameter *progress-bar-lock* (bt:make-lock "progress bar"))
+
+(defun bump-progress-bar ()
+  "Advance the loading progress bar by one step. Safe to call from any thread."
+  (bt:with-lock-held (*progress-bar-lock*)
+    (incf *cur-progress-bar*)))
+
 (defparameter *current-dir* (asdf:system-source-directory :cotd))
 (defparameter *campaign-saves-pathlist* (list "saves" "campaign"))
 (defparameter *scenario-saves-pathlist* (list "saves" "scenario"))
