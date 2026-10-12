@@ -122,6 +122,8 @@ In the SLIME prompt enter the following command to load LISPBUILDER-SDL:
 (ql:quickload "lispbuilder-sdl")
 Enter the following command to load BORDEAUX-THREADS:
 (ql:quickload "bordeaux-threads")
+Enter the following command to load CFFI:
+(ql:quickload "cffi")
 Enter the following command to load DEFENUM:
 (ql:quickload "defenum")
 Enter the following command to load Cl-STORE
