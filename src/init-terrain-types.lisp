@@ -384,7 +384,7 @@
                                                :on-bump-terrain #'(lambda (mob x y z)
                                                                     (if (and (mob-ability-p mob +mob-abil-open-close-window+)
                                                                                (can-invoke-ability mob mob +mob-abil-open-close-window+)
-                                                                               (= (get-terrain-* (level *world*) x y z) +terrain-wall-window+))
+                                                                               (eql (get-terrain-* (level *world*) x y z) +terrain-wall-window+))
                                                                       (progn
                                                                         (mob-invoke-ability mob (list x y z) +mob-abil-open-close-window+)
                                                                         t)
@@ -467,7 +467,7 @@
                                                :on-bump-terrain #'(lambda (mob x y z)
                                                                     (if (and (mob-ability-p mob +mob-abil-open-close-door+)
                                                                              (can-invoke-ability mob mob +mob-abil-open-close-door+)
-                                                                             (= (get-terrain-* (level *world*) x y z) +terrain-door-closed+))
+                                                                             (eql (get-terrain-* (level *world*) x y z) +terrain-door-closed+))
                                                                       (progn
                                                                         (mob-invoke-ability mob (list x y z) +mob-abil-open-close-door+)
                                                                         t)
@@ -542,7 +542,7 @@
                                                :on-bump-terrain #'(lambda (mob x y z)
                                                                     (if (and (mob-ability-p mob +mob-abil-toggle-light+)
                                                                              (can-invoke-ability mob mob +mob-abil-toggle-light+)
-                                                                             (= (get-terrain-* (level *world*) x y z) +terrain-wall-lantern+))
+                                                                             (eql (get-terrain-* (level *world*) x y z) +terrain-wall-lantern+))
                                                                       (progn
                                                                         (mob-invoke-ability mob (list x y z) +mob-abil-toggle-light+)
                                                                         t)
@@ -566,7 +566,7 @@
                                                :on-bump-terrain #'(lambda (mob x y z)
                                                                     (if (and (mob-ability-p mob +mob-abil-toggle-light+)
                                                                              (can-invoke-ability mob mob +mob-abil-toggle-light+)
-                                                                             (= (get-terrain-* (level *world*) x y z) +terrain-wall-lantern-off+))
+                                                                             (eql (get-terrain-* (level *world*) x y z) +terrain-wall-lantern-off+))
                                                                       (progn
                                                                         (mob-invoke-ability mob (list x y z) +mob-abil-toggle-light+)
                                                                         t)

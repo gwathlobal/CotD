@@ -776,7 +776,7 @@
                         (labels ((recursive-func (tx ty tz)
                                    (set-terrain-* level tx ty tz +terrain-floor-creep-irradiated+)
                                    (check-surroundings tx ty nil #'(lambda (dx dy)
-                                                                     (when (= (get-terrain-* level dx dy tz) +terrain-floor-creep+)
+                                                                     (when (eql (get-terrain-* level dx dy tz) +terrain-floor-creep+)
                                                                        (when (zerop (random 4))
                                                                          (recursive-func dx dy tz)))))))
                           (recursive-func tx ty tz)))
@@ -784,7 +784,7 @@
         for y = (1+ (random max-y))
         for z = (1+ (random max-z))
         while (< cur-spot max-spots) do
-          (when (= (get-terrain-* level x y z) +terrain-floor-creep+)
+          (when (eql (get-terrain-* level x y z) +terrain-floor-creep+)
             (funcall func x y z)
             (incf cur-spot)))
   )

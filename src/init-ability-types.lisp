@@ -2105,7 +2105,7 @@
                                                 (multiple-value-bind (x y z) (values-list target)
                                                   (when (get-terrain-on-use (get-terrain-* (level *world*) x y z))
                                                     (funcall (get-terrain-on-use (get-terrain-* (level *world*) x y z)) actor x y z))
-                                                  (if (= (get-terrain-* (level *world*) x y z) +terrain-door-open+)
+                                                  (if (eql (get-terrain-* (level *world*) x y z) +terrain-door-open+)
                                                     (print-visible-message x y z (level *world*) (format nil "~A opens the door. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
                                                                            :observed-mob actor
                                                                            :color sdl:*white*
@@ -2127,7 +2127,7 @@
                                                   (if (and (mob-ability-p actor +mob-abil-open-close-door+)
                                                            (can-invoke-ability actor actor +mob-abil-open-close-door+)
                                                            (path actor)
-                                                           (= (get-terrain-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor)))) +terrain-door-closed+)
+                                                           (eql (get-terrain-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor)))) +terrain-door-closed+)
                                                            (null (get-mob-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor))))))
                                                     t
                                                     nil))
@@ -2140,8 +2140,8 @@
                                                                  (= (view-z *player*) (z *player*))
                                                                  (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
                                                                  (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
-                                                                 (or (= terrain +terrain-door-closed+)
-                                                                     (= terrain +terrain-door-open+)))
+                                                                 (or (eql terrain +terrain-door-closed+)
+                                                                     (eql terrain +terrain-door-open+)))
                                                           (progn
                                                             (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
@@ -2236,7 +2236,7 @@
                                                 (multiple-value-bind (x y z) (values-list target)
                                                   (when (get-terrain-on-use (get-terrain-* (level *world*) x y z))
                                                     (funcall (get-terrain-on-use (get-terrain-* (level *world*) x y z)) actor x y z))
-                                                  (if (= (get-terrain-* (level *world*) x y z) +terrain-wall-window-opened+)
+                                                  (if (eql (get-terrain-* (level *world*) x y z) +terrain-wall-window-opened+)
                                                     (print-visible-message x y z (level *world*) (format nil "~A opens the window. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
                                                                            :observed-mob actor
                                                                            :color sdl:*white*
@@ -2258,7 +2258,7 @@
                                                   (if (and (mob-ability-p actor +mob-abil-open-close-window+)
                                                            (can-invoke-ability actor actor +mob-abil-open-close-window+)
                                                            (path actor)
-                                                           (= (get-terrain-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor)))) +terrain-wall-window+)
+                                                           (eql (get-terrain-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor)))) +terrain-wall-window+)
                                                            (null (get-mob-* (level *world*) (first (first (path actor))) (second (first (path actor))) (third (first (path actor))))))
                                                     t
                                                     nil))
@@ -2271,8 +2271,8 @@
                                                                  (= (view-z *player*) (z *player*))
                                                                  (< (get-distance (view-x *player*) (view-y *player*) (x *player*) (y *player*)) 2)
                                                                  (not (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
-                                                                 (or (= terrain +terrain-wall-window+)
-                                                                     (= terrain +terrain-wall-window-opened+)))
+                                                                 (or (eql terrain +terrain-wall-window+)
+                                                                     (eql terrain +terrain-wall-window-opened+)))
                                                           (progn
                                                             (clear-message-list (level/small-message-box (level *world*)))
                                                             (mob-invoke-ability *player* (list (view-x *player*) (view-y *player*) (view-z *player*)) ability-type-id)
@@ -3074,9 +3074,10 @@
                                                                              :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                          :singlemind))))
                                                     (progn
-                                                      (when (and (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-light-source+)
-                                                                 (> (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-light-source+) 0)
-                                                                 (get-terrain-on-use (get-terrain-* (level *world*) x y z)))
+                                                      (when (let ((light (get-terrain-type-trait (get-terrain-* (level *world*) x y z) +terrain-trait-light-source+)))
+                                                              (and light
+                                                                   (> light 0)
+                                                                   (get-terrain-on-use (get-terrain-* (level *world*) x y z))))
                                                         (funcall (get-terrain-on-use (get-terrain-* (level *world*) x y z)) actor x y z)
                                                         (print-visible-message x y z (level *world*) (format nil "~A intones an incantation and the light switches off. "
                                                                                                              (capitalize-name (prepend-article +article-the+ (visible-name actor))))

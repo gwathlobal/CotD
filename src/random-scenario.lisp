@@ -541,33 +541,23 @@
 
 (defun generate-random-scenario (req-lvl-mod req-faction-id req-faction-present specific-faction-type &key (avail-mission-type-list nil) (avail-world-sector-type-list nil) (avail-lvl-mods-list nil))
   (let ((scenario (make-instance 'scenario-gen-class))
+        ;; only these two are consulted below, to decide whether a random
+        ;; controlled-by / time-of-day modifier still needs adding
         (lvl-mod-controlled-by-set nil)
-        (lvl-mod-feats-set nil)
-        (lvl-mod-items-set nil)
-        (lvl-mod-tod-set nil)
-        (lvl-mod-weather-set nil)
-        (lvl-mod-misc-set nil))
+        (lvl-mod-tod-set nil))
     
     (flet ((add-lvl-mod (lvl-mod &key (add-to-sector t))
              (case (lm-type lvl-mod)
                (:level-mod-controlled-by (progn
                                            (setf lvl-mod-controlled-by-set t)
                                            (scenario-set-controlled-by-lvl-mod scenario lvl-mod :add-to-sector add-to-sector)))
-               (:level-mod-sector-feat (progn
-                                         (setf lvl-mod-feats-set t)
-                                         (scenario-add/remove-feat-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector)))
-               (:level-mod-sector-item (progn
-                                         (setf lvl-mod-items-set t)
-                                         (scenario-add/remove-item-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector)))
+               (:level-mod-sector-feat (scenario-add/remove-feat-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector))
+               (:level-mod-sector-item (scenario-add/remove-item-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector))
                (:level-mod-tod (progn
                                  (setf lvl-mod-tod-set t)
                                  (scenario-set-tod-lvl-mod scenario lvl-mod :add-to-sector add-to-sector)))
-               (:level-mod-weather (progn
-                                     (setf lvl-mod-weather-set t)
-                                     (scenario-add/remove-weather-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector)))
-               (:level-mod-misc (progn
-                                  (setf lvl-mod-misc-set t)
-                                  (scenario-add/remove-misc-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector))))))
+               (:level-mod-weather (scenario-add/remove-weather-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector))
+               (:level-mod-misc (scenario-add/remove-misc-lvl-mod scenario lvl-mod :add-general t :add-to-sector add-to-sector)))))
 
       (with-slots (world world-sector mission avail-controlled-list avail-feats-list avail-items-list avail-tod-list avail-weather-list avail-misc-list) scenario
         ;; create the supporting world
