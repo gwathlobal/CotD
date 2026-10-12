@@ -56,7 +56,7 @@
   (let ((pathname-middle-section (case save-game-type
                                    (:save-game-campaign *campaign-saves-pathlist*)
                                    (:save-game-scenario *scenario-saves-pathlist*))))
-    (merge-pathnames (make-pathname :directory (append '(:relative) pathname-middle-section)) *current-dir*)))
+    (merge-pathnames (make-pathname :directory (append '(:relative) pathname-middle-section)) *user-dir*)))
 
 (declaim (ftype (function (save-game-type-enum)
                           list)

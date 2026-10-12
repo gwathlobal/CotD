@@ -44,20 +44,19 @@
                        (declare (ignore unicode))
                        
                        ;; normalize mod
-                       (loop while (>= mod sdl-key-mod-num) do
-                         (decf mod sdl-key-mod-num))
+                       (setf mod (normalize-key-mod mod))
                        
                        (cond
-                         ((and (sdl:key= key :sdl-key-up) (= mod 0))
+                         ((and (key= key :key-up) (key-mod-none-p mod))
                           (decf cur-str))
-                         ((and (sdl:key= key :sdl-key-down) (= mod 0))
+                         ((and (key= key :key-down) (key-mod-none-p mod))
                           (incf cur-str))
-                         ((and (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8)) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                         ((and (or (key= key :key-up) (key= key :key-kp8)) (key-mod-shift-p mod))
                           (decf cur-str 30))
-                         ((and (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2)) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                         ((and (or (key= key :key-down) (key= key :key-kp2)) (key-mod-shift-p mod))
                           (incf cur-str 30))
                          ;; escape - quit
-                         ((sdl:key= key :sdl-key-escape) 
+                         ((key= key :key-escape) 
                           (setf *current-window* (return-to win))
                           (make-output *current-window*)
                           (return-from run-window nil))

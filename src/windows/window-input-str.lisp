@@ -54,17 +54,16 @@
     (:key-down-event (:key key :mod mod :unicode unicode)
 
                       ;; normalize mod
-                     (loop while (>= mod sdl-key-mod-num) do
-                       (decf mod sdl-key-mod-num))
+                     (setf mod (normalize-key-mod mod))
   
                      (cond
-                       ((and (not (no-escape win)) (sdl:key= key :sdl-key-escape)) 
+                       ((and (not (no-escape win)) (key= key :key-escape)) 
                         (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))
-                       ((sdl:key= key :sdl-key-backspace) (when (> (fill-pointer (input win)) 0) (decf (fill-pointer (input win)))))
+                       ((key= key :key-backspace) (when (> (fill-pointer (input win)) 0) (decf (fill-pointer (input win)))))
                        ;; a - select all
-                       ((and (all-func win) (sdl:key= key :sdl-key-a) (= mod 0)) (setf (fill-pointer (input win)) 0) (format (input win) "~A" (funcall (all-func win))))
+                       ((and (all-func win) (key= key :key-a) (key-mod-none-p mod)) (setf (fill-pointer (input win)) 0) (format (input win) "~A" (funcall (all-func win))))
                        ;; enter - confirm
-                       ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+                       ((or (key= key :key-return) (key= key :key-kp-enter))
                         (when (and (not (zerop (length (input win))))
                                    (or (null (final-check-func win))
                                        (and (final-check-func win)

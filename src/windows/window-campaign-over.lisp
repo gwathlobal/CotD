@@ -66,7 +66,7 @@
                      (declare (ignore mod unicode))
                      (cond
                        ;; escape - return to main menu
-                       ((sdl:key= key :sdl-key-escape)
+                       ((key= key :key-escape)
                         (when (game-manager/game-slot-id *game-manager*)
                           (let* ((final-save-name (format nil "~A~A" *save-final-base-dirname* (game-manager/game-slot-id *game-manager*)))
                                  (dir-pathname (merge-pathnames (make-pathname :directory `(:relative ,final-save-name)) (find-save-game-path :save-game-campaign)))

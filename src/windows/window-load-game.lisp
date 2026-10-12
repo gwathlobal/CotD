@@ -85,12 +85,12 @@
                        
                        (cond
                          ;; esc - exit the window
-                         ((sdl:key= key :sdl-key-escape) 
+                         ((key= key :key-escape) 
                           (setf *current-window* (return-to win))
                           (make-output *current-window*)
                           (return-from run-window nil))
                          ;; d - remove the selected game
-                         ((or (and (sdl:key= key :sdl-key-d))
+                         ((or (and (key= key :key-d))
                               (eq unicode +cotd-unicode-latin-d-small+))
                           (when (and game-pathname-list (nth cur-sel game-pathname-list)
                                      descr-pathname-list (nth cur-sel descr-pathname-list))
@@ -132,7 +132,7 @@
                             )
                           )
                          ;; enter - load selected game
-                         ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+                         ((or (key= key :key-return) (key= key :key-kp-enter))
                           (when (and game-pathname-list (nth cur-sel game-pathname-list))
                             (let ((saved-game nil)
                                   (serialized-save-descr (load-descr-from-disk (nth cur-sel descr-pathname-list))))

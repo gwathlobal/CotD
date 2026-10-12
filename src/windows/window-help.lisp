@@ -106,15 +106,14 @@
     (:key-down-event (:key key :mod mod :unicode unicode)
 
                       ;; normalize mod
-                     (loop while (>= mod sdl-key-mod-num) do
-                       (decf mod sdl-key-mod-num))
+                     (setf mod (normalize-key-mod mod))
                      
                      (when (= (cur-page win) +win-help-page-menu+)
                        (setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win) :start-page (truncate (cur-sel win) (length (menu-items win))) :max-str-per-page (length (menu-items win))))
                        (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (menu-items win)))))
                      
                      (cond
-                       ((and (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8)) (= mod 0))
+                       ((and (or (key= key :key-up) (key= key :key-kp8)) (key-mod-none-p mod))
                         (when (or (= (cur-page win) +win-help-page-overview+)
                                   (= (cur-page win) +win-help-page-concepts-combat+)
                                   (= (cur-page win) +win-help-page-concepts-environment+)
@@ -122,7 +121,7 @@
                                   (= (cur-page win) +win-help-page-keybindings+)
                                   (= (cur-page win) +win-help-page-credits+))
                           (decf (cur-str win))))
-                       ((and (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8)) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                       ((and (or (key= key :key-up) (key= key :key-kp8)) (key-mod-shift-p mod))
                         (when (or (= (cur-page win) +win-help-page-overview+)
                                   (= (cur-page win) +win-help-page-concepts-combat+)
                                   (= (cur-page win) +win-help-page-concepts-environment+)
@@ -130,7 +129,7 @@
                                   (= (cur-page win) +win-help-page-keybindings+)
                                   (= (cur-page win) +win-help-page-credits+))
                           (decf (cur-str win) 30)))
-                       ((and (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2)) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                       ((and (or (key= key :key-down) (key= key :key-kp2)) (key-mod-shift-p mod))
                         (when (or (= (cur-page win) +win-help-page-overview+)
                                   (= (cur-page win) +win-help-page-concepts-combat+)
                                   (= (cur-page win) +win-help-page-concepts-environment+)
@@ -138,7 +137,7 @@
                                   (= (cur-page win) +win-help-page-keybindings+)
                                   (= (cur-page win) +win-help-page-credits+))
                           (incf (cur-str win) 30)))
-                       ((and (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2)) (= mod 0))
+                       ((and (or (key= key :key-down) (key= key :key-kp2)) (key-mod-none-p mod))
                         (when (or (= (cur-page win) +win-help-page-overview+)
                                   (= (cur-page win) +win-help-page-concepts-combat+)
                                   (= (cur-page win) +win-help-page-concepts-environment+)
@@ -147,14 +146,14 @@
                                   (= (cur-page win) +win-help-page-credits+))
                           (incf (cur-str win))))
                        ;; escape - quit
-                       ((sdl:key= key :sdl-key-escape) 
+                       ((key= key :key-escape) 
                         (if (= (cur-page win) +win-help-page-menu+)
                           (progn 
                             (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))
                           (progn
                             (setf (cur-page win) +win-help-page-menu+))))
                        ;; enter - select
-                       ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+                       ((or (key= key :key-return) (key= key :key-kp-enter))
                         (when (= (cur-page win) +win-help-page-menu+)
                           (setf (cur-str win) 0)
                           (setf (cur-page win) (1+ (cur-sel win))))

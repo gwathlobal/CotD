@@ -287,9 +287,9 @@
     (setf *options* (make-options))
     
     ;; get options from file if possible
-    (if (probe-file (merge-pathnames "options.cfg" *current-dir*))
+    (if (probe-file (merge-pathnames "options.cfg" *user-dir*))
       (progn
-        (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :input)
+        (with-open-file (file (merge-pathnames "options.cfg" *user-dir*) :direction :input)
           (handler-case
               ;; *read-eval* is bound off so that a #. in the config file cannot
               ;; run code. options.cfg is the player's own file, so this is not
@@ -305,8 +305,8 @@
               ;; of them is malformed is worse than ignoring that line. The
               ;; settings window rewrites it properly on exit.
               (log:error "OPTIONS.CFG: error while reading options.cfg: ~A. Ignoring the rest of the file; it has been left alone." c)))))
-      (progn 
-        (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output)
+      (progn
+        (with-open-file (file (merge-pathnames "options.cfg" *user-dir*) :direction :output)
           (format file "~A" (create-options-file-string *options*))))
       )
     
@@ -344,15 +344,15 @@
     (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 *glyph-w* *glyph-h*))
     
     
-    (log:info "current-dir = ~A" *current-dir*)
-    (log:info "path = ~A" (sdl:create-path tiles-path *current-dir*))
-    
-    (setf *glyph-front* (sdl:load-image (sdl:create-path tiles-path *current-dir*) 
+    (log:info "asset-dir = ~A" *asset-dir*)
+    (log:info "path = ~A" (sdl:create-path tiles-path *asset-dir*))
+
+    (setf *glyph-front* (sdl:load-image (sdl:create-path tiles-path *asset-dir*)
                                         :color-key sdl:*white*))
     ;; the tinted strips are derived from *glyph-front*, so drop them with it
     (reset-glyph-strip-cache)
 
-    (setf *start-logo* (sdl:load-image (sdl:create-path "data/logo.bmp" *current-dir*)))
+    (setf *start-logo* (sdl:load-image (sdl:create-path "data/logo.bmp" *asset-dir*)))
     
     (setf *previous-scenario* nil)
     (setf *game-manager* (make-instance 'game-manager))
@@ -411,7 +411,7 @@
              (setf (name mob) (name *player*))
              (setf (alive-name mob) (alive-name *player*))))
   
-  (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
+  (with-open-file (file (merge-pathnames "options.cfg" *user-dir*) :direction :output :if-exists :supersede)
     (format file "~A" (create-options-file-string *options*))))
 
 (defun scenario-game-loop ()
@@ -630,9 +630,19 @@
 
 (defun setup-log ()
   (case *cotd-logging*
-    (:log-option-all (log:config :sane :console :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%D - %p (%c{1}) %m%n" *cotd-log-level*))
-    (:log-option-file (log:config :sane :daily (merge-pathnames (make-pathname :name "log.txt") *current-dir*) :pattern "%D - %p (%c{1}) %m%n" *cotd-log-level*))
+    (:log-option-all (log:config :sane :console :daily (merge-pathnames (make-pathname :name "log.txt") *user-dir*) :pattern "%D - %p (%c{1}) %m%n" *cotd-log-level*))
+    (:log-option-file (log:config :sane :daily (merge-pathnames (make-pathname :name "log.txt") *user-dir*) :pattern "%D - %p (%c{1}) %m%n" *cotd-log-level*))
     (t (log:config :off))))
+
+#+sbcl
+(defun determine-release-asset-dir ()
+  "The directory the running executable was launched from, independent of
+the process's cwd - argv[0] resolves relative to cwd only when it has no
+directory component (e.g. invoked as a bare name via $PATH), in which case
+this falls back to the dev default rather than guessing."
+  (handler-case
+      (uiop:pathname-directory-pathname (truename (first sb-ext:*posix-argv*)))
+    (error () *asset-dir*)))
 
 #+clisp
 (defun cotd-exec ()
@@ -647,7 +657,11 @@
  	      "libSDL")))
   
   (cffi:use-foreign-library sdl)
-  (setf *current-dir* *default-pathname-defaults*)
+  ;; *asset-dir* is left at its build-time default (bundled with the build
+  ;; tree); clisp has no equivalent of sb-ext:*posix-argv* used below for
+  ;; sbcl, so there is no tested way here to locate the executable itself.
+  (setf *user-dir* (uiop:xdg-data-home "cotd/"))
+  (ensure-directories-exist *user-dir*)
   (setf *cotd-release* t)
   (setf *cotd-logging* :log-option-none)
   (setf *cotd-log-level* :error)
@@ -669,7 +683,9 @@
  	      "libSDL")))
 
   (cffi:use-foreign-library sdl)
-  (setf *current-dir* *default-pathname-defaults*)
+  (setf *asset-dir* (determine-release-asset-dir))
+  (setf *user-dir* (uiop:xdg-data-home "cotd/"))
+  (ensure-directories-exist *user-dir*)
   (setf *cotd-release* t)
   (setf *cotd-logging* :log-option-file)
   (setf *cotd-log-level* :error)

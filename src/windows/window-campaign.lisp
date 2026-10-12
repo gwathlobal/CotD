@@ -348,43 +348,42 @@
     (:key-down-event (:key key :mod mod :unicode unicode)
                                           
                      ;; normalize mod
-                     (loop while (>= mod sdl-key-mod-num) do
-                       (decf mod sdl-key-mod-num))
+                     (setf mod (normalize-key-mod mod))
 
                      (with-slots (test-map-func cur-mode cur-sector cur-sel avail-missions return-to reveal-lair) win
                        ;;------------------
                        ;; moving - arrows
                        (case cur-mode
                          (:campaign-window-map-mode (progn (let ((new-coords cur-sector))
-                                                                 (when (or (sdl:key= key :sdl-key-pageup) (sdl:key= key :sdl-key-kp9))
+                                                                 (when (or (key= key :key-pageup) (key= key :key-kp9))
                                                                    (setf new-coords (cons (1+ (car cur-sector))
                                                                                           (1- (cdr cur-sector))))
                                                                    )
-                                                                 (when (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8))
+                                                                 (when (or (key= key :key-up) (key= key :key-kp8))
                                                                    (setf new-coords (cons (car cur-sector)
                                                                                           (1- (cdr cur-sector))))
                                                                    )
-                                                                 (when (or (sdl:key= key :sdl-key-home) (sdl:key= key :sdl-key-kp7))
+                                                                 (when (or (key= key :key-home) (key= key :key-kp7))
                                                                    (setf new-coords (cons (1- (car cur-sector))
                                                                                           (1- (cdr cur-sector))))
                                                                    )
-                                                                 (when (or (sdl:key= key :sdl-key-right) (sdl:key= key :sdl-key-kp6))
+                                                                 (when (or (key= key :key-right) (key= key :key-kp6))
                                                                    (setf new-coords (cons (1+ (car cur-sector))
                                                                                           (cdr cur-sector)))
                                                                    )
-                                                                 (when (or (sdl:key= key :sdl-key-left) (sdl:key= key :sdl-key-kp4))
+                                                                 (when (or (key= key :key-left) (key= key :key-kp4))
                                                                    (setf new-coords (cons (1- (car cur-sector))
                                                                                           (cdr cur-sector)))
                                                                    )
-                                                                 (when (or (sdl:key= key :sdl-key-pagedown) (sdl:key= key :sdl-key-kp3))
+                                                                 (when (or (key= key :key-pagedown) (key= key :key-kp3))
                                                                    (setf new-coords (cons (1+ (car cur-sector))
                                                                                           (1+ (cdr cur-sector))))
                                                                    )
-                                                                 (when (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2))
+                                                                 (when (or (key= key :key-down) (key= key :key-kp2))
                                                                    (setf new-coords (cons (car cur-sector)
                                                                                           (1+ (cdr cur-sector))))
                                                                    )
-                                                                 (when (or (sdl:key= key :sdl-key-end) (sdl:key= key :sdl-key-kp1))
+                                                                 (when (or (key= key :key-end) (key= key :key-kp1))
                                                                    (setf new-coords (cons (1- (car cur-sector))
                                                                                           (1+ (cdr cur-sector))))
                                                                    )
@@ -399,14 +398,14 @@
                        
                        (cond
                          ;; escape - quit
-                         ((sdl:key= key :sdl-key-escape)
+                         ((key= key :key-escape)
                           (with-slots (game-state) *game-manager*
                            (case game-state
                              (:game-state-campaign-map (show-escape-menu))))
                           
                           )
                          ;; r - random map
-                         ((sdl:key= key :sdl-key-r)
+                         ((key= key :key-r)
                           (with-slots (game-state) *game-manager*
                             (case game-state
                               (:game-state-campaign-init (progn
@@ -418,7 +417,7 @@
                             )
                           )
                          ;; Shift + D - debug menu, for debug purposes only
-                         ((and (sdl:key= key :sdl-key-d) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0)
+                         ((and (key= key :key-d) (key-mod-shift-p mod)
                                (null *cotd-release*))
                           (let ((menu-items ())
                                 (prompt-list ())
@@ -461,14 +460,14 @@
                             (run-window *current-window*))
                           )
                          ;; tab - change mode
-                         ((sdl:key= key :sdl-key-tab)
+                         ((key= key :key-tab)
                           (if (eq cur-mode :campaign-window-mission-mode)
                             (setf cur-mode :campaign-window-map-mode)
                             (when avail-missions
                               (setf cur-mode :campaign-window-mission-mode)
                               (campaign-win-move-select-to-mission win))))
                          ;; enter - select
-                         ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+                         ((or (key= key :key-return) (key= key :key-kp-enter))
                           (with-slots (game-state) *game-manager*
                             (case game-state
                               (:game-state-campaign-init (progn
@@ -490,33 +489,33 @@
                             )))
                        ;;------------------
                        ;; select a command - c
-                       (when (or (and (sdl:key= key :sdl-key-c) (= mod 0))
+                       (when (or (and (key= key :key-c) (key-mod-none-p mod))
                                  (eq unicode +cotd-unicode-latin-c-small+))
                          (case (game-manager/game-state *game-manager*)
                            (:game-state-campaign-map (campaign-win-display-command win :can-esc t))))
                        ;;------------------
                        ;; view situation report - s
-                       (when (or (and (sdl:key= key :sdl-key-s) (= mod 0))
+                       (when (or (and (key= key :key-s) (key-mod-none-p mod))
                                  (eq unicode +cotd-unicode-latin-s-small+))
                           (case (game-manager/game-state *game-manager*)
                             (:game-state-campaign-map (campaign-win-display-sitrep win))))
                        ;;------------------
                        ;; view situation report - e
-                       (when (or (and (sdl:key= key :sdl-key-e) (= mod 0))
+                       (when (or (and (key= key :key-e) (key-mod-none-p mod))
                                  (eq unicode +cotd-unicode-latin-e-small+))
                           (case (game-manager/game-state *game-manager*)
                             (:game-state-campaign-map (campaign-win-display-effects win))))
                        ;;------------------
                        ;; help screen - ?
-                       (when (or (sdl:key= key :sdl-key-question)
+                       (when (or (key= key :key-question)
                                  (eq unicode +cotd-unicode-question-mark+)
-                                 (and (sdl:key= key :sdl-key-slash) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
-                                 (and (sdl:key= key :sdl-key-7) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0)))
+                                 (and (key= key :key-slash) (key-mod-shift-p mod))
+                                 (and (key= key :key-7) (key-mod-shift-p mod)))
                           (case (game-manager/game-state *game-manager*)
                             (:game-state-campaign-map (campaign-win-display-help win))))
                        ;;------------------
                        ;; next day - n
-                       (when (or (and (sdl:key= key :sdl-key-n) (= mod 0))
+                       (when (or (and (key= key :key-n) (key-mod-none-p mod))
                                  (eq unicode +cotd-unicode-latin-n-small+))
                          (with-slots (game-state) *game-manager*
                            (case game-state

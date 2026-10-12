@@ -185,17 +185,17 @@
                        (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (get-mob-all-abilities *player*)))))
                      
                      (cond
-                       ((sdl:key= key :sdl-key-left)
+                       ((key= key :key-left)
                         (decf (cur-tab win))
                         (when (< (cur-tab win) +character-win-weapon&armor+)
                           (setf (cur-tab win) +character-win-weapon&armor+)))
                        
-                       ((sdl:key= key :sdl-key-right)
+                       ((key= key :key-right)
                         (incf (cur-tab win))
                         (when (> (cur-tab win) +character-win-effects+)
                           (setf (cur-tab win) +character-win-effects+)))
                         
-                       ((sdl:key= key :sdl-key-escape) 
+                       ((key= key :key-escape) 
                         (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))
                        )
                      (make-output *current-window*))

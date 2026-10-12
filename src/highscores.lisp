@@ -16,14 +16,14 @@
 
 (defun save-highscores-to-disk ()
   (handler-case
-      (let ((file-pathname (merge-pathnames (make-pathname :name *highscores-filename*) *current-dir*)))
+      (let ((file-pathname (merge-pathnames (make-pathname :name *highscores-filename*) *user-dir*)))
         (cl-store:store *highscores* file-pathname))
     (error (c)
       (log:info (format nil "~%SAVE-HIGHSCORES-TO-DISK: Error occured while saving to file: ~A.~%~%" c))))
   nil)
 
 (defun load-highscores-from-disk ()
-  (let ((file-pathname (merge-pathnames (make-pathname :name *highscores-filename*) *current-dir*)))
+  (let ((file-pathname (merge-pathnames (make-pathname :name *highscores-filename*) *user-dir*)))
     (handler-case
         (if (probe-file file-pathname)
           (setf *highscores* (cl-store:restore file-pathname))

@@ -342,14 +342,14 @@
                                     avail-faction-list cur-faction-list specific-faction-list)
                            scenario
                          (cond
-                           ((sdl:key= key :sdl-key-left)
+                           ((key= key :key-left)
                             (progn
                               (when (defenum:previous-enum-tag 'custom-scenario-window-tab-type cur-step)
                                 (setf cur-step (defenum:previous-enum-tag 'custom-scenario-window-tab-type cur-step)))
                               
                               (setf menu-items (populate-custom-scenario-win-menu win cur-step))))
                            
-                           ((sdl:key= key :sdl-key-right)
+                           ((key= key :key-right)
                             (progn
                               (when (defenum:next-enum-tag 'custom-scenario-window-tab-type cur-step)
                                 (setf cur-step (defenum:next-enum-tag 'custom-scenario-window-tab-type cur-step)))
@@ -357,12 +357,12 @@
                               (setf menu-items (populate-custom-scenario-win-menu win cur-step))))
                            
                            ;; escape - quit
-                           ((sdl:key= key :sdl-key-escape)
+                           ((key= key :key-escape)
                             (setf *current-window* (return-to win))
                             (return-from run-window (values nil nil)))
                            
                            ;; Space - add/remove feat inside feats tab
-                           ((and (sdl:key= key :sdl-key-space)
+                           ((and (key= key :key-space)
                                  (eq cur-step :custom-scenario-tab-feats))
                             (progn
                               (let ((lvl-mod (nth cur-sel overall-lvl-mods-list)))
@@ -406,7 +406,7 @@
                                   (setf menu-items (populate-custom-scenario-win-menu win cur-step))))))
                            
                            ;; Space - add/remove faction inside factions tab
-                           ((and (sdl:key= key :sdl-key-space)
+                           ((and (key= key :key-space)
                                  (eq cur-step :custom-scenario-tab-factions))
                             (progn
                               (let* ((current-faction (first (nth cur-faction cur-faction-list)))
@@ -424,7 +424,7 @@
                                 (setf menu-items (populate-custom-scenario-win-menu win cur-step)))))
                            
                            ;; enter - select
-                           ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+                           ((or (key= key :key-return) (key= key :key-kp-enter))
                             (if (not (eq cur-step :custom-scenario-tab-specific-factions))
                               (progn
                                 (setf cur-step (defenum:next-enum-tag 'custom-scenario-window-tab-type cur-step))

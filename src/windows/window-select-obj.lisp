@@ -183,10 +183,10 @@
 
                         (cond
 			  ;; escape - quit
-			  ((and (sdl:key= key :sdl-key-escape) (can-esc win)) 
+			  ((and (key= key :key-escape) (can-esc win)) 
 			   (setf *current-window* (return-to win)) (go exit-func))
 			  ;; enter - select
-			  ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+			  ((or (key= key :key-return) (key= key :key-kp-enter))
 			   (funcall (enter-func win) (cur-sel win))
 			   (go exit-func)))
                         (make-output *current-window*)

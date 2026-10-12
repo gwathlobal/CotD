@@ -838,7 +838,15 @@ hand-written methods this replaces."
   (bt:with-lock-held (*progress-bar-lock*)
     (incf *cur-progress-bar*)))
 
-(defparameter *current-dir* (asdf:system-source-directory :cotd))
+;; *asset-dir* is read-only bundled data (bitmaps, help/description text).
+;; *user-dir* is where saves, options.cfg, log.txt, highscores and morgue
+;; dumps get written. They default to the same place for development, but
+;; cotd-exec repoints them separately for a release build: the asset dir to
+;; wherever the executable actually lives, and the user dir to a
+;; per-user, always-writable OS-conventional location (an install under
+;; Program Files is not writable).
+(defparameter *asset-dir* (asdf:system-source-directory :cotd))
+(defparameter *user-dir* (asdf:system-source-directory :cotd))
 (defparameter *campaign-saves-pathlist* (list "saves" "campaign"))
 (defparameter *scenario-saves-pathlist* (list "saves" "scenario"))
 (defparameter *save-final-base-dirname* "save")

@@ -1,7 +1,7 @@
 (in-package :cotd)
 
 (defun get-txt-from-file (filename)
-  (with-open-file (file (merge-pathnames filename *current-dir*) :direction :input :if-does-not-exist nil)
+  (with-open-file (file (merge-pathnames filename *asset-dir*) :direction :input :if-does-not-exist nil)
     (when file 
       (loop for line = (read-line file nil)
             with str = (create-string "")

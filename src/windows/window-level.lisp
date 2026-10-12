@@ -504,15 +504,14 @@
                         ;(format t "MOD BEFORE NORMALIZE = ~A~%" mod)
                         
                         ;; normalize mod
-                        (loop while (>= mod sdl-key-mod-num) do
-                          (decf mod sdl-key-mod-num))
+                        (setf mod (normalize-key-mod mod))
 
                         ;(format t "MOD AFTER NORMALIZE = ~A~%" mod)
                         ;(format t "UNICODE = ~A~%" unicode)
                                                 
                         ;;------------------
 			;; moving - arrows
-			(when (or (sdl:key= key :sdl-key-pageup) (sdl:key= key :sdl-key-kp9))
+			(when (or (key= key :key-pageup) (key= key :key-kp9))
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
@@ -522,7 +521,7 @@
                                 (move-mob *player* 9)
                                 )))
                           )
-			(when (or (sdl:key= key :sdl-key-up) (sdl:key= key :sdl-key-kp8))
+			(when (or (key= key :key-up) (key= key :key-kp8))
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
@@ -532,7 +531,7 @@
                                 (move-mob *player* 8)
                                 )))
                           )
-			(when (or (sdl:key= key :sdl-key-home) (sdl:key= key :sdl-key-kp7))
+			(when (or (key= key :key-home) (key= key :key-kp7))
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
@@ -542,7 +541,7 @@
                                 (move-mob *player* 7)
                                 )))
                           )
-			(when (or (sdl:key= key :sdl-key-right) (sdl:key= key :sdl-key-kp6))
+			(when (or (key= key :key-right) (key= key :key-kp6))
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
@@ -552,16 +551,16 @@
                                 (move-mob *player* 6)
                                 )))
                           )
-                        (when (or (sdl:key= key :sdl-key-kp5)
-                                  (and (sdl:key= key :sdl-key-period)
-                                       (= mod 0)))
+                        (when (or (key= key :key-kp5)
+                                  (and (key= key :key-period)
+                                       (key-mod-none-p mod)))
                           (clear-message-list (level/small-message-box (level *world*)))
                           (if (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
                             (move-mob *player* 5)
                             )
                           )
-			(when (or (sdl:key= key :sdl-key-left) (sdl:key= key :sdl-key-kp4))
+			(when (or (key= key :key-left) (key= key :key-kp4))
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
@@ -571,7 +570,7 @@
                                 (move-mob *player* 4)
                                 )))
                           )
-			(when (or (sdl:key= key :sdl-key-pagedown) (sdl:key= key :sdl-key-kp3))
+			(when (or (key= key :key-pagedown) (key= key :key-kp3))
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
@@ -581,7 +580,7 @@
                                 (move-mob *player* 3)
                                 )))
                           )
-			(when (or (sdl:key= key :sdl-key-down) (sdl:key= key :sdl-key-kp2))
+			(when (or (key= key :key-down) (key= key :key-kp2))
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
@@ -591,7 +590,7 @@
                                 (move-mob *player* 2)
                                 )))
                           )
-			(when (or (sdl:key= key :sdl-key-end) (sdl:key= key :sdl-key-kp1))
+			(when (or (key= key :key-end) (key= key :key-kp1))
                           (if (mob-ability-p *player* +mob-abil-immobile+)
                             (add-message (format nil "You are immobile and can not move.~%"))
                             (progn
@@ -603,7 +602,7 @@
                           )
                         ;;------------------
 			;; move down - Shift + . (i.e., >)
-                        (when (and (or (and (sdl:key= key :sdl-key-period) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                        (when (and (or (and (key= key :key-period) (key-mod-shift-p mod))
                                        (eq unicode +cotd-unicode-greater-than-sign+))
                                    (> (z *player*) 0)
                                    (not (get-terrain-type-trait (get-terrain-* (level *world*) (x *player*) (y *player*) (z *player*)) +terrain-trait-blocks-move-floor+))
@@ -624,7 +623,7 @@
                           )
                         ;;------------------
 			;; move up - Shift + , (i.e., <)
-                        (when (and (or (and (sdl:key= key :sdl-key-comma) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+                        (when (and (or (and (key= key :key-comma) (key-mod-shift-p mod))
                                        (eq unicode +cotd-unicode-less-than-sign+))
                                    (or (and (mob-effect-p *player* +mob-effect-climbing-mode+)
                                             (funcall #'(lambda ()
@@ -652,19 +651,19 @@
                           )
 			;;------------------
 			;; character mode - Shift + 2
-			(when (or (and (sdl:key= key :sdl-key-2) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
+			(when (or (and (key= key :key-2) (key-mod-shift-p mod))
                                   (eq unicode +cotd-unicode-at-sign+))
 			  (setf *current-window* (make-instance 'character-window :return-to *current-window*)))
                         ;;------------------
 			;; help screen - ?
-			(when (or (sdl:key= key :sdl-key-question)
+			(when (or (key= key :key-question)
                                   (eq unicode +cotd-unicode-question-mark+)
-                                  (and (sdl:key= key :sdl-key-slash) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0))
-                                  (and (sdl:key= key :sdl-key-7) (/= (logand mod sdl-cffi::sdl-key-mod-shift) 0)))
+                                  (and (key= key :key-slash) (key-mod-shift-p mod))
+                                  (and (key= key :key-7) (key-mod-shift-p mod)))
 			  (setf *current-window* (make-instance 'help-window :return-to *current-window*)))
                         ;;------------------
 			;; select item to use - u
-                        (when (or (and (sdl:key= key :sdl-key-u))
+                        (when (or (and (key= key :key-u))
                                   (eq unicode +cotd-unicode-latin-u-small+))
                           (when (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
@@ -730,7 +729,7 @@
 			    ))
                         ;;------------------
 			;; select abilities - a
-                        (when (or (and (sdl:key= key :sdl-key-a))
+                        (when (or (and (key= key :key-a))
                                   (eq unicode +cotd-unicode-latin-a-small+))
                           (when (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
@@ -847,7 +846,7 @@
 			    ))
 			;;------------------
 			;; look mode - l
-			(when (or (and (sdl:key= key :sdl-key-l) (= mod 0))
+			(when (or (and (key= key :key-l) (key-mod-none-p mod))
                                   (eq unicode +cotd-unicode-latin-l-small+))
 			  (setf *current-window* (make-instance 'map-select-window 
 								:return-to *current-window*
@@ -858,7 +857,7 @@
 			  (make-output *current-window*))
                         ;;------------------
 			;; shoot mode - f
-			(when (or (and (sdl:key= key :sdl-key-f) (= mod 0))
+			(when (or (and (key= key :key-f) (key-mod-none-p mod))
                                   (eq unicode +cotd-unicode-latin-f-small+))
 
                           (when (can-move-if-possessed *player*)
@@ -893,7 +892,7 @@
                               (add-message (format nil "Can't switch into firing mode: no ranged weapons.~%")))))
                         ;;------------------
 			;; reload - r
-			(when (or (and (sdl:key= key :sdl-key-r) (= mod 0))
+			(when (or (and (key= key :key-r) (key-mod-none-p mod))
                                   (eq unicode +cotd-unicode-latin-r-small+))
                           (clear-message-list (level/small-message-box (level *world*)))
                           (when (can-move-if-possessed *player*)
@@ -911,14 +910,14 @@
                               (add-message (format nil "Can't reload: this is not a ranged weapon.~%")))))
                         ;;------------------
 			;; view inventory - i
-                        (when (or (and (sdl:key= key :sdl-key-i) (= mod 0))
+                        (when (or (and (key= key :key-i) (key-mod-none-p mod))
                                   (eq unicode +cotd-unicode-latin-i-small+))
                           (setf *current-window* (make-instance 'inventory-window :return-to *current-window*)))
                         ;;------------------
 			;; pick item - p, g or ,
-			(when (or (and (sdl:key= key :sdl-key-p) (= mod 0))
-                                  (and (sdl:key= key :sdl-key-g) (= mod 0))
-                                  (and (sdl:key= key :sdl-key-comma) (= mod 0)))
+			(when (or (and (key= key :key-p) (key-mod-none-p mod))
+                                  (and (key= key :key-g) (key-mod-none-p mod))
+                                  (and (key= key :key-comma) (key-mod-none-p mod)))
 
                           (when (can-move-if-possessed *player*)
                             (setf (can-move-if-possessed *player*) nil)
@@ -962,7 +961,7 @@
 			    ))
                         ;;------------------
 			;; view messages - m
-                        (when (or (and (sdl:key= key :sdl-key-m) (= mod 0))
+                        (when (or (and (key= key :key-m) (key-mod-none-p mod))
                                   (eq unicode +cotd-unicode-latin-m-small+))
 			  (setf *current-window* (make-instance 'message-window 
 								:return-to *current-window*
@@ -971,14 +970,14 @@
                           (make-output *current-window*))
                         ;;------------------
 			;; view journal - j
-                        (when (or (and (sdl:key= key :sdl-key-j) (= mod 0))
+                        (when (or (and (key= key :key-j) (key-mod-none-p mod))
                                   (eq unicode +cotd-unicode-latin-j-small+))
 			  (setf *current-window* (make-instance 'journal-window 
 								:return-to *current-window*))
                           (make-output *current-window*))
                         ;;------------------
 			;; scenario main menu - Esc
-                        (when (sdl:key= key :sdl-key-escape)
+                        (when (key= key :key-escape)
                           (show-escape-menu)
                           )
 			

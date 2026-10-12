@@ -78,25 +78,24 @@
     (:key-down-event (:key key :mod mod :unicode unicode)
 
                       ;; normalize mod
-                     (loop while (>= mod sdl-key-mod-num) do
-                       (decf mod sdl-key-mod-num))
+                     (setf mod (normalize-key-mod mod))
   
                      ;; adjusting the inventory selection
                      (cond
                        ((= (cur-tab win) +inv-tab-inv+) (progn (setf (cur-inv win) (run-selection-list key mod unicode (cur-inv win)))
                                                                (setf (cur-inv win) (adjust-selection-list (cur-inv win) (length (inv *player*)))))))
                      (cond
-                       ((sdl:key= key :sdl-key-escape) 
+                       ((key= key :key-escape) 
                         (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))
                        ;; d - drop all items
-                       ((and (sdl:key= key :sdl-key-d) (= mod 0))
+                       ((and (key= key :key-d) (key-mod-none-p mod))
                         (clear-message-list (level/small-message-box (level *world*)))
                         (mob-drop-item *player* (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                         (setf *current-window* (return-to win))
                         (make-output *current-window*)
                         (return-from run-window nil))
                        ;; Ctrl + d - drop a number of items
-                       ((and (sdl:key= key :sdl-key-d) (/= (logand mod sdl-cffi::sdl-key-mod-ctrl) 0)) 
+                       ((and (key= key :key-d) (key-mod-ctrl-p mod)) 
                         (progn
                           
                           (setf *current-window* (make-instance 'input-str-window 
@@ -129,7 +128,7 @@
                               (return-from run-window nil)))
                           ))
                        ;; u - use an item
-                       ((sdl:key= key :sdl-key-u)
+                       ((key= key :key-u)
                         (let ((item (get-inv-item-by-pos (inv *player*) (cur-inv win)))
                               (result))
                           (setf result (window-use-item item (return-to win)))

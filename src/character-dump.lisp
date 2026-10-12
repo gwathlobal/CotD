@@ -178,7 +178,7 @@
   (multiple-value-bind (second minute hour date month year day daylight-p zone) (get-decoded-time)
     (declare (ignore day daylight-p zone))
     (let* ((file-name (format nil "~A-~A-~4,'0d-~2,'0d-~2,'0d-~2,'0d-~2,'0d-~2,'0d.txt" (get-qualified-name *player*) score year month date hour minute second))
-           (dir-path (merge-pathnames "morgue/" *current-dir*)))
+           (dir-path (merge-pathnames "morgue/" *user-dir*)))
       (ensure-directories-exist dir-path)
       (with-open-file (file (merge-pathnames file-name dir-path) :direction :output :if-exists :supersede)
         (format file "~A - ~4,'0d-~2,'0d-~2,'0d ~2,'0d:~2,'0d:~2,'0d~A~%" (get-qualified-name *player*) year month date hour minute second (new-line))

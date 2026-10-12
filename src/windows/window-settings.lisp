@@ -102,19 +102,18 @@
     (:key-down-event (:key key :mod mod :unicode unicode)
                      
                      ;; normalize mod
-                     (loop while (>= mod sdl-key-mod-num) do
-                       (decf mod sdl-key-mod-num))
+                     (setf mod (normalize-key-mod mod))
 
                      (setf (cur-sel win) (run-selection-list key mod unicode (cur-sel win) :start-page (truncate (cur-sel win) (length (options-list win))) :max-str-per-page (length (options-list win))))
                      (setf (cur-sel win) (adjust-selection-list (cur-sel win) (length (options-list win))))
                      
                      (cond
-                       ((sdl:key= key :sdl-key-escape) 
+                       ((key= key :key-escape) 
                         (setf *current-window* (return-to win)) (make-output *current-window*) (return-from run-window nil))
                        
-                       ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+                       ((or (key= key :key-return) (key= key :key-kp-enter))
                         (funcall (third (nth (cur-sel win) (options-list win))))
-                        (with-open-file (file (merge-pathnames "options.cfg" *current-dir*) :direction :output :if-exists :supersede)
+                        (with-open-file (file (merge-pathnames "options.cfg" *user-dir*) :direction :output :if-exists :supersede)
                           (format file "~A" (create-options-file-string *options*)))
                         ))
                      (make-output *current-window*)

@@ -96,12 +96,12 @@
                      (declare (ignore mod unicode))
                      (cond
                        ;; escape - quit with nil
-                       ((sdl:key= key :sdl-key-escape) (progn
+                       ((key= key :key-escape) (progn
                                                          (setf *current-window* (return-to win))
                                                          (make-output *current-window*)
                                                          (return-from run-window nil)))
                        ;; space, enter - quit with t
-                       ((or (sdl:key= key :sdl-key-space) (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter)) (progn
+                       ((or (key= key :key-space) (key= key :key-return) (key= key :key-kp-enter)) (progn
                                                                                                                              (setf *current-window* (return-to win))
                                                                                                                              (make-output *current-window*)
                                                                                                                              (return-from run-window t))))

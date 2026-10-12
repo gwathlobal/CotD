@@ -89,7 +89,7 @@
                                                                (go-to-start-game))))))
                        (cond
                          ;; escape - high scores
-                         ((sdl:key= key :sdl-key-escape) 
+                         ((key= key :key-escape) 
                           (setf *current-window* (make-instance 'highscores-window :highscores-place (highscores-place win)))
                           (make-output *current-window*)
                           (run-window *current-window*)
@@ -97,7 +97,7 @@
                           (save-highscores-to-disk)
                           (exit-func))
                          ;; m - return to main menu/campaign map
-                         ((sdl:key= key :sdl-key-m)
+                         ((key= key :key-m)
                           (truncate-highscores *highscores*)
                           (save-highscores-to-disk)
                           (exit-func)))))

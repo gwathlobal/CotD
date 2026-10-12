@@ -143,12 +143,18 @@ the goal, and may depend on many factors"
     (setf (gethash (node-coord-key (node-x-pos start-node) (node-y-pos start-node) (node-z-pos start-node)) open-table)
           start-node)
 
-    ;; Pop open nodes to check until we reach the goal coordinate
+    ;; Pop open nodes to check until we reach the goal coordinate.  The
+    ;; heap has no decrease-key, so an improved path to an already-open
+    ;; coordinate is handled by lazy deletion: push a second, better node
+    ;; for that key and let a stale pop of the old one be skipped via the
+    ;; closed-table check below.  OPEN-TABLE always holds the *best* node
+    ;; found so far for its key, which is what the "already open" check
+    ;; needs to compare against.
     (loop while (> (heap-count open-heap) 0)
           for node = (heap-pop open-heap)
-          do
-             (remhash (node-coord-key (node-x-pos node) (node-y-pos node) (node-z-pos node)) open-table)
-
+          for node-key of-type fixnum = (node-coord-key (node-x-pos node) (node-y-pos node) (node-z-pos node))
+          unless (gethash node-key closed-table)
+            do
              (when (pos-equal node goal-node)
                (setf found-node node)
                (return))
@@ -166,18 +172,24 @@ the goal, and may depend on many factors"
                    unless (and (zerop x-offset) (zerop y-offset) (zerop z-offset))
                      ;; don't need to check already closed nodes
                      unless (gethash key closed-table)
-                       ;; don't need to find already open nodes, either
-                       unless (gethash key open-table)
-                         ;; only check valid coordinates
-                         when (funcall valid-func x y z (node-x-pos node) (node-y-pos node) (node-z-pos node))
-                           do
-                              (let ((new-node (make-new-node node x y z (first goal-coord) (second goal-coord) (third goal-coord) (funcall cost-func x y z))))
+                       ;; only check valid coordinates
+                       when (funcall valid-func x y z (node-x-pos node) (node-y-pos node) (node-z-pos node))
+                         do
+                            (let ((new-node (make-new-node node x y z (first goal-coord) (second goal-coord) (third goal-coord) (funcall cost-func x y z)))
+                                  (existing (gethash key open-table)))
+                              ;; Only push if this is the first time we've
+                              ;; reached KEY, or if it improves on the best
+                              ;; G-VAL seen for it so far - needed because
+                              ;; +terrain-trait-move-cost-factor+ makes step
+                              ;; cost non-uniform, so the first path found
+                              ;; to a node is not guaranteed to be cheapest.
+                              (when (or (not existing) (< (node-g-val new-node) (node-g-val existing)))
                                 (heap-push open-heap new-node)
-                                (setf (gethash key open-table) new-node)))
+                                (setf (gethash key open-table) new-node))))
 
              ;; We exhausted the possibilities of this node, so add it
              ;; to the closed nodes
-             (setf (gethash (node-coord-key (node-x-pos node) (node-y-pos node) (node-z-pos node)) closed-table) node))
+             (setf (gethash node-key closed-table) node))
 
     ;; If a goal node was found, we traverse its parent chain in
     ;; reverse to obtain our path.
@@ -195,10 +207,13 @@ the goal, and may depend on many factors"
     (+ (* (sqrt 2) diag) (* 1 (- straight (* 2 diag))))))
 
 (defun path-distance (cur-x cur-y cur-z end-x end-y end-z)
+  "Chebyshev distance: admissible for 26-way diagonal movement, where a
+single step can reduce every axis by 1 at once. Manhattan (dx+dy+dz)
+over-estimates a diagonal step by up to 3x, making A* non-optimal."
   (declare (type fixnum cur-x cur-y cur-z end-x end-y end-z))
   (let ((dx (abs (- cur-x end-x)))
         (dy (abs (- cur-y end-y)))
         (dz (abs (- cur-z end-z))))
-    (+ dx dy dz)))
+    (max dx dy dz)))
 
 (setf *h-func* #'path-distance)

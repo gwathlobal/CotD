@@ -46,11 +46,11 @@
                        
                        (cond
                          ;; escape - quit
-                         ((sdl:key= key :sdl-key-escape)
+                         ((key= key :key-escape)
                           (game-state-menu->quit)
                           (go-to-quit-game))
                          ;; enter - select
-                         ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+                         ((or (key= key :key-return) (key= key :key-kp-enter))
                           (when (and menu-funcs (nth cur-sel menu-funcs))
                             (let ((menu-result (funcall (nth cur-sel menu-funcs))))
                               (when (eq menu-result :menu-stop-loop)

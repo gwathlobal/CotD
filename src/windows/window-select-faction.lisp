@@ -58,11 +58,11 @@
                        
                        (cond
                          ;; escape - quit
-                         ((sdl:key= key :sdl-key-escape) 
+                         ((key= key :key-escape) 
                           (setf *current-window* return-to)
                           (return-from run-window nil))
                          ;; enter - select
-                         ((or (sdl:key= key :sdl-key-return) (sdl:key= key :sdl-key-kp-enter))
+                         ((or (key= key :key-return) (key= key :key-kp-enter))
                           (return-from run-window cur-sel)
                           ))
                        (make-output *current-window*))
