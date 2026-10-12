@@ -59,7 +59,7 @@ the rest of the session."
   (aref *terrain-types* terrain-type-id))
 
 (define-trait-initializer terrain-type
-    ((*terrain-trait-specs* trait terrain-trait trait))
+    ((*terrain-trait-specs* trait))
     ())
 
 (declaim (inline get-terrain-type-trait))

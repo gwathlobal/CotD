@@ -28,58 +28,79 @@
 e.g. TRAIT + BLOCKS-MOVE => TRAIT-BLOCKS-MOVE, supplied as :trait-blocks-move."
     (intern (format nil "~A-~A" (symbol-name prefix)
                     (symbol-name (trait-spec-name spec)))
-            :cotd)))
+            :cotd))
+
+  (defvar *trait-id-spaces* (make-hash-table)
+    "Maps each id space's spec-list variable to (CONST-PREFIX PARAM-PREFIX).
+Filled in by define-trait-ids so that define-trait-initializer can derive the
+constant and initarg names itself, rather than having them restated at every
+initializer and left to agree by hand.")
+
+  (defun trait-id-space (list-name)
+    "The (CONST-PREFIX PARAM-PREFIX) registered for LIST-NAME."
+    (or (gethash list-name *trait-id-spaces*)
+        (error "No id space is registered for ~S. Define it with ~
+                define-trait-ids before generating an initializer from it."
+               list-name))))
 
 (defmacro define-trait-ids (const-prefix param-prefix count-name list-name &body specs)
   "Define an id space from SPECS (see trait-spec-name above for their forms).
 
-Defines one constant per spec holding its position in the list, COUNT-NAME as
-how many there are, and LIST-NAME as the spec list - the last bound at compile
-time too, so define-trait-initializer can generate matching PARAM-PREFIX-NAME
-keyword parameters from the same list.
+Defines +CONST-PREFIX-NAME+ per spec holding its position in the list,
+COUNT-NAME as how many there are, and LIST-NAME as the spec list. Both
+prefixes and the list are recorded at compile time, so define-trait-initializer
+derives the :PARAM-PREFIX-NAME initargs and the constants to store them under
+from this one form - they are not restated at the initializer.
 
 One list therefore defines the ids, the size of the id space and the initargs,
 so appending a name to it is the whole change needed to add one. Order is the
 numbering, and for mob abilities the ids are keys in saved games, so append
 rather than insert."
-  (declare (ignore param-prefix))
   `(progn
      (eval-when (:compile-toplevel :load-toplevel :execute)
-       (defparameter ,list-name ',specs))
+       (defparameter ,list-name ',specs)
+       (setf (gethash ',list-name *trait-id-spaces*)
+             '(,const-prefix ,param-prefix)))
      ,@(loop for spec in specs
              for index from 0
              collect `(defconstant ,(trait-id-constant const-prefix spec) ,index))
      (defconstant ,count-name ,(length specs))))
 
 (defmacro define-trait-initializer (class groups extra-keys &body body)
-  "Generate CLASS's initialize-instance :after method from spec lists.
+  "Generate CLASS's initialize-instance :after method from id spaces.
 
-Each group is (SPECS-VAR TABLE-ACCESSOR CONST-PREFIX PARAM-PREFIX). Every spec
-in SPECS-VAR that takes an initarg becomes a keyword parameter named
-PARAM-PREFIX-NAME; when that argument is truthy its value is stored in
-(TABLE-ACCESSOR CLASS) under +CONST-PREFIX-NAME+.
+Each group is (SPECS-VAR TABLE-ACCESSOR), where SPECS-VAR is an id space
+defined by define-trait-ids. Every spec in it that takes an initarg becomes a
+keyword parameter, and when that argument is truthy its value is stored in
+(TABLE-ACCESSOR CLASS) under the spec's id constant. Both names come from the
+prefixes SPECS-VAR was registered with, so they cannot drift from it.
 
 EXTRA-KEYS are further keyword parameters the method needs, and BODY runs
 before the generated stores. The instance is bound to CLASS, matching the
 hand-written methods this replaces."
-  `(defmethod initialize-instance :after ((,class ,class)
-                                          &key ,@extra-keys
-                                            ,@(loop for (specs-var nil nil param-prefix) in groups
-                                                    append (loop for spec in (symbol-value specs-var)
-                                                                 when (trait-spec-initarg-p spec)
+  (flet ((initarg-specs (specs-var)
+           "(spec . param-prefix) for each spec in SPECS-VAR taking an initarg."
+           (let ((param-prefix (second (trait-id-space specs-var))))
+             (loop for spec in (symbol-value specs-var)
+                   when (trait-spec-initarg-p spec)
+                     collect (cons spec param-prefix)))))
+    `(defmethod initialize-instance :after ((,class ,class)
+                                            &key ,@extra-keys
+                                              ,@(loop for (specs-var nil) in groups
+                                                      append (loop for (spec . param-prefix) in (initarg-specs specs-var)
                                                                    collect (if (trait-spec-default-p spec)
                                                                              (list (trait-initarg-var param-prefix spec)
                                                                                    (second spec))
                                                                              (trait-initarg-var param-prefix spec)))))
-     ,@body
-     ,@(loop for (specs-var table const-prefix param-prefix) in groups
-             append (loop for spec in (symbol-value specs-var)
-                          when (trait-spec-initarg-p spec)
-                            collect (let ((var (trait-initarg-var param-prefix spec)))
-                                      `(when ,var
-                                         (setf (gethash ,(trait-id-constant const-prefix spec)
-                                                        (,table ,class))
-                                               ,var)))))))
+       ,@body
+       ,@(loop for (specs-var table) in groups
+               append (let ((const-prefix (first (trait-id-space specs-var))))
+                        (loop for (spec . param-prefix) in (initarg-specs specs-var)
+                              collect (let ((var (trait-initarg-var param-prefix spec)))
+                                        `(when ,var
+                                           (setf (gethash ,(trait-id-constant const-prefix spec)
+                                                          (,table ,class))
+                                                 ,var)))))))))
 
 (declaim (type fixnum *max-x-level* *max-y-level*))
 (declaim (ftype (function (fixnum fixnum fixnum fixnum) single-float) get-distance))

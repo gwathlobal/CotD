@@ -47,7 +47,7 @@
   (setf (aref *feature-types* (id feature-type)) feature-type))
 
 (define-trait-initializer feature-type
-    ((*feature-trait-specs* trait feature-trait trait))
+    ((*feature-trait-specs* trait))
     ())
 
 ;;--------------------

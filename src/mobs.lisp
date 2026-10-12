@@ -68,8 +68,8 @@
    ))
 
 (define-trait-initializer mob-type
-    ((*mob-abil-specs* abilities mob-abil abil)
-     (*ai-package-specs* ai-packages ai-package ai))
+    ((*mob-abil-specs* abilities)
+     (*ai-package-specs* ai-packages))
     (armor)
   ;; set up armor
   (setf (armor mob-type) (make-array (list 7) :initial-element nil))
