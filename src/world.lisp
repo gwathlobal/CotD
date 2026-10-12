@@ -267,61 +267,80 @@
     (return-from get-items-* nil))
   (aref (items level) x y z))
 
+;; Hot: ~96 and ~109 call sites, and the memo layer was the single biggest
+;; cost of a game turn. The array is created once per level with element type T
+;; and never replaced, so naming the type lets SBCL open-code the aref instead
+;; of calling hairy-data-vector-ref.
+(declaim (inline get-memo-* set-memo-*))
+
 (defun get-memo-* (level x y z)
-  (aref (memo level) x y z))
-  
+  (declare (type fixnum x y z) (optimize (speed 3)))
+  (aref (the (simple-array t (* * *)) (memo level)) x y z))
+
 (defun set-memo-* (level x y z single-memo)
-  (setf (aref (memo level) x y z) single-memo))
+  (declare (type fixnum x y z) (optimize (speed 3)))
+  (setf (aref (the (simple-array t (* * *)) (memo level)) x y z) single-memo))
 
 (defun create-single-memo (glyph-idx glyph-color back-color visibility revealed light player)
   (make-array (list 7) :initial-contents (list glyph-idx glyph-color back-color visibility revealed light player))
   ;(list glyph-idx glyph-color back-color visibility revealed light)
   )
 
+;; A single memo is the simple-vector built by create-single-memo.
+(declaim (inline get-single-memo-glyph-idx get-single-memo-glyph-color get-single-memo-back-color get-single-memo-visibility get-single-memo-revealed get-single-memo-light get-single-memo-player))
+
 (defun get-single-memo-glyph-idx (single-memo)
-  ;(nth 0 single-memo)
-  (aref single-memo 0))
+  (declare (type simple-vector single-memo) (optimize (speed 3)))
+  (svref single-memo 0))
 
 (defun get-single-memo-glyph-color (single-memo)
-  ;(nth 1 single-memo)
-  (aref single-memo 1))
+  (declare (type simple-vector single-memo) (optimize (speed 3)))
+  (svref single-memo 1))
 
 (defun get-single-memo-back-color (single-memo)
-  ;(nth 2 single-memo)
-  (aref single-memo 2))
+  (declare (type simple-vector single-memo) (optimize (speed 3)))
+  (svref single-memo 2))
 
 (defun get-single-memo-visibility (single-memo)
-  ;(nth 3 single-memo)
-  (aref single-memo 3))
+  (declare (type simple-vector single-memo) (optimize (speed 3)))
+  (svref single-memo 3))
 
 (defun get-single-memo-revealed (single-memo)
-  ;(nth 4 single-memo)
-  (aref single-memo 4))
+  (declare (type simple-vector single-memo) (optimize (speed 3)))
+  (svref single-memo 4))
 
 (defun get-single-memo-light (single-memo)
-  ;(nth 5 single-memo)
-  (aref single-memo 5))
+  (declare (type simple-vector single-memo) (optimize (speed 3)))
+  (svref single-memo 5))
 
 (defun get-single-memo-player (single-memo)
-  ;(nth 5 single-memo)
-  (aref single-memo 6))
+  (declare (type simple-vector single-memo) (optimize (speed 3)))
+  (svref single-memo 6))
 
-(defun set-single-memo-* (level x y z &key (glyph-idx (get-single-memo-glyph-idx (get-memo-* level x y z)))
-                                           (glyph-color (get-single-memo-glyph-color (get-memo-* level x y z))) 
-                                           (back-color (get-single-memo-back-color (get-memo-* level x y z))) 
-                                           (visibility (get-single-memo-visibility (get-memo-* level x y z)))
-                                           (revealed (get-single-memo-revealed (get-memo-* level x y z)))
-                                           (light (get-single-memo-light (get-memo-* level x y z)))
-                                           (player (get-single-memo-player (get-memo-* level x y z))))
-  ;(set-memo-* level x y z (create-single-memo glyph-idx glyph-color back-color visibility revealed light))
+(defun set-single-memo-* (level x y z &key (glyph-idx nil glyph-idx-p)
+                                           (glyph-color nil glyph-color-p)
+                                           (back-color nil back-color-p)
+                                           (visibility nil visibility-p)
+                                           (revealed nil revealed-p)
+                                           (light nil light-p)
+                                           (player nil player-p))
+  "Update the supplied fields of the memo at X Y Z, leaving the others alone.
+
+Each field used to default to its own (get-memo-* level x y z), so a one-field
+update did seven separate 3D lookups and then wrote all seven fields back. The
+result is the same either way - an unsupplied field was written back with the
+value just read out of it - but this does one lookup and writes only what was
+asked for. set-single-memo-* was 45.9% of a game turn before this."
+  (declare (optimize (speed 3)))
   (let ((single-memo (get-memo-* level x y z)))
-    (setf (aref single-memo 0) glyph-idx)
-    (setf (aref single-memo 1) glyph-color)
-    (setf (aref single-memo 2) back-color)
-    (setf (aref single-memo 3) visibility)
-    (setf (aref single-memo 4) revealed)
-    (setf (aref single-memo 5) light)
-    (setf (aref single-memo 6) player)))
+    (declare (type simple-vector single-memo))
+    (when glyph-idx-p (setf (svref single-memo 0) glyph-idx))
+    (when glyph-color-p (setf (svref single-memo 1) glyph-color))
+    (when back-color-p (setf (svref single-memo 2) back-color))
+    (when visibility-p (setf (svref single-memo 3) visibility))
+    (when revealed-p (setf (svref single-memo 4) revealed))
+    (when light-p (setf (svref single-memo 5) light))
+    (when player-p (setf (svref single-memo 6) player))))
 
 ;;; A connect map is (simple-array fixnum (max-x max-y max-z +connect-map-move-count+)):
 ;;; one connectivity-region id per cell per movement mode, +connect-room-none+
