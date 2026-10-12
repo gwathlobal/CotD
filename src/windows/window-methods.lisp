@@ -1,6 +1,5 @@
 (in-package :cotd)
 
-(defvar *glyph-temp*)
 (defvar *glyph-front*)
 (defvar *window-width*)
 (defvar *window-height*)
@@ -8,30 +7,57 @@
 (defparameter *msg-box-window-height* (* 13 5))
 (defvar *start-logo*)
 
+(defparameter *glyph-strip-cache* (make-hash-table :test 'eq)
+  "Font strips pre-tinted with a glyph colour, keyed on the colour object.
+
+Keyed by identity rather than by RGB: every colour in play is a shared object
+held by a terrain, feature, item or mob type, or one of the FOV parameters, so
+EQ hits essentially always and avoids reading r/g/b - CFFI struct accesses - on
+every glyph. Two equal-but-distinct colour objects would each get their own
+strip, which wastes a strip but renders the same.")
+
+(defun reset-glyph-strip-cache ()
+  "Drop the tinted strips. Call after (re)loading *glyph-front*."
+  (clrhash *glyph-strip-cache*))
+
+(defun colorized-glyph-strip (front-color)
+  "The whole font strip tinted with FRONT-COLOR, built once per colour.
+
+The tinting is what draw-glyph used to redo per glyph: fill a surface with the
+glyph colour, then blit the font over it. White is the font's colour key, so
+the fill shows through the glyph shape and the surround stays black; black is
+this surface's colour key, so blitting it leaves only the glyph. None of that
+depends on which glyph or where it goes, so it is done once per colour instead
+of 4000 times a frame."
+  (or (gethash front-color *glyph-strip-cache*)
+      (setf (gethash front-color *glyph-strip-cache*)
+              (let ((strip (sdl:create-surface (sdl:width *glyph-front*)
+                                               (sdl:height *glyph-front*)
+                                               :color-key sdl:*black*)))
+                (sdl:fill-surface front-color :surface strip)
+                (sdl:set-cell-* 0 0 (sdl:width *glyph-front*) (sdl:height *glyph-front*)
+                                :surface *glyph-front* :index 0)
+                (sdl:draw-surface-at-* *glyph-front* 0 0 :surface strip)
+                strip))))
+
 (defun draw-glyph (x y n &key (surface sdl:*default-surface*) front-color back-color)
   "Drawing a glyph from 'font.bmp' at a certain point of the surface."
   (declare (type fixnum x y n) (type sdl:color front-color back-color))
-  ;; select a rectangle with the glyph to be drawn
-  (sdl:set-cell-* (* n *glyph-w*) 0 *glyph-w* *glyph-h* :surface *glyph-front* :index 0)
-  
-  ;; fill the temporary surface with the desired color of the glyph
-  ;; draw the glyph to the temporary surface
-  ;; as the transparent color of the src surface is the actual color of the glyph (white), we get the glyph of the desired color on the black background 
-  (sdl:fill-surface front-color :surface *glyph-temp*)
-  (sdl:draw-surface-at-* *glyph-front* 0 0 :surface *glyph-temp*)
-  
-  ;; fill the rectangle on the dst surface with the desired color of the background
-  ;; draw the glyph from the temporary surface to the dst surface
-  ;; as the transparent color of the temporary surface is black, we get the glyph of the desired color on the desired background
-  ;; for speed I use this temporary rectangle as this function is invoked about 4000 times or more a frame and otherwise (e.g. using with-rectangle) map rendering slows to a crawl
-  
-  (setf (sdl:x *temp-rect*) x)
-  (setf (sdl:y *temp-rect*) y)
-  (setf (sdl:width *temp-rect*) *glyph-w*)
-  (setf (sdl:height *temp-rect*) *glyph-h*)
-  (sdl:fill-surface back-color :surface surface :template *temp-rect*)
-  
-  (sdl:draw-surface-at-* *glyph-temp* x y :surface surface))
+  (let ((strip (colorized-glyph-strip front-color)))
+    ;; select the rectangle holding this glyph, already in the right colour
+    (sdl:set-cell-* (* n *glyph-w*) 0 *glyph-w* *glyph-h* :surface strip :index 0)
+
+    ;; fill the rectangle on the dst surface with the desired background colour,
+    ;; then blit the glyph over it. Black is the strip's colour key, so only the
+    ;; glyph itself lands.
+    ;; for speed I use this temporary rectangle as this function is invoked about 4000 times or more a frame and otherwise (e.g. using with-rectangle) map rendering slows to a crawl
+    (setf (sdl:x *temp-rect*) x)
+    (setf (sdl:y *temp-rect*) y)
+    (setf (sdl:width *temp-rect*) *glyph-w*)
+    (setf (sdl:height *temp-rect*) *glyph-h*)
+    (sdl:fill-surface back-color :surface surface :template *temp-rect*)
+
+    (sdl:draw-surface-at-* strip x y :surface surface)))
 
 (defun calculate-start-coord (rel-x rel-y array max-x-view max-y-view)
   "Calculate the top-left corner of the visible area. Used to draw the map and to choose objects on it."

@@ -347,7 +347,8 @@
     
     (setf *glyph-front* (sdl:load-image (sdl:create-path tiles-path *current-dir*) 
                                         :color-key sdl:*white*))
-    (setf *glyph-temp* (sdl:create-surface *glyph-w* *glyph-h* :color-key sdl:*black*))
+    ;; the tinted strips are derived from *glyph-front*, so drop them with it
+    (reset-glyph-strip-cache)
 
     (setf *start-logo* (sdl:load-image (sdl:create-path "data/logo.bmp" *current-dir*)))
     
