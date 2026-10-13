@@ -634,9 +634,15 @@
   "The directory the running executable was launched from, independent of
 the process's cwd - argv[0] resolves relative to cwd only when it has no
 directory component (e.g. invoked as a bare name via $PATH), in which case
-this falls back to the dev default rather than guessing."
+this falls back to the dev default rather than guessing.
+
+argv[0] is an OS path, so it is parsed with PARSE-NATIVE-NAMESTRING and not
+with the CL namestring reader: the latter reads *, ? and [...] as wildcards,
+so an install under a directory like \"Red[1]\" became a wild pathname that
+TRUENAME refuses, silently dropping us to the dev default."
   (handler-case
-      (uiop:pathname-directory-pathname (truename (first sb-ext:*posix-argv*)))
+      (uiop:pathname-directory-pathname
+       (truename (uiop:parse-native-namestring (first sb-ext:*posix-argv*))))
     (error () *asset-dir*)))
 
 #+clisp
