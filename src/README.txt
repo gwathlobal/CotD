@@ -141,6 +141,5 @@ CREDITS
 
 Created by Gwathlobal using Common Lisp
 Inspired by a 7DRL "City of the Condemned" by Tapio
-Tile set inspired by copx (Warp Rogue)
 Thanks to red_kangaroo for a bunch of useful ideas.
 Feel free to email bugs and suggestions to gwathlobal@yandex.ru
