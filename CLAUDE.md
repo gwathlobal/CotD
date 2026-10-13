@@ -57,10 +57,10 @@ Always verify through the **public accessor**, not the underlying structure, so 
 
 ### SDL2 backend (`src/render.lisp`) - things only a real display shows
 
-Every headless oracle runs on SDL's `dummy` video driver, which never executes the window system's code. Two bugs in the SDL2 swap passed every headless check and only showed up when running the real game (in a nested `Xephyr :5` X server, driven by XTest key events - see the `real-game-smoke-test` memory):
+Every headless oracle runs on SDL's `dummy` video driver, which never executes the window system's code. Two bugs in the SDL2 swap passed every headless check and only showed up when running the real game (in a nested `Xephyr :5` X server, driven by XTest key events):
 - **Float traps.** SBCL enables floating-point traps; SDL's X11 code does float maths that trips them (`SDL_Init` raised `FLOATING-POINT-INVALID-OPERATION`). So every SDL call in `render.lisp` goes through `sdl-call`, which masks the traps for that call - except the hot pure-software functions listed in `*trap-safe-sdl-functions*` (blit, fill, map/get RGB; masking those too costs ~50% of frame time). Never call `cffi:foreign-funcall` directly there: a compile-time check at the end of `render.lisp` warns on any call outside `sdl-call`. Only add a function to the safe list if it's hot *and* never reaches the window system. Game code is deliberately not masked, so its own float errors still signal.
 - **Text input.** SDL2 sends a typed character as a separate `SDL_TEXTINPUT` event behind the `SDL_KEYDOWN`; `next-event` pairs them back into one key-down with `unicode`. The text is NUL-terminated inside a 32-byte array with junk after the NUL - decode only up to it. (Synthetic test events now carry such junk.)
-After any change in `render.lisp`'s window/event code, run the real game, not just the oracles.
+After any change in `render.lisp`'s window/event code, run the real game, not just the oracles: `tools/smoke-test/` (system `cotd-smoke-test`, see its README) plays a fixed route through it in Xephyr - `(cotd-smoke-test:run-smoke-test :game :source)`, or `:release` after `./build.sh` - checks exit code, save file, logged errors and blank screens, and leaves a screenshot per step in `/tmp/cotd-smoke-test/screens/` that still need looking at.
 
 ## Line endings (CRLF)
 
