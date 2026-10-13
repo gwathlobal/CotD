@@ -371,7 +371,13 @@ surfaces here use). With COLOR-KEY, pixels of that colour are transparent."
   (let* ((native (uiop:native-namestring path))
          (rw (sdl-call "SDL_RWFromFile" :string native :string "rb" :pointer)))
     (when (cffi:null-pointer-p rw)
-      (error "COTD-RENDER: cannot open ~A: ~A" native (sdl-error)))
+      ;; SDL_RWFromFile's usual failure is "Couldn't open <file>", which only
+      ;; repeats what we are already saying and wraps the message over three
+      ;; lines in the error window. Add SDL's text only when it says something
+      ;; past the name - a mode or argument complaint, say.
+      (let ((detail (sdl-error)))
+        (error "COTD-RENDER: cannot open ~A~@[: ~A~]"
+               native (unless (search native detail) detail))))
     ;; the 1 makes SDL_LoadBMP_RW close RW itself
     (let ((loaded (wrap-surface (sdl-call "SDL_LoadBMP_RW" :pointer rw :int 1 :pointer)
                                 (format nil "loading ~A" native))))
