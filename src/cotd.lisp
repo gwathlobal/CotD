@@ -566,6 +566,42 @@
     (setf random-number (random 100)))
   (game-state-post-scenario->campaign-map))
 
+(defun show-fatal-error (c)
+  "Show C in a window and wait for the player to dismiss it.
+
+Everything in here can fail in its turn: C may well be COTD-INIT failing to
+load the assets, and a window needs a font out of those same assets. Showing
+the error must never replace it with a second, less informative one, so a
+failure here is logged and otherwise swallowed - C has already been written
+to the log by the caller, which is the report that survives either way."
+  (handler-case
+      (progn
+        ;; the default font is set by COTD-INIT right after the tile sheet is
+        ;; loaded, so an error in that load leaves it NIL and every text call
+        ;; below dies on it. The fonts are separate files from the tile sheet
+        ;; and may well be readable; pick COTD-INIT's own default.
+        (unless cotd-render:*default-font*
+          (cotd-render:initialise-default-font cotd-render:*font-8x13*))
+        ;; COTD-INIT sets *WINDOW-WIDTH*/*WINDOW-HEIGHT* and opens the window
+        ;; in one breath, so an error before that leaves nothing to draw in
+        ;; and no size for DISPLAY-MSG-WINDOW to centre itself in. Open a
+        ;; plain one at a size that needs no assets to work out. An error
+        ;; later in the game has both already and keeps them.
+        (unless (cotd-render:window-surface)
+          (setf *window-width* 800
+                *window-height* 600)
+          (cotd-render:window *window-width* *window-height*
+                              :title-caption "The City of the Damned")
+          (cotd-render:enable-unicode))
+        (setf *current-window* (make-instance 'display-msg-window
+                                              :msg-line (format nil "ERROR: ~A" c)
+                                              :w (truncate (* *window-width* 2/3))
+                                              :prompt-line "[Esc] Exit"))
+        (make-output *current-window*)
+        (run-window *current-window*))
+    (error (display-error)
+      (log:error "Cannot show the error in a window: ~A" display-error))))
+
 (defmacro handle-errors-to-ui (&body body)
   `(if *cotd-release*
      (handler-case
@@ -575,15 +611,7 @@
          (setf *cotd-log-level* :info)
          (setup-log)
          (log:error "~A" c)
-         ;; *WINDOW-WIDTH* may not be bound yet if the error happened inside
-         ;; COTD-INIT before it got set - fall back to a fixed width rather
-         ;; than crash the error handler itself on an unbound variable.
-         (setf *current-window* (make-instance 'display-msg-window
-                                               :msg-line (format nil "ERROR: ~A" c)
-                                               :w (truncate (* (if (boundp '*window-width*) *window-width* 800) 2/3))
-                                               :prompt-line "[Esc] Exit"))
-         (make-output *current-window*)
-         (run-window *current-window*)
+         (show-fatal-error c)
          (return-from cotd-main nil)))
      (progn ,@body)))
 

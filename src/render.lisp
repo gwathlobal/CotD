@@ -366,12 +366,15 @@ With COLOR-KEY, pixels of that colour are transparent when it is blitted."
 (defun load-image (path &key color-key)
   "The BMP file PATH as a surface (converted to the 32-bit RGB format all
 surfaces here use). With COLOR-KEY, pixels of that colour are transparent."
-  (let ((rw (sdl-call "SDL_RWFromFile" :string (uiop:native-namestring path) :string "rb" :pointer)))
+  ;; the OS spelling of PATH, not its #P form: a directory named "Red[1]"
+  ;; prints as "Red\\[1]", which is not the name the player would go looking for
+  (let* ((native (uiop:native-namestring path))
+         (rw (sdl-call "SDL_RWFromFile" :string native :string "rb" :pointer)))
     (when (cffi:null-pointer-p rw)
-      (error "COTD-RENDER: cannot open ~A: ~A" path (sdl-error)))
+      (error "COTD-RENDER: cannot open ~A: ~A" native (sdl-error)))
     ;; the 1 makes SDL_LoadBMP_RW close RW itself
     (let ((loaded (wrap-surface (sdl-call "SDL_LoadBMP_RW" :pointer rw :int 1 :pointer)
-                                (format nil "loading ~A" path))))
+                                (format nil "loading ~A" native))))
       (unwind-protect
            (let ((surface (wrap-surface (sdl-call "SDL_ConvertSurfaceFormat"
                                                   :pointer (surface-ptr loaded)
