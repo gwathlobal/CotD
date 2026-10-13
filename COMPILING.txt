@@ -180,6 +180,7 @@ Started with no arguments, the executable goes straight into the game. It also t
 
  - cotd --version   prints the version (the one in cotd.asd).
  - cotd --check     prints where the executable looks for its data and whether the files it needs are there. Exit code 0 if the installation is complete, 1 if anything is missing - which is the quick way to catch a release archive packaged without its data/ and help/ directories.
+ - cotd --selftest [dir]  proves the game actually runs: it opens its window, renders the main menu into it, presses the key that moves the menu selection, checks that the screen changed with it, and leaves through the quit path. Exit code 0 if all of that happened, 1 otherwise, with the reason printed. Given a directory, it writes the menu before and after the key press there as PPM files. Where there is no display at all it says so and runs the same check on SDL's dummy video driver instead of failing.
  - cotd --help      prints the above.
 
 Anything else on the command line is ignored, so a launcher that passes arguments of its own cannot stop the game from starting.

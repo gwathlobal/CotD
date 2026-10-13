@@ -786,3 +786,133 @@ the actual trace."
         (unless (equal trace *headless-event-expected-trace*)
           (error "RUN-HEADLESS-EVENT-CHECK: expected~%  ~S~%got~%  ~S" *headless-event-expected-trace* trace))
         t))))
+
+;;; ---------------------------------------------------------------------
+;;; Deliverable 7: the game runs on this platform.
+;;;
+;;; Every oracle above runs on SDL's dummy video driver, which never opens a
+;;; window. This one asks for the platform's own video driver first and falls
+;;; back to dummy only if SDL cannot initialize at all, so where there is a
+;;; display it is the one check that proves the window system works: the
+;;; window opens, the main menu renders into it, a key press moves the
+;;; selection, and the quit path shuts the whole thing down.
+;;;
+;;; It is the cross-platform counterpart of tools/smoke-test, which can only
+;;; run on X11 (Xephyr and XTest are X extensions; Windows has no X server and
+;;; SDL on macOS is a Cocoa backend). The key presses here go into SDL's own
+;;; event queue through SDL_PushEvent, which needs no window manager, no input
+;;; injection and no OS permission, and so works identically on Linux, Windows
+;;; and macOS. What it cannot do is drive the shipped executable: it plays the
+;;; game in this image, from source. The executable's own startup is covered
+;;; by cotd --check.
+;;; ---------------------------------------------------------------------
+
+(defparameter *game-window-check-user-dir* (merge-pathnames "cotd-game-window-oracle/" (uiop:temporary-directory))
+  "Where RUN-GAME-WINDOW-CHECK points *USER-DIR*, so that the options.cfg and
+highscores COTD-INIT writes land outside the repo - see
+*HEADLESS-TURN-USER-DIR* for the same reasoning.")
+
+(defun uniform-pixels-p (bytes)
+  "True if every RGB triple in BYTES is one and the same colour: a window that
+was cleared but never drawn into, which is what a broken render looks like
+from the outside."
+  (or (< (length bytes) 6)
+      (loop with r = (aref bytes 0)
+            with g = (aref bytes 1)
+            with b = (aref bytes 2)
+            for i from 3 below (- (length bytes) 2) by 3
+            always (and (= (aref bytes i) r)
+                        (= (aref bytes (+ i 1)) g)
+                        (= (aref bytes (+ i 2)) b)))))
+
+(defun drive-game-window (screenshot-dir)
+  "Open the main menu in the real window, press a key, quit. Called inside
+COTD-RENDER:WITH-INIT by RUN-GAME-WINDOW-CHECK; signals an error describing
+whatever did not happen. Returns a plist of what it observed."
+  (cotd-init)
+  (let ((quit-called nil))
+    ;; the game's own quit hook, which COTD-MAIN fills in with a jump out of
+    ;; its tagbody; the window captures it at MAKE-INSTANCE, so bind it first
+    (let* ((*quit-func* (lambda () (setf quit-called t)))
+           (window (make-instance 'main-menu-window))
+           (*current-window* window))
+      (make-output window)
+      (multiple-value-bind (menu-bytes w h) (cotd-render:surface-rgb-bytes (cotd-render:window-surface))
+        (when (zerop (* w h))
+          (error "RUN-GAME-WINDOW-CHECK: the window has no size (~Dx~D)" w h))
+        (when (uniform-pixels-p menu-bytes)
+          (error "RUN-GAME-WINDOW-CHECK: the main menu rendered a blank ~Dx~D window" w h))
+        (when screenshot-dir
+          (write-ppm (merge-pathnames "menu.ppm" screenshot-dir) menu-bytes w h))
+        (let ((selection-before (main-menu-window/cur-sel window)))
+          ;; A real SDL key-down for the key the menu moves the selection
+          ;; with, then the SDL_QUIT that closing the window sends. RUN-WINDOW
+          ;; polls both out of SDL's queue itself - this is the game's own
+          ;; event loop, not a reimplementation of it.
+          (push-headless-key :key-down)
+          (cotd-render:push-quit-event)
+          (run-window window)
+          (let ((selection-after (main-menu-window/cur-sel window))
+                (after-bytes (cotd-render:surface-rgb-bytes (cotd-render:window-surface))))
+            (when screenshot-dir
+              (write-ppm (merge-pathnames "menu-after-keypress.ppm" screenshot-dir) after-bytes w h))
+            (unless quit-called
+              (error "RUN-GAME-WINDOW-CHECK: the loop ended without going through the quit path"))
+            (when (= selection-after selection-before)
+              (error "RUN-GAME-WINDOW-CHECK: the key press left the menu selection at ~D" selection-before))
+            ;; the selection is drawn in a different colour, so moving it has
+            ;; to change the pixels - proof the key reached the screen and not
+            ;; just the slot
+            (when (equalp menu-bytes after-bytes)
+              (error "RUN-GAME-WINDOW-CHECK: the menu selection moved from ~D to ~D without the window changing"
+                     selection-before selection-after))
+            (list :window-size (list w h)
+                  :selection (list selection-before selection-after)
+                  :renderer (cotd-render:renderer-name))))))))
+
+(defun native-video-available-p ()
+  "True if SDL initializes and opens a window on this machine's own video
+driver. False where there is no display at all - a runner with no desktop
+session, say - which is the only thing that may quietly send this check to the
+dummy driver."
+  (sb-posix:unsetenv "SDL_VIDEODRIVER")
+  (handler-case
+      (cotd-render:with-init ()
+        (cotd-render:window 64 48 :title-caption "cotd video probe")
+        t)
+    (error () nil)))
+
+(defun run-game-window-check (&key (screenshot-dir nil) (driver :auto))
+  "Prove the game runs here: open its window, render the main menu into it,
+press the key that moves the menu selection, and leave through the quit path.
+
+DRIVER :AUTO asks for the platform's own video driver and falls back to SDL's
+dummy one if SDL will not initialize without a display; :NATIVE and :DUMMY
+demand one or the other. With SCREENSHOT-DIR, the menu is written there as
+menu.ppm and menu-after-keypress.ppm, for looking at.
+
+Returns (values T PLIST), the plist saying which driver was used, the window
+size, the selection before and after the key press, and SDL's renderer.
+Signals an error naming whatever did not happen."
+  (ensure-directories-exist *game-window-check-user-dir*)
+  (when screenshot-dir
+    (ensure-directories-exist screenshot-dir))
+  (flet ((attempt (which)
+           (ecase which
+             (:native (sb-posix:unsetenv "SDL_VIDEODRIVER"))
+             (:dummy (sb-posix:setenv "SDL_VIDEODRIVER" "dummy" 1)))
+           (let ((*user-dir* *game-window-check-user-dir*))
+             (cotd-render:with-init ()
+               (list* :driver which (drive-game-window screenshot-dir))))))
+    (ecase driver
+      (:native (values t (attempt :native)))
+      (:dummy (values t (attempt :dummy)))
+      (:auto
+       ;; Decided by a probe rather than by catching whatever the full check
+       ;; signals: a machine with no desktop session should quietly fall back,
+       ;; but a missing font or a blank menu is a failure and has to be
+       ;; reported as itself rather than mistaken for a missing display.
+       (let ((which (if (native-video-available-p) :native :dummy)))
+         (when (eq which :dummy)
+           (format t "~&RUN-GAME-WINDOW-CHECK: no video driver opens a window here; using SDL's dummy one~%"))
+         (values t (attempt which)))))))

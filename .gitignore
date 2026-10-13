@@ -56,6 +56,7 @@ ROADMAP.md
 # greps, the Windows SDL2 runtime they unzip)
 /dist/
 /level-checksums.txt
+/game-window-shots/
 /build.log
 /sdl2-runtime/
 /quicklisp.lisp

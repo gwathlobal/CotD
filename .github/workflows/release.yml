@@ -58,7 +58,20 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libsdl2-2.0-0
+          sudo apt-get install -y --no-install-recommends libsdl2-2.0-0 xvfb
+
+      # So that the game-window check below opens a real window here too.
+      # Windows and macOS runners have a desktop session of their own; if one
+      # turns out not to, the check says so and carries on with SDL's dummy
+      # driver rather than failing.
+      - name: Start a virtual display (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp &
+          for _ in $(seq 1 30); do [ -S /tmp/.X11-unix/X99 ] && break; sleep 1; done
+          [ -S /tmp/.X11-unix/X99 ] || { echo "::error::Xvfb did not come up"; exit 1; }
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
 
       - name: Install SDL2 (macOS)
         if: runner.os == 'macOS'
@@ -121,12 +134,20 @@ jobs:
                           (dolist (e entries) (format s "~S~%" e)))
                         (unless (= (length entries) expected)
                           (push "level-gen regression" failed)))
+                      ;; The one check that proves the game runs on this
+                      ;; platform: it asks for the real video driver, opens the
+                      ;; window, renders the main menu into it, presses the key
+                      ;; that moves the menu selection and leaves through the
+                      ;; quit path. It signals rather than returning NIL when
+                      ;; any of that does not happen.
+                      (multiple-value-bind (ok info)
+                          (run-game-window-check :screenshot-dir #p"../game-window-shots/")
+                        (declare (ignore ok))
+                        (format t "~&game window: ~S~%" info))
                       (when failed
                         (format t "~&FAILED: ~{~A~^, ~}~%" failed)
                         (sb-ext:exit :code 1))
                       (format t "~&all oracles passed~%"))'
-        env:
-          SDL_VIDEODRIVER: dummy
 
       - name: Build the executable
         shell: bash
@@ -169,6 +190,7 @@ jobs:
       # its data, and the executable finds it from wherever it was installed.
       - name: Verify the archive (Linux, macOS)
         if: runner.os != 'Windows'
+        timeout-minutes: 10
         shell: bash
         run: |
           set -euo pipefail
@@ -184,11 +206,15 @@ jobs:
             *) echo "::error::the binary reports '$reported', not version ${{ steps.version.outputs.version }}"; exit 1 ;;
           esac
           "$exe" --check
+          # and the unpacked binary actually runs: its own window, its own
+          # menu, a key press that moves the selection, a clean quit
+          "$exe" --selftest "$GITHUB_WORKSPACE/game-window-shots/exe"
         env:
           XDG_DATA_HOME: ${{ runner.temp }}/cotd-data
 
       - name: Verify the archive (Windows)
         if: runner.os == 'Windows'
+        timeout-minutes: 10
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -201,8 +227,8 @@ jobs:
           # waits for one, and it has no console to print to. -Wait -PassThru
           # gets a real exit code, and a redirected handle is inherited even
           # with no console attached.
-          function Invoke-Cotd($argument, $outFile) {
-            $p = Start-Process -FilePath $exe -ArgumentList $argument -Wait -PassThru `
+          function Invoke-Cotd([string[]]$arguments, $outFile) {
+            $p = Start-Process -FilePath $exe -ArgumentList $arguments -Wait -PassThru `
                    -WorkingDirectory $env:USERPROFILE -RedirectStandardOutput $outFile
             Get-Content $outFile | Write-Host
             return $p.ExitCode
@@ -215,6 +241,11 @@ jobs:
           }
           $code = Invoke-Cotd '--check' (Join-Path $env:RUNNER_TEMP 'check.txt')
           if ($code -ne 0) { throw "cotd.exe --check exited with $code (data files missing from the archive)" }
+          # and the unpacked binary actually runs: its own window, its own
+          # menu, a key press that moves the selection, a clean quit
+          $shots = Join-Path $env:GITHUB_WORKSPACE 'game-window-shots\exe'
+          $code = Invoke-Cotd @('--selftest', $shots) (Join-Path $env:RUNNER_TEMP 'selftest.txt')
+          if ($code -ne 0) { throw "cotd.exe --selftest exited with $code" }
         env:
           XDG_DATA_HOME: ${{ runner.temp }}/cotd-data
 
@@ -226,11 +257,16 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Upload this platform's level checksums
+      # The menu screenshots are the thing to look at when a platform is in
+      # doubt: they show what that machine actually drew.
+      - name: Upload this platform's checks
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: level-checksums-${{ matrix.platform }}
-          path: level-checksums.txt
+          name: checks-${{ matrix.platform }}
+          path: |
+            level-checksums.txt
+            game-window-shots/
           if-no-files-found: warn
           retention-days: 30
 
