@@ -340,6 +340,7 @@
     (cotd-render:window *window-width* *window-height*
                 :title-caption "The City of the Damned"
                 :icon-caption "The City of the Damned")
+    (log:info "SDL renderer: ~A" (cotd-render:renderer-name))
     (cotd-render:enable-key-repeat nil nil)
     (cotd-render:enable-unicode)
 

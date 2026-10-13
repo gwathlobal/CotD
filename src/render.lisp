@@ -14,7 +14,7 @@
    #:*default-font* #:*font-6x13* #:*font-8x13* #:*font-6x13o* #:*font-8x13o*
    #:color #:*default-surface*
    #:*white* #:*black* #:*red* #:*yellow* #:*magenta* #:*green* #:*cyan* #:*blue*
-   #:surface-rgb-bytes #:window-surface))
+   #:surface-rgb-bytes #:window-surface #:renderer-name))
 
 ;;;; The render backend boundary.
 ;;;;
@@ -62,6 +62,7 @@
 (defconstant +sdl-pixelformat-rgb888+ #x16161804)
 (defconstant +sdl-windowpos-centered+ #x2FFF0000)
 (defconstant +sdl-window-shown+ 4)
+(defconstant +sdl-textureaccess-streaming+ 1)
 (defconstant +sdl-pressed+ 1)
 (defconstant +sdl-event-size+ 56)
 
@@ -164,6 +165,8 @@ COTD-MAIN, which has its own) reuses that session: SDL_Quit is not
 reference-counted, so only the outermost one may call it.")
 
 (defvar *window* nil "The SDL_Window pointer, once WINDOW has run.")
+(defvar *renderer* nil "The window's SDL_Renderer pointer, once WINDOW has run.")
+(defvar *texture* nil "The streaming SDL_Texture UPDATE-DISPLAY uploads to.")
 (defvar *window-surface* nil "The window's SURFACE, once WINDOW has run.")
 
 (defvar *src-rect* nil)
@@ -193,10 +196,7 @@ reference-counted, so only the outermost one may call it.")
                  (reset-font-surfaces)
                  (reset-frame-limiter)
                  (funcall fn))
-            (when *window*
-              (sdl-call "SDL_DestroyWindow" :pointer *window* :void))
-            (setf *window* nil
-                  *window-surface* nil)
+            (destroy-window)
             (dolist (buffer (list *src-rect* *dst-rect* *event* *peek-event*))
               (when buffer
                 (cffi:foreign-free buffer)))
@@ -420,25 +420,69 @@ result does not depend on which pixel format the backend picked."
 ;;; The window.
 ;;; ---------------------------------------------------------------------
 
+;;; Drawing is all software, into *WINDOW-SURFACE* - an ordinary surface of
+;;; our own, not the one SDL_GetWindowSurface would give. UPDATE-DISPLAY
+;;; uploads it to a streaming texture and presents that through an
+;;; SDL_Renderer, which on a real display is OpenGL or Direct3D. Presenting
+;;; the window surface directly would go through X11 or GDI instead, and the
+;;; Steam overlay, which hooks the GPU APIs' present, would never be drawn.
+;;; SDL falls back to its software renderer where there is no GPU API (the
+;;; dummy driver the headless checks use).
+
+(defun destroy-window ()
+  "Destroy the window and everything WINDOW made for it, if there is one."
+  (when *texture*
+    (sdl-call "SDL_DestroyTexture" :pointer *texture* :void))
+  (when *renderer*
+    (sdl-call "SDL_DestroyRenderer" :pointer *renderer* :void))
+  (when *window*
+    (sdl-call "SDL_DestroyWindow" :pointer *window* :void))
+  (when *window-surface*
+    (free-surface *window-surface*))
+  (setf *texture* nil *renderer* nil *window* nil *window-surface* nil))
+
+(defun created (ptr what)
+  "PTR, which WHAT returned; signals SDL's error if it is null."
+  (when (cffi:null-pointer-p ptr)
+    (error "COTD-RENDER: ~A failed: ~A" what (sdl-error)))
+  ptr)
+
 (defun window (w h &key (title-caption "") icon-caption)
   "Open the W x H game window (replacing any earlier one) and return its surface."
   (declare (ignore icon-caption))
-  (when *window*
-    (sdl-call "SDL_DestroyWindow" :pointer *window* :void)
-    (setf *window* nil *window-surface* nil))
-  (let ((window (sdl-call "SDL_CreateWindow" :string title-caption
-                          :int +sdl-windowpos-centered+ :int +sdl-windowpos-centered+
-                          :int w :int h :uint32 +sdl-window-shown+ :pointer)))
-    (when (cffi:null-pointer-p window)
-      (error "COTD-RENDER: SDL_CreateWindow failed: ~A" (sdl-error)))
-    (setf *window* window
-          *window-surface* (wrap-surface (sdl-call "SDL_GetWindowSurface" :pointer window :pointer)
-                                         "SDL_GetWindowSurface"))))
+  (destroy-window)
+  (setf *window* (created (sdl-call "SDL_CreateWindow" :string title-caption
+                                    :int +sdl-windowpos-centered+ :int +sdl-windowpos-centered+
+                                    :int w :int h :uint32 +sdl-window-shown+ :pointer)
+                          "SDL_CreateWindow")
+        *renderer* (created (sdl-call "SDL_CreateRenderer" :pointer *window* :int -1 :uint32 0 :pointer)
+                            "SDL_CreateRenderer")
+        *texture* (created (sdl-call "SDL_CreateTexture" :pointer *renderer*
+                                     :uint32 +sdl-pixelformat-rgb888+
+                                     :int +sdl-textureaccess-streaming+ :int w :int h :pointer)
+                           "SDL_CreateTexture")
+        *window-surface* (create-surface w h)))
+
+(defun renderer-name ()
+  "The name of the SDL renderer presenting the window (\"opengl\", \"direct3d\",
+\"software\"...), or NIL before WINDOW. Only a GPU one shows the Steam overlay."
+  (when *renderer*
+    ;; SDL_RendererInfo starts with its const char *name
+    (cffi:with-foreign-object (info :uint8 128)
+      (unless (zerop (sdl-call "SDL_GetRendererInfo" :pointer *renderer* :pointer info :int))
+        (error "COTD-RENDER: SDL_GetRendererInfo failed: ~A" (sdl-error)))
+      (cffi:foreign-string-to-lisp (cffi:mem-ref info :pointer)))))
 
 (defun update-display ()
   "Show what has been drawn to the window's surface."
   (when *window*
-    (sdl-call "SDL_UpdateWindowSurface" :pointer *window* :int)))
+    (let ((ptr (surface-ptr *window-surface*)))
+      (sdl-call "SDL_UpdateTexture" :pointer *texture* :pointer (cffi:null-pointer)
+                :pointer (cffi:foreign-slot-value ptr '(:struct sdl-surface) 'pixels)
+                :int (cffi:foreign-slot-value ptr '(:struct sdl-surface) 'pitch) :int)
+      (sdl-call "SDL_RenderCopy" :pointer *renderer* :pointer *texture*
+                :pointer (cffi:null-pointer) :pointer (cffi:null-pointer) :int)
+      (sdl-call "SDL_RenderPresent" :pointer *renderer* :void))))
 
 (defun enable-key-repeat (&rest args)
   "No-op: SDL2 always delivers key repeats, at the OS's rate."
