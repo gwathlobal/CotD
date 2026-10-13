@@ -861,6 +861,14 @@ hand-written methods this replaces."
   (bt:with-lock-held (*progress-bar-lock*)
     (incf *cur-progress-bar*)))
 
+;; The version, taken from cotd.asd's :version so that bumping a release
+;; still means editing exactly one place. Read at load time, which for a
+;; release build is build time, so the saved image carries it with no ASDF
+;; left to consult at run time.
+(defparameter *cotd-version*
+  (let ((system (asdf:find-system :cotd nil)))
+    (or (and system (asdf:component-version system)) "unknown")))
+
 ;; *asset-dir* is read-only bundled data (bitmaps, help/description text).
 ;; *user-dir* is where saves, options.cfg, log.txt, highscores and morgue
 ;; dumps get written. They default to the same place for development, but

@@ -14,7 +14,9 @@
   :description "A roguelike battle of Angels and Demons in the streets of a Human city."  
   :version "2.0.2"  
   :author "Gwathlobal"    
-  :depends-on (sdl2 bordeaux-threads cffi defenum cl-store log4cl uiop)
+  ;; libSDL2 itself is not here: render.lisp declares it to CFFI and opens it
+  ;; when a session starts, so building needs no SDL2 installed.
+  :depends-on (bordeaux-threads cffi defenum cl-store log4cl uiop)
   :components
     ((:file "render")
      (:file "pathfinding")

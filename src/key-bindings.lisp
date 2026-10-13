@@ -8,64 +8,90 @@
 ;;; key's unshifted symbol in the current layout) and the modifier masks are
 ;;; SDL2's KMOD bits. Remapping a key for a player means overriding one entry
 ;;; in *KEY-BINDINGS*.
+;;;
+;;; The numbers are SDL2's own, from SDL_keycode.h and SDL_scancode.h, and are
+;;; ABI: they are what libSDL2 puts in an event, whatever it was built from.
+;;; Spelling them out here is what keeps the game buildable without SDL2
+;;; installed - render.lisp resolves the library's functions by name at the
+;;; call, and these were the only values that used to need it at compile time.
+;;; RUN-HEADLESS-EVENT-CHECK drives the whole table through the event loop.
+
+(defconstant +sdlk-scancode-mask+ #x40000000
+  "SDLK_SCANCODE_MASK: set in the keycode of a key that types no character,
+over the key's scancode.")
 
 (defparameter *key-bindings*
-  `((:key-2 . ,sdl2-ffi:+sdlk-2+)
-    (:key-7 . ,sdl2-ffi:+sdlk-7+)
-    (:key-a . ,sdl2-ffi:+sdlk-a+)
-    (:key-b . ,sdl2-ffi:+sdlk-b+)
-    (:key-backspace . ,sdl2-ffi:+sdlk-backspace+)
-    (:key-c . ,sdl2-ffi:+sdlk-c+)
-    (:key-comma . ,sdl2-ffi:+sdlk-comma+)
-    (:key-d . ,sdl2-ffi:+sdlk-d+)
-    (:key-down . ,sdl2-ffi:+sdlk-down+)
-    (:key-e . ,sdl2-ffi:+sdlk-e+)
-    (:key-end . ,sdl2-ffi:+sdlk-end+)
-    (:key-escape . ,sdl2-ffi:+sdlk-escape+)
-    (:key-f . ,sdl2-ffi:+sdlk-f+)
-    (:key-g . ,sdl2-ffi:+sdlk-g+)
-    (:key-h . ,sdl2-ffi:+sdlk-h+)
-    (:key-home . ,sdl2-ffi:+sdlk-home+)
-    (:key-i . ,sdl2-ffi:+sdlk-i+)
-    (:key-j . ,sdl2-ffi:+sdlk-j+)
-    (:key-k . ,sdl2-ffi:+sdlk-k+)
-    (:key-kp1 . ,sdl2-ffi:+sdlk-kp-1+)
-    (:key-kp2 . ,sdl2-ffi:+sdlk-kp-2+)
-    (:key-kp3 . ,sdl2-ffi:+sdlk-kp-3+)
-    (:key-kp4 . ,sdl2-ffi:+sdlk-kp-4+)
-    (:key-kp5 . ,sdl2-ffi:+sdlk-kp-5+)
-    (:key-kp6 . ,sdl2-ffi:+sdlk-kp-6+)
-    (:key-kp7 . ,sdl2-ffi:+sdlk-kp-7+)
-    (:key-kp8 . ,sdl2-ffi:+sdlk-kp-8+)
-    (:key-kp9 . ,sdl2-ffi:+sdlk-kp-9+)
-    (:key-kp-enter . ,sdl2-ffi:+sdlk-kp-enter+)
-    (:key-l . ,sdl2-ffi:+sdlk-l+)
-    (:key-left . ,sdl2-ffi:+sdlk-left+)
-    (:key-m . ,sdl2-ffi:+sdlk-m+)
-    (:key-n . ,sdl2-ffi:+sdlk-n+)
-    (:key-o . ,sdl2-ffi:+sdlk-o+)
-    (:key-p . ,sdl2-ffi:+sdlk-p+)
-    (:key-pagedown . ,sdl2-ffi:+sdlk-pagedown+)
-    (:key-pageup . ,sdl2-ffi:+sdlk-pageup+)
-    (:key-period . ,sdl2-ffi:+sdlk-period+)
-    (:key-q . ,sdl2-ffi:+sdlk-q+)
-    (:key-question . ,sdl2-ffi:+sdlk-question+)
-    (:key-r . ,sdl2-ffi:+sdlk-r+)
-    (:key-return . ,sdl2-ffi:+sdlk-return+)
-    (:key-right . ,sdl2-ffi:+sdlk-right+)
-    (:key-s . ,sdl2-ffi:+sdlk-s+)
-    (:key-slash . ,sdl2-ffi:+sdlk-slash+)
-    (:key-space . ,sdl2-ffi:+sdlk-space+)
-    (:key-t . ,sdl2-ffi:+sdlk-t+)
-    (:key-tab . ,sdl2-ffi:+sdlk-tab+)
-    (:key-u . ,sdl2-ffi:+sdlk-u+)
-    (:key-up . ,sdl2-ffi:+sdlk-up+)
-    (:key-v . ,sdl2-ffi:+sdlk-v+)
-    (:key-w . ,sdl2-ffi:+sdlk-w+)
-    (:key-x . ,sdl2-ffi:+sdlk-x+)
-    (:key-y . ,sdl2-ffi:+sdlk-y+)
-    (:key-z . ,sdl2-ffi:+sdlk-z+))
+  ;; A key that types a character has that character's code for a keycode; the
+  ;; four below type none but are ASCII control codes all the same; the rest
+  ;; are a scancode with +SDLK-SCANCODE-MASK+ set, named in the comment.
+  `((:key-2 . ,(char-code #\2))
+    (:key-7 . ,(char-code #\7))
+    (:key-a . ,(char-code #\a))
+    (:key-b . ,(char-code #\b))
+    (:key-backspace . 8)                                   ; SDLK_BACKSPACE
+    (:key-c . ,(char-code #\c))
+    (:key-comma . ,(char-code #\,))
+    (:key-d . ,(char-code #\d))
+    (:key-down . ,(logior +sdlk-scancode-mask+ 81))        ; SDL_SCANCODE_DOWN
+    (:key-e . ,(char-code #\e))
+    (:key-end . ,(logior +sdlk-scancode-mask+ 77))         ; SDL_SCANCODE_END
+    (:key-escape . 27)                                     ; SDLK_ESCAPE
+    (:key-f . ,(char-code #\f))
+    (:key-g . ,(char-code #\g))
+    (:key-h . ,(char-code #\h))
+    (:key-home . ,(logior +sdlk-scancode-mask+ 74))        ; SDL_SCANCODE_HOME
+    (:key-i . ,(char-code #\i))
+    (:key-j . ,(char-code #\j))
+    (:key-k . ,(char-code #\k))
+    (:key-kp1 . ,(logior +sdlk-scancode-mask+ 89))         ; SDL_SCANCODE_KP_1
+    (:key-kp2 . ,(logior +sdlk-scancode-mask+ 90))         ; SDL_SCANCODE_KP_2
+    (:key-kp3 . ,(logior +sdlk-scancode-mask+ 91))         ; SDL_SCANCODE_KP_3
+    (:key-kp4 . ,(logior +sdlk-scancode-mask+ 92))         ; SDL_SCANCODE_KP_4
+    (:key-kp5 . ,(logior +sdlk-scancode-mask+ 93))         ; SDL_SCANCODE_KP_5
+    (:key-kp6 . ,(logior +sdlk-scancode-mask+ 94))         ; SDL_SCANCODE_KP_6
+    (:key-kp7 . ,(logior +sdlk-scancode-mask+ 95))         ; SDL_SCANCODE_KP_7
+    (:key-kp8 . ,(logior +sdlk-scancode-mask+ 96))         ; SDL_SCANCODE_KP_8
+    (:key-kp9 . ,(logior +sdlk-scancode-mask+ 97))         ; SDL_SCANCODE_KP_9
+    (:key-kp-enter . ,(logior +sdlk-scancode-mask+ 88))    ; SDL_SCANCODE_KP_ENTER
+    (:key-l . ,(char-code #\l))
+    (:key-left . ,(logior +sdlk-scancode-mask+ 80))        ; SDL_SCANCODE_LEFT
+    (:key-m . ,(char-code #\m))
+    (:key-n . ,(char-code #\n))
+    (:key-o . ,(char-code #\o))
+    (:key-p . ,(char-code #\p))
+    (:key-pagedown . ,(logior +sdlk-scancode-mask+ 78))    ; SDL_SCANCODE_PAGEDOWN
+    (:key-pageup . ,(logior +sdlk-scancode-mask+ 75))      ; SDL_SCANCODE_PAGEUP
+    (:key-period . ,(char-code #\.))
+    (:key-q . ,(char-code #\q))
+    (:key-question . ,(char-code #\?))
+    (:key-r . ,(char-code #\r))
+    (:key-return . 13)                                     ; SDLK_RETURN
+    (:key-right . ,(logior +sdlk-scancode-mask+ 79))       ; SDL_SCANCODE_RIGHT
+    (:key-s . ,(char-code #\s))
+    (:key-slash . ,(char-code #\/))
+    (:key-space . ,(char-code #\Space))
+    (:key-t . ,(char-code #\t))
+    (:key-tab . 9)                                         ; SDLK_TAB
+    (:key-u . ,(char-code #\u))
+    (:key-up . ,(logior +sdlk-scancode-mask+ 82))          ; SDL_SCANCODE_UP
+    (:key-v . ,(char-code #\v))
+    (:key-w . ,(char-code #\w))
+    (:key-x . ,(char-code #\x))
+    (:key-y . ,(char-code #\y))
+    (:key-z . ,(char-code #\z)))
   "Maps our own key identifiers to SDL2 keycodes.")
+
+;;; KMOD bits, from SDL_keycode.h. KMOD_SHIFT and KMOD_CTRL are the left and
+;;; right bits of the one modifier together, which is why the predicates below
+;;; test with LOGAND rather than EQL.
+
+(defconstant +kmod-lshift+ #x0001)
+(defconstant +kmod-rshift+ #x0002)
+(defconstant +kmod-lctrl+ #x0040)
+(defconstant +kmod-rctrl+ #x0080)
+(defconstant +kmod-num+ #x1000)
+(defconstant +kmod-shift+ (logior +kmod-lshift+ +kmod-rshift+))
+(defconstant +kmod-ctrl+ (logior +kmod-lctrl+ +kmod-rctrl+))
 
 (defun key= (key our-key)
   "True if KEY (from a :key-down-event) is the physical key bound to OUR-KEY in *KEY-BINDINGS*."
@@ -76,14 +102,14 @@
 
 (defun normalize-key-mod (mod)
   "Normalizes a raw SDL key modifier bitmask the way every window's key-down handler used to do inline."
-  (loop while (>= mod sdl2-ffi:+kmod-num+) do (decf mod sdl2-ffi:+kmod-num+))
+  (loop while (>= mod +kmod-num+) do (decf mod +kmod-num+))
   mod)
 
 (defun key-mod-shift-p (mod)
-  (/= (logand mod sdl2-ffi:+kmod-shift+) 0))
+  (/= (logand mod +kmod-shift+) 0))
 
 (defun key-mod-ctrl-p (mod)
-  (/= (logand mod sdl2-ffi:+kmod-ctrl+) 0))
+  (/= (logand mod +kmod-ctrl+) 0))
 
 (defun key-mod-none-p (mod)
   (= mod 0))
@@ -92,5 +118,5 @@
   "A raw modifier bitmask with SHIFT and/or CTRL held, as a :key-down-event's
 MOD would carry it - the inverse of KEY-MOD-SHIFT-P/KEY-MOD-CTRL-P. Only the
 headless event check needs to build one."
-  (logior (if shift sdl2-ffi:+kmod-lshift+ 0)
-          (if ctrl sdl2-ffi:+kmod-lctrl+ 0)))
+  (logior (if shift +kmod-lshift+ 0)
+          (if ctrl +kmod-lctrl+ 0)))

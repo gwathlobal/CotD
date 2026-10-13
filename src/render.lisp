@@ -23,12 +23,11 @@
 ;;;; this file is the only one that talks to SDL itself (key-bindings.lisp
 ;;;; holds the matching key constants). The backend is SDL2 with software
 ;;;; rendering: everything is drawn into SDL surfaces, the window's own
-;;;; surface among them, and UPDATE-DISPLAY presents it. libSDL2 is loaded by
-;;;; cl-sdl2 (the SDL2 system's SDL2::LIBSDL2); the calls below go through
-;;;; CFFI directly with raw pointers rather than through cl-sdl2's wrappers,
-;;;; because DRAW-GLYPH alone makes thousands of them per frame and because
-;;;; cl-sdl2's WITH-INIT runs its body on a thread of its own, which would lose
-;;;; the caller's dynamic bindings.
+;;;; surface among them, and UPDATE-DISPLAY presents it. libSDL2 is declared
+;;;; and opened here (ENSURE-SDL2-LOADED, from WITH-INIT), and the calls below
+;;;; go through CFFI directly with raw pointers rather than through any
+;;;; wrapper layer, because DRAW-GLYPH alone makes thousands of them per
+;;;; frame.
 ;;;;
 ;;;; Contract that is not visible from the symbol list:
 ;;;;  - *DEFAULT-SURFACE* is NIL during normal play, and a NIL surface (the
@@ -112,7 +111,8 @@
 (assert (= 12 (cffi:foreign-slot-offset '(:struct sdl-window-event) 'event)))
 
 (defmacro without-fp-traps (&body body)
-  "Run BODY with floating point traps masked (the mask set is cl-sdl2's)."
+  "Run BODY with floating point traps masked - every trap SDL's video drivers
+have been seen to trip."
   #+sbcl
   `(sb-int:with-float-traps-masked (:underflow :overflow :inexact :invalid :divide-by-zero)
      ,@body)
@@ -154,6 +154,32 @@ point traps are masked during the call unless NAME is one of
   (sdl-call "SDL_GetError" :string))
 
 ;;; ---------------------------------------------------------------------
+;;; libSDL2 itself.
+;;;
+;;; The library is opened when a session starts rather than when this file is
+;;; loaded, which is what lets the game be *built* on a machine with no SDL2
+;;; installed: CFFI resolves a FOREIGN-FUNCALL's symbol by name at the call,
+;;; so nothing here needs the library until SDL-CALL actually runs one. A
+;;; saved executable starts with no foreign library open at all, so it has to
+;;; happen there too - and does, through the same path.
+;;; ---------------------------------------------------------------------
+
+(cffi:define-foreign-library libsdl2
+  (:darwin (:or (:framework "SDL2") (:default "libSDL2")))
+  (:unix (:or "libSDL2-2.0.so.0" "libSDL2.so.0.2" "libSDL2"))
+  (:windows "SDL2.dll")
+  (t (:default "libSDL2")))
+
+(defun ensure-sdl2-loaded ()
+  "Open libSDL2, unless this image already has it open."
+  (unless (cffi:foreign-library-loaded-p 'libsdl2)
+    ;; masked like every other call out to SDL: dlopen runs the library's own
+    ;; initializers, and this file's whole premise is that their float maths
+    ;; is not ours to trap on
+    (without-fp-traps
+      (cffi:load-foreign-library 'libsdl2))))
+
+;;; ---------------------------------------------------------------------
 ;;; Session state: SDL init/quit, and the foreign scratch buffers the hot
 ;;; paths reuse. The buffers are allocated per session rather than at load
 ;;; time, so none of them is a stale pointer inside a saved executable image.
@@ -184,6 +210,7 @@ reference-counted, so only the outermost one may call it.")
   (if *sdl-active*
       (funcall fn)
       (progn
+        (ensure-sdl2-loaded)
         (unless (zerop (sdl-call "SDL_Init" :uint32 +sdl-init-video+ :int))
           (error "COTD-RENDER: SDL_Init failed: ~A" (sdl-error)))
         (let ((*sdl-active* t))
@@ -366,12 +393,21 @@ With COLOR-KEY, pixels of that colour are transparent when it is blitted."
 (defun load-image (path &key color-key)
   "The BMP file PATH as a surface (converted to the 32-bit RGB format all
 surfaces here use). With COLOR-KEY, pixels of that colour are transparent."
-  (let ((rw (sdl-call "SDL_RWFromFile" :string (uiop:native-namestring path) :string "rb" :pointer)))
+  ;; the OS spelling of PATH, not its #P form: a directory named "Red[1]"
+  ;; prints as "Red\\[1]", which is not the name the player would go looking for
+  (let* ((native (uiop:native-namestring path))
+         (rw (sdl-call "SDL_RWFromFile" :string native :string "rb" :pointer)))
     (when (cffi:null-pointer-p rw)
-      (error "COTD-RENDER: cannot open ~A: ~A" path (sdl-error)))
+      ;; SDL_RWFromFile's usual failure is "Couldn't open <file>", which only
+      ;; repeats what we are already saying and wraps the message over three
+      ;; lines in the error window. Add SDL's text only when it says something
+      ;; past the name - a mode or argument complaint, say.
+      (let ((detail (sdl-error)))
+        (error "COTD-RENDER: cannot open ~A~@[: ~A~]"
+               native (unless (search native detail) detail))))
     ;; the 1 makes SDL_LoadBMP_RW close RW itself
     (let ((loaded (wrap-surface (sdl-call "SDL_LoadBMP_RW" :pointer rw :int 1 :pointer)
-                                (format nil "loading ~A" path))))
+                                (format nil "loading ~A" native))))
       (unwind-protect
            (let ((surface (wrap-surface (sdl-call "SDL_ConvertSurfaceFormat"
                                                   :pointer (surface-ptr loaded)

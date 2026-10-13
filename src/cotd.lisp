@@ -566,6 +566,42 @@
     (setf random-number (random 100)))
   (game-state-post-scenario->campaign-map))
 
+(defun show-fatal-error (c)
+  "Show C in a window and wait for the player to dismiss it.
+
+Everything in here can fail in its turn: C may well be COTD-INIT failing to
+load the assets, and a window needs a font out of those same assets. Showing
+the error must never replace it with a second, less informative one, so a
+failure here is logged and otherwise swallowed - C has already been written
+to the log by the caller, which is the report that survives either way."
+  (handler-case
+      (progn
+        ;; the default font is set by COTD-INIT right after the tile sheet is
+        ;; loaded, so an error in that load leaves it NIL and every text call
+        ;; below dies on it. The fonts are separate files from the tile sheet
+        ;; and may well be readable; pick COTD-INIT's own default.
+        (unless cotd-render:*default-font*
+          (cotd-render:initialise-default-font cotd-render:*font-8x13*))
+        ;; COTD-INIT sets *WINDOW-WIDTH*/*WINDOW-HEIGHT* and opens the window
+        ;; in one breath, so an error before that leaves nothing to draw in
+        ;; and no size for DISPLAY-MSG-WINDOW to centre itself in. Open a
+        ;; plain one at a size that needs no assets to work out. An error
+        ;; later in the game has both already and keeps them.
+        (unless (cotd-render:window-surface)
+          (setf *window-width* 800
+                *window-height* 600)
+          (cotd-render:window *window-width* *window-height*
+                              :title-caption "The City of the Damned")
+          (cotd-render:enable-unicode))
+        (setf *current-window* (make-instance 'display-msg-window
+                                              :msg-line (format nil "ERROR: ~A" c)
+                                              :w (truncate (* *window-width* 2/3))
+                                              :prompt-line "[Esc] Exit"))
+        (make-output *current-window*)
+        (run-window *current-window*))
+    (error (display-error)
+      (log:error "Cannot show the error in a window: ~A" display-error))))
+
 (defmacro handle-errors-to-ui (&body body)
   `(if *cotd-release*
      (handler-case
@@ -575,15 +611,7 @@
          (setf *cotd-log-level* :info)
          (setup-log)
          (log:error "~A" c)
-         ;; *WINDOW-WIDTH* may not be bound yet if the error happened inside
-         ;; COTD-INIT before it got set - fall back to a fixed width rather
-         ;; than crash the error handler itself on an unbound variable.
-         (setf *current-window* (make-instance 'display-msg-window
-                                               :msg-line (format nil "ERROR: ~A" c)
-                                               :w (truncate (* (if (boundp '*window-width*) *window-width* 800) 2/3))
-                                               :prompt-line "[Esc] Exit"))
-         (make-output *current-window*)
-         (run-window *current-window*)
+         (show-fatal-error c)
          (return-from cotd-main nil)))
      (progn ,@body)))
 
@@ -634,16 +662,87 @@
   "The directory the running executable was launched from, independent of
 the process's cwd - argv[0] resolves relative to cwd only when it has no
 directory component (e.g. invoked as a bare name via $PATH), in which case
-this falls back to the dev default rather than guessing."
+this falls back to the dev default rather than guessing.
+
+argv[0] is an OS path, so it is parsed with PARSE-NATIVE-NAMESTRING and not
+with the CL namestring reader: the latter reads *, ? and [...] as wildcards,
+so an install under a directory like \"Red[1]\" became a wild pathname that
+TRUENAME refuses, silently dropping us to the dev default."
   (handler-case
-      (uiop:pathname-directory-pathname (truename (first sb-ext:*posix-argv*)))
+      (uiop:pathname-directory-pathname
+       (truename (uiop:parse-native-namestring (first sb-ext:*posix-argv*))))
     (error () *asset-dir*)))
+
+;;; ---------------------------------------------------------------------
+;;; Command-line options of the release executable. They exist so that a
+;;; freshly built binary can be checked without a display or a human at the
+;;; keyboard - the game itself opens a window and waits for input, which
+;;; answers nothing in a CI job.
+;;;
+;;; On Windows the executable is built with :application-type :gui and so has
+;;; no console attached: output goes nowhere when it is started from a prompt,
+;;; but a redirection ("cotd.exe --check > out.txt") inherits a real handle and
+;;; works as everywhere else. The exit code is reliable on every platform.
+;;; ---------------------------------------------------------------------
+
+(defparameter *essential-assets*
+  '("data/logo.bmp" "data/font_large.bmp" "data/fonts/" "data/descriptions/" "help/")
+  "The bundled files and directories the game cannot start without, relative
+to *ASSET-DIR*. Checked by --check, which is how a release archive is verified
+to have been packaged with its data alongside the executable.")
+
+(defun print-version ()
+  (format t "City of the Damned ~A~%" *cotd-version*))
+
+(defun print-usage ()
+  (print-version)
+  (format t "~%Usage: cotd [option]~%")
+  (format t "Given no option, the game starts normally.~%~%")
+  (format t "  --version   print the version and exit~%")
+  (format t "  --check     check that the bundled data files are in place~%")
+  (format t "  --help      print this message and exit~%"))
+
+(defun check-install ()
+  "Report where the executable looks for its data and whether the files it
+needs are there. Returns the exit code to quit with: 0 if the installation is
+complete, 1 if anything is missing."
+  (print-version)
+  (format t "asset directory: ~A~%" (uiop:native-namestring *asset-dir*))
+  (format t "user directory:  ~A~%" (uiop:native-namestring (uiop:xdg-data-home "cotd/")))
+  (let ((missing nil))
+    (dolist (asset *essential-assets*)
+      (cond ((probe-file (cotd-render:create-path asset *asset-dir*))
+             (format t "  ok       ~A~%" asset))
+            (t
+             (setf missing t)
+             (format t "  MISSING  ~A~%" asset))))
+    (cond (missing
+           (format t "~%Data files are missing. The data and help directories have to sit~%~
+                      next to the executable - see COMPILING.txt.~%")
+           1)
+          (t
+           (format t "~%All data files present.~%")
+           0))))
+
+#+sbcl
+(defun handle-command-line-args ()
+  "Act on a command-line option if the executable was given one. Returns the
+exit code to quit with, or NIL to carry on and start the game.
+
+Anything unrecognized is deliberately ignored rather than rejected: the game
+is normally started by double-clicking it, and a launcher that passes an
+argument of its own (Finder's -psn_... on macOS, for one) must not turn into a
+game that refuses to open."
+  (let ((args (rest sb-ext:*posix-argv*)))
+    (flet ((given-p (&rest names)
+             (some (lambda (name) (member name args :test #'string=)) names)))
+      (cond ((given-p "--help" "-h") (print-usage) 0)
+            ((given-p "--version" "-v") (print-version) 0)
+            ((given-p "--check") (check-install))
+            (t nil)))))
 
 #+clisp
 (defun cotd-exec ()
-  ;; reopen libSDL2 in the started executable, under cl-sdl2's own library
-  ;; definition (which knows the per-platform file names)
-  (cffi:load-foreign-library 'sdl2::libsdl2)
   ;; *asset-dir* is left at its build-time default (bundled with the build
   ;; tree); clisp has no equivalent of sb-ext:*posix-argv* used below for
   ;; sbcl, so there is no tested way here to locate the executable itself.
@@ -659,10 +758,14 @@ this falls back to the dev default rather than guessing."
 
 #+sbcl
 (defun cotd-exec ()
-  ;; reopen libSDL2 in the started executable, under cl-sdl2's own library
-  ;; definition (which knows the per-platform file names)
-  (cffi:load-foreign-library 'sdl2::libsdl2)
   (setf *asset-dir* (determine-release-asset-dir))
+  ;; An option is answered before libSDL2 is so much as opened, so that
+  ;; --version and --check still work where there is no display and no SDL2
+  ;; installed - which is exactly where a build gets checked.
+  (let ((exit-code (handle-command-line-args)))
+    (when exit-code
+      (finish-output)
+      (sb-ext:exit :code exit-code)))
   (setf *user-dir* (uiop:xdg-data-home "cotd/"))
   (ensure-directories-exist *user-dir*)
   (setf *cotd-release* t)
@@ -679,10 +782,19 @@ this falls back to the dev default rather than guessing."
                    :quiet t :script t :init-function #'cotd-exec  
 		   :executable t))
 
-#+(and sbcl windows) 
+;;; :save-runtime-options t is what lets COTD-EXEC see its own options at all.
+;;; Without it the SBCL C runtime parses the command line first and answers
+;;; --version and --help with SBCL's text (and would honour --core and
+;;; --dynamic-space-size from whoever starts the game); with it, runtime option
+;;; processing is inhibited, the space sizes of this build are baked in, and
+;;; every argument reaches SB-EXT:*POSIX-ARGV* untouched.
+
+#+(and sbcl windows)
 (defun make-exec ()
-  (sb-ext:save-lisp-and-die "cotd.exe" :toplevel #'cotd-exec :executable t :application-type :gui))
+  (sb-ext:save-lisp-and-die "cotd.exe" :toplevel #'cotd-exec :executable t :application-type :gui
+                            :save-runtime-options t))
 
 #+(and sbcl unix) 
 (defun make-exec ()
-  (sb-ext:save-lisp-and-die "cotd" :toplevel #'cotd-exec :executable t :compression nil))
+  (sb-ext:save-lisp-and-die "cotd" :toplevel #'cotd-exec :executable t :compression nil
+                            :save-runtime-options t))

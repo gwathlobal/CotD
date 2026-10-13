@@ -1,1 +1,0 @@
-- The path to the game should contain no "[" characters

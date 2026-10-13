@@ -48,3 +48,14 @@ log.txt
 # golden-screen baselines and mismatches: captured locally by
 # capture-golden-screens / compare-golden-screens, never committed
 test/golden/
+
+ROADMAP.md
+
+# written into the working tree by the CI workflows (release staging, the
+# level-gen checksums each platform reports, the build log the warning gate
+# greps, the Windows SDL2 runtime they unzip)
+/dist/
+/level-checksums.txt
+/build.log
+/sdl2-runtime/
+/quicklisp.lisp

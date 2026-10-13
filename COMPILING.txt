@@ -116,11 +116,9 @@ The key strings here are:
 
 7. Install dependencies
 
-Download the SDL2 runtime library for Windows (SDL2-2.x.y-win32-x64.zip from https://github.com/libsdl-org/SDL/releases - any 2.0.5 or newer) and put SDL2.dll into C:\Lisp\SBCL\1.3.12.
+Download the SDL2 runtime library for Windows (SDL2-2.x.y-win32-x64.zip from https://github.com/libsdl-org/SDL/releases - any 2.0.5 or newer) and put SDL2.dll into C:\Lisp\SBCL\1.3.12. That library is all the SDL the game needs: there is no Lisp binding to install for it, since the game declares SDL2 to CFFI itself and opens it when it starts. It therefore has to be present to run the game, but not to compile or build it.
 Start Emacs, press Alt + X (M x) and enter the word "slime" (without quotes) to run SLIME.
-In the SLIME prompt enter the following command to load SDL2 (the cl-sdl2 bindings; Quicklisp fetches the libraries it needs along with it):
-(ql:quickload "sdl2")
-Enter the following command to load BORDEAUX-THREADS:
+In the SLIME prompt enter the following command to load BORDEAUX-THREADS:
 (ql:quickload "bordeaux-threads")
 Enter the following command to load CFFI:
 (ql:quickload "cffi")
@@ -159,7 +157,7 @@ sbcl --non-interactive --load ../build.lisp
 
 build.lisp loads the cotd system and calls (cotd:make-exec). It is shared by both scripts so that the two cannot drift apart, and you can equally well run that one command by hand from src/.
 
-All the dependencies from the "Install dependencies" step above have to be installed first, since the build loads the whole system. On Windows SDL2.dll has to be findable as well, exactly as it is when running from the REPL.
+All the Lisp libraries from the "Install dependencies" step above have to be installed first, since the build loads the whole system. SDL2 itself is not needed to build - the build never opens the library, only the finished game does - so a build machine does not have to have SDL2.dll or libSDL2 at all.
 
 The executable loads the SDL2 library when it starts, so wherever the game is run, SDL2 has to be present: on Windows put SDL2.dll next to cotd.exe (when you hand the game to someone else, ship SDL2.dll with it); on Linux the system's SDL2 package (e.g. libsdl2-2.0-0 on Debian/Ubuntu) has to be installed.
 
@@ -176,6 +174,23 @@ The executable is written into src/, alongside data/ and help/:
 Leave it there, or copy data/ and help/ along with it: a release build resolves its asset directory from the executable's own location rather than from the current directory, so it can be started from anywhere, but the data has to sit next to it. Saves, options.cfg, log.txt, highscores and morgue dumps are deliberately kept somewhere else - in the directory (uiop:xdg-data-home "cotd/") resolves to - so that an install into a read-only location still works.
 
 
+CHECKING A BUILD
+
+Started with no arguments, the executable goes straight into the game. It also takes three options, which answer and exit without opening a window or needing SDL2 - enough to check a build on a machine with no display:
+
+ - cotd --version   prints the version (the one in cotd.asd).
+ - cotd --check     prints where the executable looks for its data and whether the files it needs are there. Exit code 0 if the installation is complete, 1 if anything is missing - which is the quick way to catch a release archive packaged without its data/ and help/ directories.
+ - cotd --help      prints the above.
+
+Anything else on the command line is ignored, so a launcher that passes arguments of its own cannot stop the game from starting.
+
+On Windows cotd.exe is a GUI-subsystem program with no console attached, so this output goes nowhere when it is started from a prompt. Redirect it to see it:
+
+cotd.exe --check > out.txt
+
+The exit code is reliable on every platform either way.
+
+
 NOTES FOR LINUX AND MACOS
 
 The instructions above are written for Windows, but nothing in the game is Windows-specific. The shape is the same: install SBCL, install Quicklisp and run (ql:add-to-init-file), install SDL2 (e.g. "apt install libsdl2-2.0-0" on Debian/Ubuntu), put the repository somewhere ASDF can find it (~/common-lisp/ is searched by default), then (asdf:load-system :cotd) and (cotd:cotd-main).
@@ -185,6 +200,6 @@ Instead of the environment variables in step 3 ("Set up Environmental Variables"
 macOS is UNTESTED. What follows is what to expect, not a verified recipe - if you get it working, corrections are welcome.
 
  - SBCL is available from www.sbcl.org or via "brew install sbcl".
- - "brew install sdl2" installs SDL2. A Homebrew dylib lives under /opt/homebrew/lib on Apple silicon or /usr/local/lib on Intel, which may have to be added to cffi:*foreign-library-directories* or to DYLD_LIBRARY_PATH before CFFI will find it. Both the REPL and a release build use cl-sdl2's library definition, which looks for the SDL2 framework first and then for libSDL2.
+ - "brew install sdl2" installs SDL2. A Homebrew dylib lives under /opt/homebrew/lib on Apple silicon or /usr/local/lib on Intel, which may have to be added to cffi:*foreign-library-directories* or to DYLD_LIBRARY_PATH before CFFI will find it. The game's own library definition (in src/render.lisp) looks for the SDL2 framework first and then for libSDL2, in the REPL and in a release build alike.
  - On macOS a window and its event loop have to live on the process's main thread. The release executable runs the game on the main thread, so it should be fine. Running from SLIME is the catch: SLIME evaluates REPL input on a worker thread, so (cotd:cotd-main) typed there will fail to open the window. Start it on the main thread instead with (sb-thread:interrupt-thread (sb-thread:main-thread) #'cotd:cotd-main), or set swank:*communication-style* to :fd-handler or nil so that SLIME itself evaluates on the main thread. The level generator's worker threads never touch SDL.
  - build.sh itself is portable - plain bash, no GNU-only constructs - and writes src/cotd there the same way it does on Linux.
