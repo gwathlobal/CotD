@@ -711,3 +711,87 @@ for looking at."
                     (not (eq (second (first results)) :same)))
            (write-ppm (merge-pathnames (format nil "~A.actual.ppm" name) dir) bytes w h)))))
     (nreverse results)))
+
+;;; ---------------------------------------------------------------------
+;;; Deliverable 6: event loop oracle (sdl2 migration).
+;;;
+;;; COTD-RENDER:WITH-EVENTS replaced lispbuilder-sdl's macro of the same name;
+;;; the golden screens can't see input handling at all. This queues a fixed
+;;; script of synthetic events through COTD-RENDER:PUSH-*-EVENT and checks the
+;;; exact order and content of the clauses WITH-EVENTS runs, including the two
+;;; easy-to-lose details of the original: every queued event is still
+;;; dispatched after a quit clause returns T in :POLL mode, and a quit clause
+;;; returning NIL does not end the loop. Keys are named by our own :KEY-x ids
+;;; and checked with KEY= and the modifier predicates, so the expected trace
+;;; is backend-independent and must hold on any render backend.
+;;; ---------------------------------------------------------------------
+
+(defun headless-key-name (key)
+  "Our :KEY-x id bound to backend key value KEY, via KEY=."
+  (car (find-if (lambda (binding) (key= key (car binding))) *key-bindings*)))
+
+(defun push-headless-key (name &key shift ctrl char)
+  (cotd-render:push-key-down-event (cdr (assoc name *key-bindings*))
+                                   :mod (key-mod-bits :shift shift :ctrl ctrl)
+                                   :unicode (if char (char-code char) 0)))
+
+(defparameter *headless-event-expected-trace*
+  '((:key :key-a nil nil 97 0) (:key :key-b t nil 66 0) (:expose 0)
+    (:idle 1)
+    (:quit 1) (:key :key-c nil t 0 1)
+    (:idle 2)
+    (:key :key-escape nil nil 27 2) (:quit 2) (:key :key-d nil nil 100 2) (:expose 2)
+    :return-from :key-q :then (:key :key-w)))
+
+(defun run-headless-event-check ()
+  "Drive COTD-RENDER:WITH-EVENTS with the scripted events above under
+SDL_VIDEODRIVER=dummy. Returns T, or signals an error showing the expected and
+the actual trace."
+  (sb-posix:setenv "SDL_VIDEODRIVER" "dummy" 1)
+  (cotd-render:with-init ()
+    (cotd-render:window 10 10)
+    ;; dispatch and drop whatever SDL queued itself at startup
+    (cotd-render:with-events ()
+      (:quit-event () t)
+      (:idle () (cotd-render:push-quit-event)))
+    (let ((trace ())
+          (idle-n 0))
+      (push-headless-key :key-a :char #\a)
+      (push-headless-key :key-b :shift t :char #\B)
+      (cotd-render:push-expose-event)
+      (cotd-render:with-events ()
+        (:quit-event () (push (list :quit idle-n) trace) (>= idle-n 2))
+        (:key-down-event (:key key :mod mod :unicode unicode)
+                         (let ((mod (normalize-key-mod mod)))
+                           (push (list :key (headless-key-name key) (key-mod-shift-p mod) (key-mod-ctrl-p mod) unicode idle-n)
+                                 trace)))
+        (:video-expose-event () (push (list :expose idle-n) trace))
+        (:idle ()
+               (push (list :idle (incf idle-n)) trace)
+               (case idle-n
+                 ;; this quit is refused (returns NIL); the key behind it still arrives
+                 (1 (cotd-render:push-quit-event)
+                    (push-headless-key :key-c :ctrl t))
+                 ;; this quit is accepted, and what is queued behind it is still dispatched
+                 (2 (push-headless-key :key-escape :char (code-char 27))
+                    (cotd-render:push-quit-event)
+                    (push-headless-key :key-d :char #\d)
+                    (cotd-render:push-expose-event)))))
+      ;; leaving a clause with RETURN-FROM ends the loop and leaves the rest queued
+      (push-headless-key :key-q :char #\q)
+      (push-headless-key :key-w :char #\w)
+      (push :return-from trace)
+      (push (block out
+              (cotd-render:with-events ()
+                (:quit-event () t)
+                (:key-down-event (:key key) (return-from out (headless-key-name key)))))
+            trace)
+      (push :then trace)
+      (cotd-render:with-events ()
+        (:quit-event () t)
+        (:key-down-event (:key key) (push (list :key (headless-key-name key)) trace))
+        (:idle () (cotd-render:push-quit-event)))
+      (let ((trace (nreverse trace)))
+        (unless (equal trace *headless-event-expected-trace*)
+          (error "RUN-HEADLESS-EVENT-CHECK: expected~%  ~S~%got~%  ~S" *headless-event-expected-trace* trace))
+        t))))

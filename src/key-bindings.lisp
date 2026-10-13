@@ -89,3 +89,10 @@
 
 (defun key-mod-none-p (mod)
   (= mod 0))
+
+(defun key-mod-bits (&key shift ctrl)
+  "A raw modifier bitmask with SHIFT and/or CTRL held, as a :key-down-event's
+MOD would carry it - the inverse of KEY-MOD-SHIFT-P/KEY-MOD-CTRL-P. Only the
+headless event check needs to build one."
+  (logior (if shift (cffi:foreign-enum-value 'sdl-cffi::sdl-mod :sdl-key-mod-lshift) 0)
+          (if ctrl (cffi:foreign-enum-value 'sdl-cffi::sdl-mod :sdl-key-mod-lctrl) 0)))

@@ -5,7 +5,7 @@
   (:import-from #:sdl
    ;; window/video setup and the main event loop
    #:init-video #:window #:enable-key-repeat #:enable-unicode
-   #:update-display #:with-events
+   #:update-display
 
    ;; surfaces and images
    #:create-path #:*default-surface*
@@ -15,7 +15,8 @@
    #:x #:y #:width #:height)
   (:export
    #:with-init #:init-video #:window #:enable-key-repeat #:enable-unicode
-   #:update-display #:with-events
+   #:update-display #:with-events #:delay
+   #:push-key-down-event #:push-expose-event #:push-quit-event
    #:load-image #:create-surface #:create-path #:fill-surface #:blit
    #:rectangle #:rectangle-from-edges-* #:with-rectangle #:draw-rectangle #:draw-pixel-*
    #:x #:y #:width #:height
@@ -198,6 +199,7 @@ a previous session are no longer valid."
 (defmacro with-init ((&rest flags) &body body)
   `(sdl:with-init (,@flags)
      (reset-font-surfaces)
+     (reset-frame-limiter)
      ,@body))
 
 (defun char-width (font) (bitmap-font-char-width font))
@@ -268,3 +270,138 @@ Only the glyph pixels are written."
                (error "COTD-RENDER: ~S has no glyph in the bitmap fonts" c))
              (blit strip cx y :surface surface :src-x (* code w) :src-w w :src-h h))
     surface))
+
+;;; ---------------------------------------------------------------------
+;;; Events and the frame loop.
+;;;
+;;; WITH-EVENTS keeps the clause syntax of lispbuilder-sdl's macro of the same
+;;; name, for the four clauses CotD uses:
+;;;
+;;;   (:quit-event () body)            - body's value T ends the loop
+;;;   (:key-down-event (:key k :mod m :unicode u) body)  - any subset of keys
+;;;   (:video-expose-event () body)
+;;;   (:idle () body)                  - once per frame, after the queue is empty
+;;;
+;;; and its behaviour: in :POLL mode every pending event is dispatched (even
+;;; ones still queued behind a quit), then, unless quitting, the :IDLE forms
+;;; run and the loop sleeps to hold *FRAME-RATE*. :WAIT blocks for each event
+;;; and has no idle step. Key values are the backend's own (*KEY-BINDINGS* in
+;;; key-bindings.lisp translates them), MOD is a modifier bitmask and UNICODE
+;;; the character code typed, 0 if none.
+;;; ---------------------------------------------------------------------
+
+(defvar *event* nil
+  "Foreign buffer NEXT-EVENT reads each event into; allocated on first use.
+Plain malloc'd memory, so it outlives SDL sessions. Event fields are copied
+into the clause's variables before its body runs, so a WITH-EVENTS nested in
+a clause body reusing the buffer is harmless.")
+
+(defun next-event (wait)
+  "Read the next event into *EVENT* and return its type, one of :QUIT,
+:KEY-DOWN, :EXPOSE or :OTHER. Returns NIL when no event is pending (WAIT
+false) or on an error (WAIT true, which otherwise blocks until one arrives)."
+  (unless *event*
+    (setf *event* (cffi:foreign-alloc '(:union sdl-cffi::sdl-event))))
+  (if (= 0 (if wait
+               (sdl-cffi::sdl-wait-event *event*)
+               (sdl-cffi::sdl-poll-event *event*)))
+      nil
+      (case (sdl::event-type *event*)
+        (:quit-event :quit)
+        (:key-down-event :key-down)
+        (:video-expose-event :expose)
+        (t :other))))
+
+(defun event-key () (sdl::key-key *event*))
+(defun event-mod () (sdl::key-mod *event*))
+(defun event-unicode () (sdl::key-unicode *event*))
+
+(defun push-event-of-type (type)
+  (let ((event (sdl::new-event type)))
+    (sdl-cffi::sdl-push-event event)
+    ;; SDL copies the event into its queue
+    (cffi:foreign-free event)))
+
+(defun push-quit-event () (push-event-of-type :quit-event))
+(defun push-expose-event () (push-event-of-type :video-expose-event))
+
+(defun push-key-down-event (key &key (mod 0) (unicode 0))
+  "Queue a key press of KEY (a backend key value, as in *KEY-BINDINGS*) as if
+typed with modifier bitmask MOD, producing character code UNICODE. For tests:
+the headless event check drives WITH-EVENTS with these."
+  (let* ((event (sdl::new-event :key-down-event))
+         (keysym (cffi:foreign-slot-pointer event '(:struct sdl-cffi::sdl-keyboard-event) 'sdl-cffi::keysym)))
+    (setf (cffi:foreign-slot-value keysym '(:struct sdl-cffi::sdl-key-sym) 'sdl-cffi::sym) key
+          (cffi:foreign-slot-value keysym '(:struct sdl-cffi::sdl-key-sym) 'sdl-cffi::mod) mod
+          (cffi:foreign-slot-value keysym '(:struct sdl-cffi::sdl-key-sym) 'sdl-cffi::unicode) unicode)
+    (sdl-cffi::sdl-push-event event)
+    (cffi:foreign-free event)))
+
+(defun ticks () (sdl-cffi::sdl-get-ticks))
+
+(defun delay (ms)
+  "Sleep for MS milliseconds."
+  (sdl-cffi::sdl-delay ms))
+
+(defparameter *frame-rate* 30
+  "Frames per second WITH-EVENTS holds its :POLL loop to (lispbuilder-sdl's default).")
+
+(defvar *frame-count* 0)
+(defvar *frame-base-ticks* nil)
+
+(defun reset-frame-limiter ()
+  (setf *frame-count* 0
+        *frame-base-ticks* nil))
+
+(defun run-frame (idle-fn)
+  "Run IDLE-FN, then sleep for whatever is left of this frame. The schedule is
+SDL_gfx's (as in lispbuilder-sdl): frame N is due at base + N * 1000/rate ms;
+a frame that is already late restarts the schedule from now instead of
+trying to catch up."
+  (let ((now (ticks)))
+    (funcall idle-fn)
+    (if (null *frame-base-ticks*)
+        (setf *frame-count* 0
+              *frame-base-ticks* now)
+        (let ((delta (- (+ *frame-base-ticks* (* (incf *frame-count*) (truncate 1000 *frame-rate*)))
+                        now)))
+          (if (> delta 0)
+              (delay (min delta 500))
+              (setf *frame-count* 0
+                    *frame-base-ticks* now))))))
+
+(defun key-down-bindings (params)
+  (loop for (key var) on params by #'cddr
+        collect (list var (ecase key
+                            (:key '(event-key))
+                            (:mod '(event-mod))
+                            (:unicode '(event-unicode))))))
+
+(defmacro with-events ((&optional (type :poll)) &body clauses)
+  (check-type type (member :poll :wait))
+  (let ((quit (gensym "QUIT-"))
+        (event-type (gensym "EVENT-TYPE-"))
+        (idle ())
+        (cases ()))
+    (dolist (clause clauses)
+      (destructuring-bind (kind params &rest body) clause
+        (unless (or (eq kind :key-down-event) (null params))
+          (error "WITH-EVENTS: ~S takes no parameters, got ~S" kind params))
+        (ecase kind
+          (:quit-event (push `(:quit (setf ,quit (progn ,@body))) cases))
+          (:key-down-event (push `(:key-down (let ,(key-down-bindings params) ,@body)) cases))
+          (:video-expose-event (push `(:expose ,@body) cases))
+          (:idle (setf idle body)))))
+    (let ((dispatch `(case ,event-type ,@(reverse cases))))
+      `(let ((,quit nil))
+         (loop until ,quit
+               do ,(if (eq type :poll)
+                       `(loop for ,event-type = (next-event nil)
+                              while ,event-type
+                              do ,dispatch)
+                       `(loop for ,event-type = (and (not ,quit) (next-event t))
+                              while ,event-type
+                              do ,dispatch))
+                  ,@(when (eq type :poll)
+                      `((unless ,quit
+                          (run-frame (lambda () ,@idle))))))))))
