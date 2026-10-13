@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-City of the Damned (CotD) is a roguelike written in Common Lisp (SBCL) on SDL2 (software rendering into SDL surfaces). Dependencies: `sdl2` (cl-sdl2 - used only to load libSDL2 and for its keycode constants; `src/render.lisp` calls SDL through CFFI directly), `bordeaux-threads`, `cffi`, `defenum`, `cl-store`, `uiop`, `log4cl` (via Quicklisp). ASDF system defined in `src/cotd.asd`.
+City of the Damned (CotD) is a roguelike written in Common Lisp (SBCL) on SDL2 (software rendering into SDL surfaces). Dependencies: `bordeaux-threads`, `cffi`, `defenum`, `cl-store`, `uiop`, `log4cl` (via Quicklisp). There is deliberately **no cl-sdl2 dependency**: `src/render.lisp` declares libSDL2 to CFFI itself (`define-foreign-library libsdl2`) and opens it from `with-init` when a session starts, and `src/key-bindings.lisp` holds the SDL2 keycode/KMOD values. So SDL2 need not be installed to *build* - only to run. Keep it that way: nothing outside those two files may name an SDL symbol. ASDF system defined in `src/cotd.asd`.
 
 ## Commands
 
