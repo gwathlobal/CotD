@@ -109,21 +109,47 @@
 (assert (= 12 (cffi:foreign-slot-offset '(:struct sdl-text-input-event) 'text)))
 (assert (= 12 (cffi:foreign-slot-offset '(:struct sdl-window-event) 'event)))
 
-(defun sdl-error ()
-  (cffi:foreign-funcall "SDL_GetError" :string))
-
 (defmacro without-fp-traps (&body body)
-  "Run BODY with floating point traps masked. SBCL runs with them enabled,
-and SDL's video drivers (X11, at least) do float arithmetic that is harmless in
-C but trips them - SDL_Init raises FLOATING-POINT-INVALID-OPERATION on a real
-display. Only calls that reach into the video driver or the window system are
-wrapped, not the whole game, so a float error in CotD's own code still
-signals. The mask set is cl-sdl2's (its WITHOUT-FP-TRAPS)."
+  "Run BODY with floating point traps masked (the mask set is cl-sdl2's)."
   #+sbcl
   `(sb-int:with-float-traps-masked (:underflow :overflow :inexact :invalid :divide-by-zero)
      ,@body)
   #-sbcl
   `(progn ,@body))
+
+;;; Every call into SDL in this file goes through SDL-CALL - never CFFI's
+;;; FOREIGN-FUNCALL directly (the check at the end of this file enforces it).
+;;;
+;;; Why: SBCL runs with floating point traps enabled, so a NaN or an infinity
+;;; signals an error instead of quietly propagating. C code is written for the
+;;; opposite, and SDL's video drivers (X11 at least) produce such values in
+;;; passing - with traps on, SDL_Init on a real display signals
+;;; FLOATING-POINT-INVALID-OPERATION. So SDL-CALL masks the traps for the
+;;; duration of the call, by default for every SDL function. The few that
+;;; never reach a video driver and are called per glyph or per pixel are
+;;; listed in *TRAP-SAFE-SDL-FUNCTIONS* and skip the masking, for speed.
+;;; Forgetting to list a function only costs a little time; it can't crash.
+;;; CotD's own code is never masked, so its float errors still signal.
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defparameter *trap-safe-sdl-functions*
+    '("SDL_UpperBlit" "SDL_FillRect" "SDL_MapRGB" "SDL_GetRGB")
+    "SDL functions SDL-CALL calls without masking floating point traps. Only
+pure software surface operations, which never touch the window system, may
+be listed - and only hot ones, since the masking is what keeps the rest safe."))
+
+(defmacro sdl-call (name &rest args)
+  "Call the SDL2 C function NAME (a literal string) with ARGS as for
+CFFI:FOREIGN-FUNCALL: argument type/value pairs, then the return type. Floating
+point traps are masked during the call unless NAME is one of
+*TRAP-SAFE-SDL-FUNCTIONS*."
+  (check-type name string)
+  (if (member name *trap-safe-sdl-functions* :test #'string=)
+      `(cffi:foreign-funcall ,name ,@args)
+      `(without-fp-traps (cffi:foreign-funcall ,name ,@args))))
+
+(defun sdl-error ()
+  (sdl-call "SDL_GetError" :string))
 
 ;;; ---------------------------------------------------------------------
 ;;; Session state: SDL init/quit, and the foreign scratch buffers the hot
@@ -154,7 +180,7 @@ reference-counted, so only the outermost one may call it.")
   (if *sdl-active*
       (funcall fn)
       (progn
-        (unless (zerop (without-fp-traps (cffi:foreign-funcall "SDL_Init" :uint32 +sdl-init-video+ :int)))
+        (unless (zerop (sdl-call "SDL_Init" :uint32 +sdl-init-video+ :int))
           (error "COTD-RENDER: SDL_Init failed: ~A" (sdl-error)))
         (let ((*sdl-active* t))
           (unwind-protect
@@ -167,17 +193,17 @@ reference-counted, so only the outermost one may call it.")
                  (reset-frame-limiter)
                  (funcall fn))
             (when *window*
-              (without-fp-traps (cffi:foreign-funcall "SDL_DestroyWindow" :pointer *window* :void)))
+              (sdl-call "SDL_DestroyWindow" :pointer *window* :void))
             (setf *window* nil
                   *window-surface* nil)
             (dolist (buffer (list *src-rect* *dst-rect* *event* *peek-event*))
               (when buffer
                 (cffi:foreign-free buffer)))
             (setf *src-rect* nil *dst-rect* nil *event* nil *peek-event* nil)
-            (without-fp-traps (cffi:foreign-funcall "SDL_Quit" :void)))))))
+            (sdl-call "SDL_Quit" :void))))))
 
 (defun init-video ()
-  (unless (zerop (without-fp-traps (cffi:foreign-funcall "SDL_InitSubSystem" :uint32 +sdl-init-video+ :int)))
+  (unless (zerop (sdl-call "SDL_InitSubSystem" :uint32 +sdl-init-video+ :int))
     (error "COTD-RENDER: SDL_InitSubSystem failed: ~A" (sdl-error))))
 
 ;;; ---------------------------------------------------------------------
@@ -202,7 +228,7 @@ error if PTR is null."
   (cffi:foreign-slot-value (surface-ptr surface) '(:struct sdl-surface) 'format))
 
 (defun free-surface (surface)
-  (cffi:foreign-funcall "SDL_FreeSurface" :pointer (surface-ptr surface) :void))
+  (sdl-call "SDL_FreeSurface" :pointer (surface-ptr surface) :void))
 
 (defvar *default-surface* nil
   "The surface drawing goes to by default; NIL means the window.")
@@ -278,29 +304,29 @@ error if PTR is null."
 (defun map-color (surface packed)
   "PACKED as a pixel value in SURFACE's pixel format."
   (declare (type (unsigned-byte 24) packed))
-  (cffi:foreign-funcall "SDL_MapRGB" :pointer (surface-format surface)
-                        :uint8 (ldb (byte 8 16) packed) :uint8 (ldb (byte 8 8) packed) :uint8 (ldb (byte 8 0) packed)
-                        :uint32))
+  (sdl-call "SDL_MapRGB" :pointer (surface-format surface)
+            :uint8 (ldb (byte 8 16) packed) :uint8 (ldb (byte 8 8) packed) :uint8 (ldb (byte 8 0) packed)
+            :uint32))
 
 (defun set-color-key (surface packed)
-  (cffi:foreign-funcall "SDL_SetColorKey" :pointer (surface-ptr surface) :int 1 :uint32 (map-color surface packed) :int))
+  (sdl-call "SDL_SetColorKey" :pointer (surface-ptr surface) :int 1 :uint32 (map-color surface packed) :int))
 
 ;;; ---------------------------------------------------------------------
 ;;; Drawing.
 ;;; ---------------------------------------------------------------------
 
 (defun fill-xywh (surface x y w h color)
-  (cffi:foreign-funcall "SDL_FillRect" :pointer (surface-ptr surface)
-                        :pointer (set-foreign-rect *dst-rect* x y w h)
-                        :uint32 (map-color surface color) :int))
+  (sdl-call "SDL_FillRect" :pointer (surface-ptr surface)
+            :pointer (set-foreign-rect *dst-rect* x y w h)
+            :uint32 (map-color surface color) :int))
 
 (defun fill-surface (color &key template (surface *default-surface*))
   "Fill SURFACE (NIL = the window), or the TEMPLATE rectangle of it, with COLOR."
   (let ((surface (target-surface surface)))
     (if template
         (fill-xywh surface (rect-x template) (rect-y template) (rect-w template) (rect-h template) color)
-        (cffi:foreign-funcall "SDL_FillRect" :pointer (surface-ptr surface) :pointer (cffi:null-pointer)
-                              :uint32 (map-color surface color) :int))))
+        (sdl-call "SDL_FillRect" :pointer (surface-ptr surface) :pointer (cffi:null-pointer)
+                  :uint32 (map-color surface color) :int))))
 
 (defun draw-rectangle (rect &key (color *white*) (surface *default-surface*))
   "The 1-pixel outline of RECT, its right and bottom edges at x+w-1 / y+h-1."
@@ -318,17 +344,17 @@ error if PTR is null."
                           (src-x 0) (src-y 0) (src-w (surface-w src)) (src-h (surface-h src)))
   "Copy the SRC-W x SRC-H area at SRC-X SRC-Y of SRC (by default, all of it)
 to X Y on SURFACE (NIL = the window). SRC's colour key, if any, applies."
-  (cffi:foreign-funcall "SDL_UpperBlit"
-                        :pointer (surface-ptr src) :pointer (set-foreign-rect *src-rect* src-x src-y src-w src-h)
-                        :pointer (surface-ptr (target-surface surface)) :pointer (set-foreign-rect *dst-rect* x y 0 0)
-                        :int))
+  (sdl-call "SDL_UpperBlit"
+            :pointer (surface-ptr src) :pointer (set-foreign-rect *src-rect* src-x src-y src-w src-h)
+            :pointer (surface-ptr (target-surface surface)) :pointer (set-foreign-rect *dst-rect* x y 0 0)
+            :int))
 
 (defun create-surface (w h &key color-key)
   "A new W x H surface, all black, in the window's 32-bit RGB format.
 With COLOR-KEY, pixels of that colour are transparent when it is blitted."
-  (let ((surface (wrap-surface (cffi:foreign-funcall "SDL_CreateRGBSurfaceWithFormat"
-                                                     :uint32 0 :int w :int h :int 32
-                                                     :uint32 +sdl-pixelformat-rgb888+ :pointer)
+  (let ((surface (wrap-surface (sdl-call "SDL_CreateRGBSurfaceWithFormat"
+                                         :uint32 0 :int w :int h :int 32
+                                         :uint32 +sdl-pixelformat-rgb888+ :pointer)
                                "SDL_CreateRGBSurfaceWithFormat")))
     (when color-key
       (set-color-key surface color-key))
@@ -340,16 +366,16 @@ With COLOR-KEY, pixels of that colour are transparent when it is blitted."
 (defun load-image (path &key color-key)
   "The BMP file PATH as a surface (converted to the 32-bit RGB format all
 surfaces here use). With COLOR-KEY, pixels of that colour are transparent."
-  (let ((rw (cffi:foreign-funcall "SDL_RWFromFile" :string (uiop:native-namestring path) :string "rb" :pointer)))
+  (let ((rw (sdl-call "SDL_RWFromFile" :string (uiop:native-namestring path) :string "rb" :pointer)))
     (when (cffi:null-pointer-p rw)
       (error "COTD-RENDER: cannot open ~A: ~A" path (sdl-error)))
     ;; the 1 makes SDL_LoadBMP_RW close RW itself
-    (let ((loaded (wrap-surface (cffi:foreign-funcall "SDL_LoadBMP_RW" :pointer rw :int 1 :pointer)
+    (let ((loaded (wrap-surface (sdl-call "SDL_LoadBMP_RW" :pointer rw :int 1 :pointer)
                                 (format nil "loading ~A" path))))
       (unwind-protect
-           (let ((surface (wrap-surface (cffi:foreign-funcall "SDL_ConvertSurfaceFormat"
-                                                              :pointer (surface-ptr loaded)
-                                                              :uint32 +sdl-pixelformat-rgb888+ :uint32 0 :pointer)
+           (let ((surface (wrap-surface (sdl-call "SDL_ConvertSurfaceFormat"
+                                                  :pointer (surface-ptr loaded)
+                                                  :uint32 +sdl-pixelformat-rgb888+ :uint32 0 :pointer)
                                         "SDL_ConvertSurfaceFormat")))
              (when color-key
                (set-color-key surface color-key))
@@ -362,12 +388,12 @@ length in bytes. Surfaces here are 32 bits per pixel."
   (let ((s (gensym "SURFACE-")))
     `(let ((,s ,surface))
        (assert (= 4 (cffi:foreign-slot-value (surface-format ,s) '(:struct sdl-pixel-format) 'bytes-per-pixel)))
-       (cffi:foreign-funcall "SDL_LockSurface" :pointer (surface-ptr ,s) :int)
+       (sdl-call "SDL_LockSurface" :pointer (surface-ptr ,s) :int)
        (unwind-protect
             (let ((,pixels (cffi:foreign-slot-value (surface-ptr ,s) '(:struct sdl-surface) 'pixels))
                   (,pitch (cffi:foreign-slot-value (surface-ptr ,s) '(:struct sdl-surface) 'pitch)))
               ,@body)
-         (cffi:foreign-funcall "SDL_UnlockSurface" :pointer (surface-ptr ,s) :void)))))
+         (sdl-call "SDL_UnlockSurface" :pointer (surface-ptr ,s) :void)))))
 
 (defun surface-rgb-bytes (surface)
   "SURFACE's pixels as a fresh (UNSIGNED-BYTE 8) vector, 3 bytes (R G B) per
@@ -383,8 +409,8 @@ result does not depend on which pixel format the backend picked."
         (dotimes (y h)
           (dotimes (x w)
             (let ((i (* 3 (+ x (* y w)))))
-              (cffi:foreign-funcall "SDL_GetRGB" :uint32 (cffi:mem-ref pixels :uint32 (+ (* y pitch) (* 4 x)))
-                                    :pointer format :pointer r :pointer g :pointer b :void)
+              (sdl-call "SDL_GetRGB" :uint32 (cffi:mem-ref pixels :uint32 (+ (* y pitch) (* 4 x)))
+                        :pointer format :pointer r :pointer g :pointer b :void)
               (setf (aref bytes i) (cffi:mem-ref r :uint8)
                     (aref bytes (+ i 1)) (cffi:mem-ref g :uint8)
                     (aref bytes (+ i 2)) (cffi:mem-ref b :uint8)))))))
@@ -398,21 +424,21 @@ result does not depend on which pixel format the backend picked."
   "Open the W x H game window (replacing any earlier one) and return its surface."
   (declare (ignore icon-caption))
   (when *window*
-    (without-fp-traps (cffi:foreign-funcall "SDL_DestroyWindow" :pointer *window* :void))
+    (sdl-call "SDL_DestroyWindow" :pointer *window* :void)
     (setf *window* nil *window-surface* nil))
-  (let ((window (without-fp-traps (cffi:foreign-funcall "SDL_CreateWindow" :string title-caption
-                                      :int +sdl-windowpos-centered+ :int +sdl-windowpos-centered+
-                                      :int w :int h :uint32 +sdl-window-shown+ :pointer))))
+  (let ((window (sdl-call "SDL_CreateWindow" :string title-caption
+                          :int +sdl-windowpos-centered+ :int +sdl-windowpos-centered+
+                          :int w :int h :uint32 +sdl-window-shown+ :pointer)))
     (when (cffi:null-pointer-p window)
       (error "COTD-RENDER: SDL_CreateWindow failed: ~A" (sdl-error)))
     (setf *window* window
-          *window-surface* (wrap-surface (without-fp-traps (cffi:foreign-funcall "SDL_GetWindowSurface" :pointer window :pointer))
+          *window-surface* (wrap-surface (sdl-call "SDL_GetWindowSurface" :pointer window :pointer)
                                          "SDL_GetWindowSurface"))))
 
 (defun update-display ()
   "Show what has been drawn to the window's surface."
   (when *window*
-    (without-fp-traps (cffi:foreign-funcall "SDL_UpdateWindowSurface" :pointer *window* :int))))
+    (sdl-call "SDL_UpdateWindowSurface" :pointer *window* :int)))
 
 (defun enable-key-repeat (&rest args)
   "No-op: SDL2 always delivers key repeats, at the OS's rate."
@@ -421,7 +447,7 @@ result does not depend on which pixel format the backend picked."
 
 (defun enable-unicode ()
   "Turn on SDL2's text input, which supplies the UNICODE of key-down events."
-  (without-fp-traps (cffi:foreign-funcall "SDL_StartTextInput" :void)))
+  (sdl-call "SDL_StartTextInput" :void))
 
 ;;; ---------------------------------------------------------------------
 ;;; Bitmap fonts.
@@ -593,12 +619,12 @@ Only the glyph pixels are written."
 (defun take-following-text-input ()
   "If the next queued event is a SDL_TEXTINPUT, remove it and return its
 character code; otherwise 0."
-  (if (and (= 1 (cffi:foreign-funcall "SDL_PeepEvents" :pointer *peek-event* :int 1 :int +sdl-peekevent+
-                                      :uint32 +sdl-firstevent+ :uint32 +sdl-lastevent+ :int))
+  (if (and (= 1 (sdl-call "SDL_PeepEvents" :pointer *peek-event* :int 1 :int +sdl-peekevent+
+                          :uint32 +sdl-firstevent+ :uint32 +sdl-lastevent+ :int))
            (= +sdl-textinput+ (event-type *peek-event*)))
       (progn
-        (cffi:foreign-funcall "SDL_PeepEvents" :pointer *peek-event* :int 1 :int +sdl-getevent+
-                              :uint32 +sdl-textinput+ :uint32 +sdl-textinput+ :int)
+        (sdl-call "SDL_PeepEvents" :pointer *peek-event* :int 1 :int +sdl-getevent+
+                  :uint32 +sdl-textinput+ :uint32 +sdl-textinput+ :int)
         (text-input-code *peek-event*))
       0))
 
@@ -608,8 +634,8 @@ or :OTHER; for :KEY-DOWN, EVENT-KEY/EVENT-MOD/EVENT-UNICODE then hold its
 fields. Returns NIL when no event is pending (WAIT false) or on an error
 (WAIT true, which otherwise blocks until one arrives)."
   (if (zerop (if wait
-                 (without-fp-traps (cffi:foreign-funcall "SDL_WaitEvent" :pointer *event* :int))
-                 (without-fp-traps (cffi:foreign-funcall "SDL_PollEvent" :pointer *event* :int))))
+                 (sdl-call "SDL_WaitEvent" :pointer *event* :int)
+                 (sdl-call "SDL_PollEvent" :pointer *event* :int)))
       nil
       (let ((type (event-type *event*)))
         (cond
@@ -621,7 +647,7 @@ fields. Returns NIL when no event is pending (WAIT false) or on an error
            :key-down)
           ((= type +sdl-textinput+)
            (setf *event-key* 0
-                 *event-mod* (cffi:foreign-funcall "SDL_GetModState" :int)
+                 *event-mod* (sdl-call "SDL_GetModState" :int)
                  *event-unicode* (text-input-code *event*))
            :key-down)
           ((and (= type +sdl-windowevent+)
@@ -639,7 +665,7 @@ fields. Returns NIL when no event is pending (WAIT false) or on an error
     (dotimes (i +sdl-event-size+)
       (setf (cffi:mem-aref event :uint8 i) 0))
     (funcall fill-fn event)
-    (when (minusp (without-fp-traps (cffi:foreign-funcall "SDL_PushEvent" :pointer event :int)))
+    (when (minusp (sdl-call "SDL_PushEvent" :pointer event :int))
       (error "COTD-RENDER: SDL_PushEvent failed: ~A" (sdl-error)))))
 
 (defun push-quit-event ()
@@ -673,11 +699,11 @@ drives WITH-EVENTS with these."
                                                32 :encoding :utf-8)))))
 
 (defun ticks ()
-  (cffi:foreign-funcall "SDL_GetTicks" :uint32))
+  (sdl-call "SDL_GetTicks" :uint32))
 
 (defun delay (ms)
   "Sleep for MS milliseconds."
-  (cffi:foreign-funcall "SDL_Delay" :uint32 ms :void))
+  (sdl-call "SDL_Delay" :uint32 ms :void))
 
 (defparameter *frame-rate* 30
   "Frames per second WITH-EVENTS holds its :POLL loop to (lispbuilder-sdl's
@@ -742,3 +768,17 @@ trying to catch up."
                   ,@(when (eq type :poll)
                       `((unless ,quit
                           (run-frame (lambda () ,@idle))))))))))
+
+;;; Enforce the rule above: the only calls to CFFI:FOREIGN-FUNCALL in this file
+;;; are the two in SDL-CALL. A direct call elsewhere would bypass the trap
+;;; masking and only fail on a real display, which no headless check runs; it
+;;; is caught here instead, as a build warning (the build is kept at zero).
+(eval-when (:compile-toplevel)
+  (let* ((source (uiop:read-file-string *compile-file-truename*))
+         (pattern (concatenate 'string "(" "cffi:foreign-funcall"))
+         (count (loop for start = 0 then (1+ found)
+                      for found = (search pattern source :start2 start)
+                      while found count t)))
+    (unless (= count 2)
+      (warn "render.lisp calls CFFI:FOREIGN-FUNCALL directly ~D time~:P outside SDL-CALL; ~
+             call SDL through SDL-CALL instead" (- count 2)))))
