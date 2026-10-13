@@ -5,15 +5,15 @@
 
 (defmethod make-output ((win highscores-window))
   ;; fill the screen black
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-    (sdl:fill-surface sdl:*black* :template a-rect))
+  (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+    (cotd-render:fill-surface cotd-render:*black* :template a-rect))
 
-  (sdl:draw-string-solid-* "HIGH SCORES" (truncate *window-width* 2) 10 :justify :center :color sdl:*white*)
+  (cotd-render:draw-string-solid-* "HIGH SCORES" (truncate *window-width* 2) 10 :justify :center :color cotd-render:*white*)
 
   (loop for record in (highscores-table/records *highscores*)
         for n from 0 to 9
         with str = nil
-        with color = sdl:*white*
+        with color = cotd-render:*white*
         with additional-record = (if (> (length (highscores-table/records *highscores*)) 10)
                                    (nth 10 (highscores-table/records *highscores*))
                                    nil)
@@ -21,29 +21,29 @@
            (setf str (format nil "  ~3<~A.~> ~A~%~%" (1+ n) (write-highscore-record-to-str record)))
            (if (and (highscores-place win)
                     (= (highscores-place win) n))
-             (setf color sdl:*yellow*)
-             (setf color sdl:*white*))
-           (sdl:with-rectangle (rect (sdl:rectangle :x 0 :y (+ 30 (* n (sdl:char-height sdl:*default-font*) 3)) :w *window-width* :h (* (sdl:char-height sdl:*default-font*) 2)))
+             (setf color cotd-render:*yellow*)
+             (setf color cotd-render:*white*))
+           (cotd-render:with-rectangle (rect (cotd-render:rectangle :x 0 :y (+ 30 (* n (cotd-render:char-height cotd-render:*default-font*) 3)) :w *window-width* :h (* (cotd-render:char-height cotd-render:*default-font*) 2)))
              (write-text str rect :color color))
         finally
            (when additional-record
-             (sdl:draw-string-solid-* "  ---" 0 (+ 30 (* 10 (sdl:char-height sdl:*default-font*) 3)) :color sdl:*white*)
+             (cotd-render:draw-string-solid-* "  ---" 0 (+ 30 (* 10 (cotd-render:char-height cotd-render:*default-font*) 3)) :color cotd-render:*white*)
              (setf str (format nil "  ~3<11.~> ~A~%" (write-highscore-record-to-str additional-record)))
              (if (and (highscores-place win)
                       (= (highscores-place win) 10))
-             (setf color sdl:*yellow*)
-             (setf color sdl:*white*))
-             (sdl:with-rectangle (rect (sdl:rectangle :x 0 :y (+ 30 (sdl:char-height sdl:*default-font*) (* 10 (sdl:char-height sdl:*default-font*) 3)) :w *window-width* :h (* (sdl:char-height sdl:*default-font*) 2)))
+             (setf color cotd-render:*yellow*)
+             (setf color cotd-render:*white*))
+             (cotd-render:with-rectangle (rect (cotd-render:rectangle :x 0 :y (+ 30 (cotd-render:char-height cotd-render:*default-font*) (* 10 (cotd-render:char-height cotd-render:*default-font*) 3)) :w *window-width* :h (* (cotd-render:char-height cotd-render:*default-font*) 2)))
                (write-text str rect :color color)))
            )
   
-  (sdl:draw-string-solid-* (format nil "[Esc] Quit")
-                           10 (- *window-height* 13 (sdl:char-height sdl:*default-font*)))
+  (cotd-render:draw-string-solid-* (format nil "[Esc] Quit")
+                           10 (- *window-height* 13 (cotd-render:char-height cotd-render:*default-font*)))
   
-  (sdl:update-display))
+  (cotd-render:update-display))
 
 (defmethod run-window ((win highscores-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
                      (declare (ignore mod unicode))

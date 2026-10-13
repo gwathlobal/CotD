@@ -6,7 +6,7 @@
                                                             "Possessed")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*red*)))
+                                                             cotd-render:*red*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-blessed+
                                              :name-func #'(lambda (effect actor)
@@ -14,7 +14,7 @@
                                                             "Blessed")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*blue*)
+                                                             cotd-render:*blue*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore actor))
                                                          (incf (total-blessed (level *world*)))
@@ -33,7 +33,7 @@
                                                             "Revealed")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*red*)
+                                                             cotd-render:*red*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-disguise-for-mob actor)
@@ -49,7 +49,7 @@
                                                             "Concealed")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*cyan*)
+                                                             cotd-render:*cyan*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-disguise-for-mob actor)
@@ -65,7 +65,7 @@
                                                             "Concealed")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*green*)))
+                                                             cotd-render:*green*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-called-for-help+
                                              :name-func #'(lambda (effect actor)
@@ -73,7 +73,7 @@
                                                             "Called")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*green*)))
+                                                             cotd-render:*green*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-divine-shield+ 
                                              :name-func #'(lambda (effect actor)
@@ -81,7 +81,7 @@
                                                             "Divine shield")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*yellow*)))
+                                                             cotd-render:*yellow*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-cursed+ 
                                              :name-func #'(lambda (effect actor)
@@ -89,7 +89,7 @@
                                                             "Cursed")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             (sdl:color :r 139 :g 69 :b 19))
+                                                             (cotd-render:color :r 139 :g 69 :b 19))
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-m-acc actor)
@@ -106,7 +106,7 @@
                                                             "Blind")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             (sdl:color :r 100 :g 100 :b 100))
+                                                             (cotd-render:color :r 100 :g 100 :b 100))
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-sight actor)
@@ -121,7 +121,7 @@
                                                             "Fear")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*magenta*)))
+                                                             cotd-render:*magenta*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-climbing-mode+
                                 :name-func #'(lambda (effect actor)
@@ -129,7 +129,7 @@
                                                             "Climbing")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             (sdl:color :r 100 :g 100 :b 100))
+                                                             (cotd-render:color :r 100 :g 100 :b 100))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
                                                             (rem-mob-effect-simple actor +mob-effect-climbing-mode+)
@@ -143,7 +143,7 @@
                                                             "On alert")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*red*)))
+                                                             cotd-render:*red*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-ready-to-possess+ 
                                 :name-func #'(lambda (effect actor)
@@ -151,7 +151,7 @@
                                                             "Ready to possess")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             (sdl:color :r 100 :g 100 :b 100))))
+                                                             (cotd-render:color :r 100 :g 100 :b 100))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-avatar-of-brilliance+
                                 :name-func #'(lambda (effect actor)
@@ -159,7 +159,7 @@
                                                             "Avatar of Brilliance")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*white*)
+                                                             cotd-render:*white*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (let ((old-max-hp (max-hp actor)))
@@ -188,7 +188,7 @@
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A transforms itself into an Avatar of Brilliance. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind))))
                                              :on-remove #'(lambda (effect actor)
@@ -223,7 +223,7 @@
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A transforms itself back into a chrome angel. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                   :color sdl:*white*
+                                                                                   :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))
                                                             
@@ -239,7 +239,7 @@
                                                             "Empowered")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*green*)
+                                                             cotd-render:*green*)
                                              :on-add #'(lambda (effect actor)
                                                          (setf (param1 effect) (mob-type actor)) ;; store mob-type-id in param1 of the effect
                                                          (set-mob-effect (get-mob-by-id (actor-id effect)) :effect-type-id +mob-effect-necrolink+ :actor-id (actor-id effect) :cd t :param1 (target-id effect))
@@ -278,7 +278,7 @@
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A is empowered. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                               :color sdl:*white*
+                                                                               :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind))))
                                              :on-remove #'(lambda (effect actor)
@@ -324,7 +324,7 @@
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A loses its power. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                   :color sdl:*white*
+                                                                                   :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind))))))
 
@@ -334,7 +334,7 @@
                                                             "Necrolink")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             (sdl:color :r 100 :g 100 :b 100))
+                                                             (cotd-render:color :r 100 :g 100 :b 100))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
                                                             (setf (order actor) nil))))
@@ -345,7 +345,7 @@
                                                             "Gravity pull")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*red*)))
+                                                             cotd-render:*red*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-flying+ 
                                 :name-func #'(lambda (effect actor)
@@ -353,7 +353,7 @@
                                                             "Flying")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*cyan*)
+                                                             cotd-render:*cyan*)
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
                                                             (apply-gravity actor))))
@@ -364,7 +364,7 @@
                                                             "Slowed")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*red*)
+                                                             cotd-render:*red*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-speed actor)
@@ -380,7 +380,7 @@
                                                             "Holy touch")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*white*)
+                                                             cotd-render:*white*)
                                              :on-add #'(lambda (effect actor)
                                                          (setf (param1 effect) (weapon actor))
                                                          (setf (weapon actor) (list "Holy touch" (list +weapon-dmg-fire+ 2 3 +normal-ap+ 100 (list :is-fire)) nil))
@@ -395,7 +395,7 @@
                                                             "Extinguished light")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             (sdl:color :r 100 :g 100 :b 100))
+                                                             (cotd-render:color :r 100 :g 100 :b 100))
                                              :on-add #'(lambda (effect actor)
                                                          (setf (param1 effect) (cur-light actor))
                                                          (setf (cur-light actor) 0)
@@ -410,7 +410,7 @@
                                                             "Merged")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*cyan*)
+                                                             cotd-render:*cyan*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (let ((singer nil)
@@ -494,14 +494,14 @@
                                                             "Righteous fury")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             (sdl:color :r 255 :g 140 :b 0))
+                                                             (cotd-render:color :r 255 :g 140 :b 0))
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (setf (weapon actor) (list "Flaming sword" (list +weapon-dmg-fire+ 4 7 (truncate +normal-ap+ 1.3) 100 (list :chops-body-parts :is-fire)) nil))
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A is filled with righteous fury. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind))))
                                              :on-remove #'(lambda (effect actor)
@@ -510,7 +510,7 @@
                                                             (set-mob-effect actor :effect-type-id +mob-effect-slow+ :actor-id (id actor) :cd 3)
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A is no longer filled with righteous fury. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                   :color sdl:*white*
+                                                                                   :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind))))
                                              ))
@@ -521,7 +521,7 @@
                                                             "Wet")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*blue*)
+                                                             cotd-render:*blue*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-armor actor)
@@ -537,7 +537,7 @@
                                                             "Pain link")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*white*)
+                                                             cotd-render:*white*)
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore actor))
                                                             ;; param1 - id of the mob, affected by the +mob-effect-pain-link-source+
@@ -551,7 +551,7 @@
                                                             "Pain link")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*magenta*)
+                                                             cotd-render:*magenta*)
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore actor))
                                                             ;; I need this otherwise there will be an infinite recursion 
@@ -566,7 +566,7 @@
                                                             "Reinforced soul")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*cyan*)))
+                                                             cotd-render:*cyan*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-silence+ 
                                              :name-func #'(lambda (effect actor)
@@ -574,7 +574,7 @@
                                                             "Silenced")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*cyan*)))
+                                                             cotd-render:*cyan*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-confuse+
                                              :name-func #'(lambda (effect actor)
@@ -582,7 +582,7 @@
                                                             "Confused")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*magenta*)))
+                                                             cotd-render:*magenta*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-split-soul-source+ 
                                              :name-func #'(lambda (effect actor)
@@ -590,7 +590,7 @@
                                                             "Split soul")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*white*)
+                                                             cotd-render:*white*)
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore actor))
                                                             ;; param1 - id of the mob, affected by the +mob-effect-split-soul-target+
@@ -604,7 +604,7 @@
                                                             "Split soul")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*white*)
+                                                             cotd-render:*white*)
                                              :on-remove #'(lambda (effect actor)
                                                             ;; I need this otherwise there will be an infinite recursion 
                                                             (when (mob-effect-p (get-mob-by-id (actor-id effect)) +mob-effect-split-soul-source+)
@@ -623,7 +623,7 @@
                                                             "Sprint")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*green*)
+                                                             cotd-render:*green*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (rem-mob-effect actor +mob-effect-climbing-mode+)
@@ -640,7 +640,7 @@
                                                             "Exerted")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*yellow*)))
+                                                             cotd-render:*yellow*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-casting-shadow+
                                              :name-func #'(lambda (effect actor)
@@ -648,7 +648,7 @@
                                                             "Casting shadows")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             (sdl:color :r 100 :g 100 :b 100))))
+                                                             (cotd-render:color :r 100 :g 100 :b 100))))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-disguised+
                                              :name-func #'(lambda (effect actor)
@@ -656,7 +656,7 @@
                                                             "Disguised")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*white*)
+                                                             cotd-render:*white*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          ;; Malseraph likes when you lose disguises
@@ -670,7 +670,7 @@
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A reveals itself as ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                            (get-qualified-name actor))
-                                                                                  :color sdl:*white*
+                                                                                  :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))
                                                             ;; Malseraph likes when you lose disguises
@@ -682,7 +682,7 @@
                                                             "Constricting")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*yellow*)
+                                                             cotd-render:*yellow*)
                                              :on-remove #'(lambda (effect actor)
                                                             ;; the param1 here is (list (list x y z)            - xyz coordinates of the constrictor
                                                             ;;                          (list id1 id2 id3 ...)) - collection of mob IDs that are being constricted by this constrictor 
@@ -700,7 +700,7 @@
                                                             "Constricted")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*yellow*)
+                                                             cotd-render:*yellow*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-dodge actor))
@@ -730,9 +730,9 @@
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore actor))
                                                              (cond
-                                                               ((> (param1 effect) 10) sdl:*red*)
-                                                               ((> (param1 effect) 5) sdl:*yellow*)
-                                                               (t sdl:*green*)))
+                                                               ((> (param1 effect) 10) cotd-render:*red*)
+                                                               ((> (param1 effect) 5) cotd-render:*yellow*)
+                                                               (t cotd-render:*green*)))
                                              :on-tick #'(lambda (effect actor)
                                                           (when (zerop (random 3))
                                                             (decf (param1 effect)))
@@ -743,21 +743,21 @@
                                                                              (mob-set-mutation actor +mob-abil-casts-light+)
                                                                              (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                                     (format nil "~A is now casting light. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                                    :color sdl:*white*
+                                                                                                    :color cotd-render:*white*
                                                                                                     :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                                   :singlemind)))))
                                                                 ((= r 1) (when (not (mob-ability-p actor +mob-abil-vulnerable-to-fire+))
                                                                            (mob-set-mutation actor +mob-abil-vulnerable-to-fire+)
                                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                                   (format nil "~A is now vulnerable to fire. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                                  :color sdl:*white*
+                                                                                                  :color cotd-render:*white*
                                                                                                   :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                                 :singlemind)))))
                                                                 ((= r 2) (when (not (mob-ability-p actor +mob-abil-vulnerable-to-vorpal+))
                                                                            (mob-set-mutation actor +mob-abil-vulnerable-to-vorpal+)
                                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                                   (format nil "~A is now vulnerable to vorpal. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                                  :color sdl:*white*
+                                                                                                  :color cotd-render:*white*
                                                                                                   :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                                 :singlemind))))))))
                                                           (when (<= (param1 effect) 0)
@@ -769,7 +769,7 @@
                                                             "Deep breath")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             (sdl:color :r 100 :g 100 :b 100))
+                                                             (cotd-render:color :r 100 :g 100 :b 100))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
                                                             (generate-sound actor (x actor) (y actor) (z actor) 50 #'(lambda (str)
@@ -783,7 +783,7 @@
                                                                                                                (format nil "~A irradiates ~A. "
                                                                                                                        (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                                                        (prepend-article +article-the+ (visible-name target)))
-                                                                                                               :color sdl:*white*
+                                                                                                               :color cotd-render:*white*
                                                                                                                :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                                              :singlemind)))
                                                                                         (let* ((malseraph (get-god-by-id (get-worshiped-god-type (worshiped-god actor))))
@@ -807,7 +807,7 @@
                                                             "Polymorhped")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*magenta*)
+                                                             cotd-render:*magenta*)
                                              :on-add #'(lambda (effect actor)
 
                                                          (when (mob-effect-p actor +mob-effect-avatar-of-brilliance+)
@@ -827,7 +827,7 @@
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A transforms into a sheep. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))
                                                          
@@ -877,7 +877,7 @@
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A transforms back into a ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                            (name (get-mob-type-by-id (first (param1 effect)))))
-                                                                                   :color sdl:*white*
+                                                                                   :color cotd-render:*white*
                                                                                    :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                  :singlemind)))
                                                             
@@ -923,7 +923,7 @@
                                                             "Glowing")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore actor effect))
-                                                             sdl:*yellow*)))
+                                                             cotd-render:*yellow*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-parasite+
                                              :name-func #'(lambda (effect actor)
@@ -931,7 +931,7 @@
                                                             "Parasite")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             (sdl:color :r 0 :g 100 :b 0))
+                                                             (cotd-render:color :r 0 :g 100 :b 0))
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-armor actor))
@@ -945,7 +945,7 @@
                                                             "Evolving")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*green*)
+                                                             cotd-render:*green*)
                                              :on-remove #'(lambda (effect actor)
                                                             ;; evolution finished, give the ability
                                                             (when (eq (cd effect) 0)
@@ -956,7 +956,7 @@
                                                                                        (format nil "~A finishes evolving and ~A. "
                                                                                                (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                                str)
-                                                                                       :color sdl:*white*
+                                                                                       :color cotd-render:*white*
                                                                                        :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                      :singlemind)))))
                                                             )))
@@ -968,9 +968,9 @@
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore actor))
                                                              (cond
-                                                               ((> (param1 effect) 10) sdl:*red*)
-                                                               ((> (param1 effect) 5) sdl:*yellow*)
-                                                               (t sdl:*green*)))
+                                                               ((> (param1 effect) 10) cotd-render:*red*)
+                                                               ((> (param1 effect) 5) cotd-render:*yellow*)
+                                                               (t cotd-render:*green*)))
                                              :on-tick #'(lambda (effect actor)
                                                           (when (>= (param1 effect) 15)
                                                             (setf (param1 effect) 15))
@@ -987,7 +987,7 @@
                                                             "Metabolic boost")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*yellow*)
+                                                             cotd-render:*yellow*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          
@@ -1002,7 +1002,7 @@
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "The metabolism of ~A returns to the norm. " (prepend-article +article-the+ (visible-name actor)))
-                                                                                   :color sdl:*white*
+                                                                                   :color cotd-render:*white*
                                                                                    :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                  :singlemind)))
                                                             )))
@@ -1013,7 +1013,7 @@
                                                             "Spines")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*green*)
+                                                             cotd-render:*green*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-armor actor))
@@ -1025,7 +1025,7 @@
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A retracts its spines. " (prepend-article +article-the+ (visible-name actor)))
-                                                                                   :color sdl:*white*
+                                                                                   :color cotd-render:*white*
                                                                                    :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                  :singlemind)))
                                                             )))
@@ -1036,7 +1036,7 @@
                                                             "Dies in")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*red*)
+                                                             cotd-render:*red*)
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore effect))
 
@@ -1060,7 +1060,7 @@
                                                             "Laying eggs")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             (sdl:color :r 60 :g 179 :b 113))
+                                                             (cotd-render:color :r 60 :g 179 :b 113))
                                              :on-remove #'(lambda (effect actor)
                                                             (declare (ignore actor))
                                                             (when (eq (cd effect) 0)
@@ -1075,7 +1075,7 @@
                                                             "Regenerate")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*green*)
+                                                             cotd-render:*green*)
                                              :on-tick #'(lambda (effect actor)
                                                           (declare (ignore effect))
                                                           (incf (cur-hp actor))
@@ -1088,7 +1088,7 @@
                                                             "Corroded")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*red*)
+                                                             cotd-render:*red*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-armor actor))
@@ -1102,7 +1102,7 @@
                                                             "Primdordial transfer")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*white*)))
+                                                             cotd-render:*white*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-polymorph-tree+ 
                                              :name-func #'(lambda (effect actor)
@@ -1110,7 +1110,7 @@
                                                             "Polymorhped")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*magenta*)
+                                                             cotd-render:*magenta*)
                                              :on-add #'(lambda (effect actor)
 
                                                          (when (mob-effect-p actor +mob-effect-avatar-of-brilliance+)
@@ -1130,7 +1130,7 @@
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A transforms into a tree. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))
                                                          
@@ -1174,7 +1174,7 @@
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A transforms back into a ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                            (name (get-mob-type-by-id (first (param1 effect)))))
-                                                                                   :color sdl:*white*
+                                                                                   :color cotd-render:*white*
                                                                                    :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                  :singlemind)))
                                                             
@@ -1220,7 +1220,7 @@
                                                             "Rest in peace")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*white*)))
+                                                             cotd-render:*white*)))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-life-guard+
                                              :name-func #'(lambda (effect actor)
@@ -1228,7 +1228,7 @@
                                                             "Meat shield")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*green*)
+                                                             cotd-render:*green*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
 
@@ -1286,7 +1286,7 @@
                                                             "Invisibility")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*cyan*)
+                                                             cotd-render:*cyan*)
                                              ))
 
 (set-effect-type (make-instance 'effect-type :id +mob-effect-soul-sickness+
@@ -1295,12 +1295,12 @@
                                                             "Soul sickness")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*cyan*)
+                                                             cotd-render:*cyan*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A gets infected with soul sickness. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))
                                                          )
@@ -1336,7 +1336,7 @@
                                                             "Demonic power")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*magenta*)
+                                                             cotd-render:*magenta*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (let ((old-max-hp (max-hp actor)))
@@ -1364,7 +1364,7 @@
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A gains demonic power. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind))))
                                              :on-remove #'(lambda (effect actor)
@@ -1400,7 +1400,7 @@
                                                             
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                    (format nil "~A transforms back into a human being. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                   :color sdl:*white*
+                                                                                   :color cotd-render:*white*
                                                                                    :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                  :singlemind)))
                                                             
@@ -1413,7 +1413,7 @@
                                                             "Demonic sigil")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*green*)
+                                                             cotd-render:*green*)
                                              :on-add #'(lambda (effect actor)
                                                          (push (id actor) (demonic-sigils (level *world*)))
                                                          (setf (param1 effect) 0))
@@ -1435,7 +1435,7 @@
                                                             "Demonic machine")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*green*)
+                                                             cotd-render:*green*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (push (id actor) (demonic-machines (level *world*))))
@@ -1451,7 +1451,7 @@
                                                             "Bomb ticking")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*green*)
+                                                             cotd-render:*green*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore actor))
                                                          (unless (param1 effect)
@@ -1468,7 +1468,7 @@
                                                             (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                                    (format nil "The bomb ticks... ~A! " param1)
                                                                                    :observed-mob actor
-                                                                                   :color sdl:*white*
+                                                                                   :color cotd-render:*white*
                                                                                    :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                  :singlemind)))
 
@@ -1505,7 +1505,7 @@
                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                                      (format nil "KABOOM! ")
                                                                                      :observed-mob actor
-                                                                                     :color sdl:*white*
+                                                                                     :color cotd-render:*white*
                                                                                      :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                    :singlemind)))
 
@@ -1535,7 +1535,7 @@
                                                             "Reduce resistances")
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*yellow*)
+                                                             cotd-render:*yellow*)
                                              :on-add #'(lambda (effect actor)
                                                          (declare (ignore effect))
                                                          (adjust-armor actor))
@@ -1549,4 +1549,4 @@
                                                             (format nil "Strength in numbers (~A%)" (param1 effect)))
                                              :color-func #'(lambda (effect actor)
                                                              (declare (ignore effect actor))
-                                                             sdl:*green*)))
+                                                             cotd-render:*green*)))

@@ -12,32 +12,32 @@
 
 (defmethod make-output ((win main-menu-window))
   (with-slots (cur-sel menu-items menu-strs) win
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-      (sdl:fill-surface sdl:*black* :template a-rect))
+    (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+      (cotd-render:fill-surface cotd-render:*black* :template a-rect))
     
-    ;;(sdl:draw-string-solid-* "City of the Damned" (truncate *window-width* 2) 10 :justify :center :color sdl:*white*)
+    ;;(cotd-render:draw-string-solid-* "City of the Damned" (truncate *window-width* 2) 10 :justify :center :color cotd-render:*white*)
 
-    (sdl:draw-surface-at-* *start-logo* (- (truncate *window-width* 2) (truncate (sdl:width *start-logo*) 2)) 10 :surface sdl:*default-surface*)
+    (cotd-render:draw-surface-at-* *start-logo* (- (truncate *window-width* 2) (truncate (cotd-render:width *start-logo*) 2)) 10 :surface cotd-render:*default-surface*)
     
-    (sdl:draw-string-solid-* "Whoever wins... We lose" (- *window-width* 20) (+ 10 10 (sdl:height *start-logo*)) :justify :right :color sdl:*white*)
+    (cotd-render:draw-string-solid-* "Whoever wins... We lose" (- *window-width* 20) (+ 10 10 (cotd-render:height *start-logo*)) :justify :right :color cotd-render:*white*)
     
     ;; drawing selection list
     (loop with color-list = ()
           for i from 0 below (length menu-strs) do
             (if (= i cur-sel)
-              (push sdl:*yellow* color-list)
-              (push sdl:*white* color-list))
+              (push cotd-render:*yellow* color-list)
+              (push cotd-render:*white* color-list))
           finally (setf color-list (reverse color-list))
-                  (draw-selection-list menu-strs cur-sel (length menu-strs) 20 (+ 10 10 (sdl:height *start-logo*) (sdl:char-height sdl:*default-font*) (sdl:char-height sdl:*default-font*)) :color-list color-list :use-letters t))
+                  (draw-selection-list menu-strs cur-sel (length menu-strs) 20 (+ 10 10 (cotd-render:height *start-logo*) (cotd-render:char-height cotd-render:*default-font*) (cotd-render:char-height cotd-render:*default-font*)) :color-list color-list :use-letters t))
         
-    (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Exit game")
-                             10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
+    (cotd-render:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Exit game")
+                             10 (- *window-height* 10 (cotd-render:char-height cotd-render:*default-font*)))
     
-    (sdl:update-display)))
+    (cotd-render:update-display)))
 
 (defmethod run-window ((win main-menu-window))
   (with-slots (cur-sel menu-funcs menu-strs) win
-    (sdl:with-events ()
+    (cotd-render:with-events ()
       (:quit-event () (funcall (quit-func win)) t)
       (:key-down-event (:key key :mod mod :unicode unicode)
                        

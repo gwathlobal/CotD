@@ -192,17 +192,17 @@
         (format file "~A~A~%" scenario-stats (new-line))
         (format file "~A~%" (new-line))
         (let ((x 6)
-              (y (+ 40 (* 13 (sdl:get-font-height))))
+              (y (+ 40 (* 13 (cotd-render:get-font-height))))
               (w 800)
-              (h (- 520 40 10 (sdl:char-height sdl:*default-font*) (* 14 (sdl:get-font-height)))))
-          (sdl:with-rectangle (rect (sdl:rectangle :x x
+              (h (- 520 40 10 (cotd-render:char-height cotd-render:*default-font*) (* 14 (cotd-render:get-font-height)))))
+          (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x
                                                    :y y
                                                    :w w
                                                    :h h))
             (let ((max-lines (write-text (get-msg-str-list (level/full-message-box (level *world*))) rect :count-only t)))
               (when (> (message-list-length) 0)
-                (multiple-value-bind (max-lines final-txt) (write-text (get-msg-str-list (level/full-message-box (level *world*))) rect :start-line (if (< (truncate h (sdl:char-height sdl:*default-font*)) max-lines)
-                                                                                                                                (- max-lines (truncate h (sdl:char-height sdl:*default-font*)))
+                (multiple-value-bind (max-lines final-txt) (write-text (get-msg-str-list (level/full-message-box (level *world*))) rect :start-line (if (< (truncate h (cotd-render:char-height cotd-render:*default-font*)) max-lines)
+                                                                                                                                (- max-lines (truncate h (cotd-render:char-height cotd-render:*default-font*)))
                                                                                                                                 0)
                                                                                                                   :count-only t)
                   (declare (ignore max-lines))

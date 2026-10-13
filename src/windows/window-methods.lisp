@@ -8,14 +8,14 @@
 (defvar *start-logo*)
 
 (defparameter *sdl-color-cache* (make-hash-table :test 'eql)
-  "packed-color -> sdl:color, so each distinct colour allocates at most once.")
+  "packed-color -> cotd-render:color, so each distinct colour allocates at most once.")
 
 (defun sdl-color (packed)
-  "The one boundary converting a packed-color to the sdl:color the renderer needs."
+  "The one boundary converting a packed-color to the cotd-render:color the renderer needs."
   (declare (type packed-color packed) (optimize (speed 3)))
   (or (gethash packed *sdl-color-cache*)
       (setf (gethash packed *sdl-color-cache*)
-            (sdl:color :r (ldb (byte 8 16) packed)
+            (cotd-render:color :r (ldb (byte 8 16) packed)
                        :g (ldb (byte 8 8) packed)
                        :b (ldb (byte 8 0) packed)))))
 
@@ -37,8 +37,8 @@ the headless render oracle in headless-test.lisp, which needs these same
 globals but none of COTD-INIT's options/highscores/window-caption setup."
   (setf *glyph-w* 15 *glyph-h* 15)
   (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 *glyph-w* *glyph-h*))
-  (setf *glyph-front* (sdl:load-image (sdl:create-path "data/font_large.bmp" *asset-dir*)
-                                      :color-key sdl:*white*))
+  (setf *glyph-front* (cotd-render:load-image (cotd-render:create-path "data/font_large.bmp" *asset-dir*)
+                                      :color-key cotd-render:*white*))
   ;; the tinted strips are derived from *glyph-front*, so drop them with it
   (reset-glyph-strip-cache))
 
@@ -53,33 +53,33 @@ depends on which glyph or where it goes, so it is done once per colour instead
 of 4000 times a frame."
   (or (gethash front-color *glyph-strip-cache*)
       (setf (gethash front-color *glyph-strip-cache*)
-              (let ((strip (sdl:create-surface (sdl:width *glyph-front*)
-                                               (sdl:height *glyph-front*)
-                                               :color-key sdl:*black*)))
-                (sdl:fill-surface (sdl-color front-color) :surface strip)
-                (sdl:set-cell-* 0 0 (sdl:width *glyph-front*) (sdl:height *glyph-front*)
+              (let ((strip (cotd-render:create-surface (cotd-render:width *glyph-front*)
+                                               (cotd-render:height *glyph-front*)
+                                               :color-key cotd-render:*black*)))
+                (cotd-render:fill-surface (sdl-color front-color) :surface strip)
+                (cotd-render:set-cell-* 0 0 (cotd-render:width *glyph-front*) (cotd-render:height *glyph-front*)
                                 :surface *glyph-front* :index 0)
-                (sdl:draw-surface-at-* *glyph-front* 0 0 :surface strip)
+                (cotd-render:draw-surface-at-* *glyph-front* 0 0 :surface strip)
                 strip))))
 
-(defun draw-glyph (x y n &key (surface sdl:*default-surface*) front-color back-color)
+(defun draw-glyph (x y n &key (surface cotd-render:*default-surface*) front-color back-color)
   "Drawing a glyph from 'font.bmp' at a certain point of the surface."
   (declare (type fixnum x y n) (type packed-color front-color back-color))
   (let ((strip (colorized-glyph-strip front-color)))
     ;; select the rectangle holding this glyph, already in the right colour
-    (sdl:set-cell-* (* n *glyph-w*) 0 *glyph-w* *glyph-h* :surface strip :index 0)
+    (cotd-render:set-cell-* (* n *glyph-w*) 0 *glyph-w* *glyph-h* :surface strip :index 0)
 
     ;; fill the rectangle on the dst surface with the desired background colour,
     ;; then blit the glyph over it. Black is the strip's colour key, so only the
     ;; glyph itself lands.
     ;; for speed I use this temporary rectangle as this function is invoked about 4000 times or more a frame and otherwise (e.g. using with-rectangle) map rendering slows to a crawl
-    (setf (sdl:x *temp-rect*) x)
-    (setf (sdl:y *temp-rect*) y)
-    (setf (sdl:width *temp-rect*) *glyph-w*)
-    (setf (sdl:height *temp-rect*) *glyph-h*)
-    (sdl:fill-surface (sdl-color back-color) :surface surface :template *temp-rect*)
+    (setf (cotd-render:x *temp-rect*) x)
+    (setf (cotd-render:y *temp-rect*) y)
+    (setf (cotd-render:width *temp-rect*) *glyph-w*)
+    (setf (cotd-render:height *temp-rect*) *glyph-h*)
+    (cotd-render:fill-surface (sdl-color back-color) :surface surface :template *temp-rect*)
 
-    (sdl:draw-surface-at-* strip x y :surface surface)))
+    (cotd-render:draw-surface-at-* strip x y :surface surface)))
 
 (defun calculate-start-coord (rel-x rel-y array max-x-view max-y-view)
   "Calculate the top-left corner of the visible area. Used to draw the map and to choose objects on it."
@@ -116,8 +116,8 @@ of 4000 times a frame."
 	   (setf single-memo (aref array (+ sx x) (+ sy y) rel-z))
 	   ;;(when (and (eql (get-single-memo-visible single-memo) nil) 
 	   ;;      (not (eql (glyph object) (map-object-template-glyph (get-map-object-template +glyph-blank+)))))
-	   ;;  (setf (glyph-color object) (sdl:color :r 140 :b 140 :g 140))
-	   ;;  (setf (back-color object) (sdl:color :r 30 :b 30 :g 30)))
+	   ;;  (setf (glyph-color object) (cotd-render:color :r 140 :b 140 :g 140))
+	   ;;  (setf (back-color object) (cotd-render:color :r 30 :b 30 :g 30)))
 	   ;; draw the glyph
 	   
 	   (draw-glyph x1 y1 (get-single-memo-glyph-idx single-memo) 
@@ -129,32 +129,32 @@ of 4000 times a frame."
            (when (get-single-memo-player single-memo)
              (highlight-map-tile x1 y1)))))))
 
-(defun highlight-left-top-corner (x1 y1 &key (color sdl:*yellow*))
-  (sdl:draw-pixel-* (+ x1 1) y1 :color color)
-  (sdl:draw-pixel-* (+ x1 2) y1 :color color)
-  (sdl:draw-pixel-* x1 (+ y1 1) :color color)
-  (sdl:draw-pixel-* x1 (+ y1 2) :color color))
+(defun highlight-left-top-corner (x1 y1 &key (color cotd-render:*yellow*))
+  (cotd-render:draw-pixel-* (+ x1 1) y1 :color color)
+  (cotd-render:draw-pixel-* (+ x1 2) y1 :color color)
+  (cotd-render:draw-pixel-* x1 (+ y1 1) :color color)
+  (cotd-render:draw-pixel-* x1 (+ y1 2) :color color))
 
-(defun highlight-left-bottom-corner (x1 y1 &key (color sdl:*yellow*))
-  (sdl:draw-pixel-* (+ x1 1) y1 :color color)
-  (sdl:draw-pixel-* (+ x1 2) y1 :color color)
-  (sdl:draw-pixel-* x1 (- y1 1) :color color)
-  (sdl:draw-pixel-* x1 (- y1 2) :color color))
+(defun highlight-left-bottom-corner (x1 y1 &key (color cotd-render:*yellow*))
+  (cotd-render:draw-pixel-* (+ x1 1) y1 :color color)
+  (cotd-render:draw-pixel-* (+ x1 2) y1 :color color)
+  (cotd-render:draw-pixel-* x1 (- y1 1) :color color)
+  (cotd-render:draw-pixel-* x1 (- y1 2) :color color))
 
-(defun highlight-right-top-corner (x1 y1 &key (color sdl:*yellow*))
-  (sdl:draw-pixel-* (- x1 1) y1 :color color)
-  (sdl:draw-pixel-* (- x1 2) y1 :color color)
-  (sdl:draw-pixel-* x1 (+ y1 1) :color color)
-  (sdl:draw-pixel-* x1 (+ y1 2) :color color))
+(defun highlight-right-top-corner (x1 y1 &key (color cotd-render:*yellow*))
+  (cotd-render:draw-pixel-* (- x1 1) y1 :color color)
+  (cotd-render:draw-pixel-* (- x1 2) y1 :color color)
+  (cotd-render:draw-pixel-* x1 (+ y1 1) :color color)
+  (cotd-render:draw-pixel-* x1 (+ y1 2) :color color))
 
-(defun highlight-right-bottom-corner (x1 y1 &key (color sdl:*yellow*))
-  (sdl:draw-pixel-* (- x1 1) y1 :color color)
-  (sdl:draw-pixel-* (- x1 2) y1 :color color)
-  (sdl:draw-pixel-* x1 (- y1 1) :color color)
-  (sdl:draw-pixel-* x1 (- y1 2) :color color))
+(defun highlight-right-bottom-corner (x1 y1 &key (color cotd-render:*yellow*))
+  (cotd-render:draw-pixel-* (- x1 1) y1 :color color)
+  (cotd-render:draw-pixel-* (- x1 2) y1 :color color)
+  (cotd-render:draw-pixel-* x1 (- y1 1) :color color)
+  (cotd-render:draw-pixel-* x1 (- y1 2) :color color))
 
 (defun highlight-map-tile (x1 y1)
-  (let ((color (sdl:color :r 85 :g 107 :b 47)))
+  (let ((color (cotd-render:color :r 85 :g 107 :b 47)))
     ;; draw the rectangle
     (highlight-left-top-corner x1 y1 :color color)
 
@@ -166,7 +166,7 @@ of 4000 times a frame."
     ))
 
 (defun highlight-world-map-tile (x1 y1)
-  (let ((color sdl:*yellow*))
+  (let ((color cotd-render:*yellow*))
     ;; draw the rectangle
     (highlight-left-top-corner x1 y1 :color color)
 
@@ -230,8 +230,8 @@ of 4000 times a frame."
 
 (defun fill-background-tiles ()
   "Fill the background"
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-    (sdl:fill-surface sdl:*black* :template a-rect)))
+  (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+    (cotd-render:fill-surface cotd-render:*black* :template a-rect)))
 
 (defun create-string (&optional str)
   (let ((new-str (make-array (list 0) :element-type 'character :adjustable t :fill-pointer t)))
@@ -253,12 +253,12 @@ of 4000 times a frame."
 (defvar *sel-x-offset* 4)
 
 (defun draw-selection-list (str-list cur-str str-per-page x y &key (color-list ())
-                                                                   (char-height (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
+                                                                   (char-height (+ (cotd-render:char-height cotd-render:*default-font*) *sel-y-offset*))
                                                                    (str-func #'(lambda (x y color str use-letters)
                                                                                  ;; use-letters here can be
                                                                                  ;;   nil
                                                                                  ;;   (list i str-per-page)
-                                                                                 (sdl:draw-string-solid-* (if use-letters
+                                                                                 (cotd-render:draw-string-solid-* (if use-letters
                                                                                                             (if (< (first use-letters) (second use-letters))
                                                                                                               (format nil "[~A]  ~A" (nth (first use-letters) *char-list*) str)
                                                                                                               (format nil "     ~A" str))
@@ -282,35 +282,35 @@ of 4000 times a frame."
       (setf str (nth (+ i list-start) str-list))
       ;; highlight the current selected item
       (if (eql color-list nil)
-        (setf color sdl:*white*)
+        (setf color cotd-render:*white*)
         (setf color (nth (+ i list-start) color-list)))
-      (funcall str-func (+ x (sdl:char-width sdl:*default-font*) *sel-x-offset*) (+ y (* i char-height)) color str (if use-letters
+      (funcall str-func (+ x (cotd-render:char-width cotd-render:*default-font*) *sel-x-offset*) (+ y (* i char-height)) color str (if use-letters
                                                                                                                      (list i str-per-page)
                                                                                                                      nil))
       )
     ;; draw a scroll bar when necessary
     (when (> (length str-list) str-per-page)
-      (sdl:draw-string-solid-* "*" x (+ y (* char-height (truncate (* (/ cur-str (length str-list)) str-per-page)))) :color sdl:*white*))))
+      (cotd-render:draw-string-solid-* "*" x (+ y (* char-height (truncate (* (/ cur-str (length str-list)) str-per-page)))) :color cotd-render:*white*))))
 
 (defun draw-multiline-selection-list (item-list cur-item x y w h &optional (color-list ()))
   (unless item-list
     (return-from draw-multiline-selection-list nil))
   
-  (sdl:with-rectangle (rect (sdl:rectangle :x x :y y :w (- w 12) :h h))  
+  (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x :y y :w (- w 12) :h h))  
     (let ((screen-list ()) (start-item) (is-more-than-one-screen nil))
       ;; assign numbers of screens to the items pertaining to them
       (let ((screen-i 0) (item-h) (is-first t))
         (dotimes (i (length item-list))
 	  (setf item-h (* 13 (write-text (nth i item-list) rect :count-only t)))
 	  
-	  (if (or (> (sdl:height rect) item-h) (and is-first (<= (sdl:height rect) item-h)))
+	  (if (or (> (cotd-render:height rect) item-h) (and is-first (<= (cotd-render:height rect) item-h)))
 	      (progn
 		(setf screen-list (append screen-list (list screen-i)))
 		(setf is-first nil)
-		(if (> (sdl:height rect) item-h)
+		(if (> (cotd-render:height rect) item-h)
 		    (progn
-		      (incf (sdl:y rect) item-h)
-		      (decf (sdl:height rect) item-h))
+		      (incf (cotd-render:y rect) item-h)
+		      (decf (cotd-render:height rect) item-h))
 		    (progn 
 		      (incf screen-i)
 		      (setf is-more-than-one-screen t))))
@@ -318,10 +318,10 @@ of 4000 times a frame."
 		(incf screen-i)
 		(setf is-more-than-one-screen t)
 		(setf screen-list (append screen-list (list screen-i)))
-		(setf (sdl:y rect) y)
-		(setf (sdl:height rect) h)
-                (incf (sdl:y rect) item-h)
-                (decf (sdl:height rect) item-h)
+		(setf (cotd-render:y rect) y)
+		(setf (cotd-render:height rect) h)
+                (incf (cotd-render:y rect) item-h)
+                (decf (cotd-render:height rect) item-h)
 		(setf is-first t)))
 	  ))
       
@@ -333,8 +333,8 @@ of 4000 times a frame."
       
       ;; draw the screen found
       (let ((str) (item-h) (color))
-        (setf (sdl:y rect) y)
-	(setf (sdl:height rect) h)
+        (setf (cotd-render:y rect) y)
+	(setf (cotd-render:height rect) h)
 	;; yes, ugly hack but I was being lazy and did not want to investigate how to create a 'while' statement
 	;; iterate through all items until we get to the starting one
 	(dotimes (i (- (length item-list) start-item))
@@ -343,17 +343,17 @@ of 4000 times a frame."
 		(setf str (nth (+ i start-item) item-list))
 		;; highlight the current selected item
 		(if (eql color-list nil)
-		    (setf color sdl:*white*)
+		    (setf color cotd-render:*white*)
 		    (setf color (nth (+ i start-item) color-list)))
 		(setf item-h (* 13 (write-text str rect :color color :count-only nil)))
-		(when (> (sdl:height rect) item-h)
-		  (incf (sdl:y rect) item-h)
-		  (decf (sdl:height rect) item-h)))
+		(when (> (cotd-render:height rect) item-h)
+		  (incf (cotd-render:y rect) item-h)
+		  (decf (cotd-render:height rect) item-h)))
 	      (progn
 		(return)))))
       ;; draw scroll bar when necessary
       (when is-more-than-one-screen
-	(sdl:draw-string-solid-* "*" (- (+ x w) 12) (+ y (truncate (* h (/ cur-item (length item-list))))) :color sdl:*white*)))))
+	(cotd-render:draw-string-solid-* "*" (- (+ x w) 12) (+ y (truncate (* h (/ cur-item (length item-list))))) :color cotd-render:*white*)))))
 
 (defun run-selection-list (key mod unicode cur-str &key (start-page 0) (max-str-per-page -1) (use-letters t))
   (declare (ignore unicode))
@@ -420,50 +420,50 @@ of 4000 times a frame."
 	   (t (setf was-letter t))))
     (values cur-pos word-length eol)))
 
-(defun write-text (txt rect &key (surface sdl:*default-surface*) (justify :left) (color sdl:*white*) (font sdl:*default-font*) (count-only nil) (start-line 0))
-  (let ((txt-length (length txt)) (read-pos 0) (x (sdl:x rect)) (y (sdl:y rect)) (eol) (word-length) (row-length-in-pixels 0) (prev-pos) (cur-pos) (read-pos2) (cur-line 0)
+(defun write-text (txt rect &key (surface cotd-render:*default-surface*) (justify :left) (color cotd-render:*white*) (font cotd-render:*default-font*) (count-only nil) (start-line 0))
+  (let ((txt-length (length txt)) (read-pos 0) (x (cotd-render:x rect)) (y (cotd-render:y rect)) (eol) (word-length) (row-length-in-pixels 0) (prev-pos) (cur-pos) (read-pos2) (cur-line 0)
         (final-txt (create-string)))
-    (loop until (or (>= read-pos txt-length) (>= y (+ (sdl:y rect) (sdl:height rect)))) do
+    (loop until (or (>= read-pos txt-length) (>= y (+ (cotd-render:y rect) (cotd-render:height rect)))) do
 	 (setf prev-pos read-pos)
 	 (setf cur-pos prev-pos)
 	 (multiple-value-setq (read-pos word-length eol) (read-word txt read-pos))
-	 (setf row-length-in-pixels (* word-length (sdl:char-width font)))
+	 (setf row-length-in-pixels (* word-length (cotd-render:char-width font)))
 	 (incf cur-pos word-length)
-	 (loop until (or (>= read-pos txt-length) (>= x (+ (sdl:x rect) (sdl:width rect)))) do
+	 (loop until (or (>= read-pos txt-length) (>= x (+ (cotd-render:x rect) (cotd-render:width rect)))) do
 	      (when (eql eol t) (loop-finish))
 	      (multiple-value-setq (read-pos2 word-length eol) (read-word txt read-pos))
-	      (if (< (+ row-length-in-pixels (* word-length (sdl:char-width font))) (sdl:width rect))
-		(progn (incf row-length-in-pixels (* word-length (sdl:char-width font))) (setf read-pos read-pos2))
+	      (if (< (+ row-length-in-pixels (* word-length (cotd-render:char-width font))) (cotd-render:width rect))
+		(progn (incf row-length-in-pixels (* word-length (cotd-render:char-width font))) (setf read-pos read-pos2))
 		(progn (loop-finish)))
 	      (incf cur-pos word-length))
 	 (cond
-	   ((eql justify ':left) (setf x (sdl:x rect)))
-	   ((eql justify ':center) (setf x (truncate (+ (sdl:x rect) (sdl:width rect)) 2)))
-	   ((eql justify ':right) (setf x (+ (sdl:x rect) (sdl:width rect)))))
+	   ((eql justify ':left) (setf x (cotd-render:x rect)))
+	   ((eql justify ':center) (setf x (truncate (+ (cotd-render:x rect) (cotd-render:width rect)) 2)))
+	   ((eql justify ':right) (setf x (+ (cotd-render:x rect) (cotd-render:width rect)))))
          (when (and (eql count-only t) (>= cur-line start-line))
            (format final-txt "~A~A~%" (subseq txt prev-pos cur-pos) (new-line)))
 	 (when (and (eql count-only nil) (>= cur-line start-line))
-	   (sdl:draw-string-solid-* (subseq txt prev-pos cur-pos) x y :justify justify :surface surface :font font :color color)
-	   (incf y (sdl:char-height font)))
+	   (cotd-render:draw-string-solid-* (subseq txt prev-pos cur-pos) x y :justify justify :surface surface :font font :color color)
+	   (incf y (cotd-render:char-height font)))
 	 (incf cur-line))
     (values cur-line final-txt)))
 
-(defun write-colored-text (txt-struct rect &key (surface sdl:*default-surface*) (font sdl:*default-font*) (count-only nil) (start-line 0))
+(defun write-colored-text (txt-struct rect &key (surface cotd-render:*default-surface*) (font cotd-render:*default-font*) (count-only nil) (start-line 0))
   ;;(format t "write-colored-text~%")
-  (let ((x (sdl:x rect)) (y (sdl:y rect)) (eol) (word-length) (prev-pos) (cur-pos) (read-pos2) (cur-line 0)
+  (let ((x (cotd-render:x rect)) (y (cotd-render:y rect)) (eol) (word-length) (prev-pos) (cur-pos) (read-pos2) (cur-line 0)
         (final-txt (create-string)))
     (loop for (txt color) in txt-struct
           for txt-length = (length txt)
           for read-pos = 0
           do
              ;;(format t "TXT = ~A~%~%" txt)
-             (loop until (or (>= read-pos txt-length) (>= y (+ (sdl:y rect) (sdl:height rect)))) do
+             (loop until (or (>= read-pos txt-length) (>= y (+ (cotd-render:y rect) (cotd-render:height rect)))) do
                (setf prev-pos read-pos)
                (setf cur-pos prev-pos)
-               (loop until (or (>= read-pos txt-length) (>= x (+ (sdl:x rect) (sdl:width rect)))) do
+               (loop until (or (>= read-pos txt-length) (>= x (+ (cotd-render:x rect) (cotd-render:width rect)))) do
                  (when (eql eol t) (loop-finish))
                  (multiple-value-setq (read-pos2 word-length eol) (read-word txt read-pos))
-                 (if (< (+ x (* word-length (sdl:char-width font))) (+ (sdl:x rect) (sdl:width rect)))
+                 (if (< (+ x (* word-length (cotd-render:char-width font))) (+ (cotd-render:x rect) (cotd-render:width rect)))
                    (progn 
                      (setf read-pos read-pos2)
                      ;;(format t "read-pos = ~A, cur-pos = ~A, cur-pos + world-length = ~A " read-pos cur-pos (+ cur-pos word-length))
@@ -471,8 +471,8 @@ of 4000 times a frame."
                      (when (>= cur-line start-line)
                        (format final-txt "~A" (subseq txt cur-pos (+ cur-pos word-length)))
                        (when (null count-only)
-                         (sdl:draw-string-solid-* (subseq txt cur-pos (+ cur-pos word-length)) x y :justify :left :surface surface :font font :color color)))
-                     (incf x (* word-length (sdl:char-width font)))
+                         (cotd-render:draw-string-solid-* (subseq txt cur-pos (+ cur-pos word-length)) x y :justify :left :surface surface :font font :color color)))
+                     (incf x (* word-length (cotd-render:char-width font)))
                      (incf cur-pos word-length))
                    (progn (setf eol t) (loop-finish)))
                      )
@@ -480,12 +480,12 @@ of 4000 times a frame."
                ;;(format t "X = ~A, Y = ~A, EOL = ~A, read-pos = ~A, txt-length = ~A~%" x y eol read-pos txt-length)
 
                (when eol
-                 (setf x (sdl:x rect))
+                 (setf x (cotd-render:x rect))
                  (setf eol nil)
                  (when (>= cur-line start-line)
                    (format final-txt "~A~%" (new-line))
                    (when (null count-only)
-                     (incf y (sdl:char-height font))))
+                     (incf y (cotd-render:char-height font))))
                  (incf cur-line))
                    )
           )
@@ -588,7 +588,7 @@ of 4000 times a frame."
     (run-window *current-window*)))
 
 (defun pause-for-poll ()
-  (sdl:with-events (:poll)
+  (cotd-render:with-events (:poll)
     (:quit-event () (funcall (quit-func *current-window*)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
                      (declare (ignore mod unicode))

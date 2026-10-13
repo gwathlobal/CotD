@@ -8,18 +8,18 @@
 
 (defmethod make-output ((win final-stats-window))
   ;; fill the screen black
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-    (sdl:fill-surface sdl:*black* :template a-rect))
+  (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+    (cotd-render:fill-surface cotd-render:*black* :template a-rect))
  
   ;; displaying the type of game over
   (let ((str (create-string)) (color))
     (if (player-won win)
       (progn
         (format str "VICTORY! ")
-        (setf color sdl:*green*))
+        (setf color cotd-render:*green*))
       (progn
         (format str "DEFEAT! ")
-        (setf color sdl:*red*)))
+        (setf color cotd-render:*red*)))
     (when (player-died win)
       (format str "YOU DIED, AND "))
     (case (game-over-type win)
@@ -35,7 +35,7 @@
       (:game-over-ghost-won (setf str (format nil "YOU HAVE PUT YOURSELF TO REST"))))
     
     
-    (sdl:draw-string-solid-* str  (truncate *window-width* 2) 10 :justify :center :color color)
+    (cotd-render:draw-string-solid-* str  (truncate *window-width* 2) 10 :justify :center :color color)
     )
   
   ;; display scenario stats
@@ -43,25 +43,25 @@
          (max-lines)
          (prompt-str))
     
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* 1 (sdl:get-font-height))))
+    (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 30 :w *window-width* :h (* 1 (cotd-render:get-font-height))))
       (setf max-lines (write-text str a-rect :count-only t)))
     
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 30 :w *window-width* :h (* max-lines (sdl:get-font-height))))
+    (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 30 :w *window-width* :h (* max-lines (cotd-render:get-font-height))))
       (write-text str a-rect))
 
-    (show-message-box 6 (+ 40 (* max-lines (sdl:get-font-height))) *window-width* (- *window-height* 40 10 (sdl:char-height sdl:*default-font*) (* (1+ max-lines) (sdl:get-font-height))) (level/full-message-box (level *world*)))
+    (show-message-box 6 (+ 40 (* max-lines (cotd-render:get-font-height))) *window-width* (- *window-height* 40 10 (cotd-render:char-height cotd-render:*default-font*) (* (1+ max-lines) (cotd-render:get-font-height))) (level/full-message-box (level *world*)))
 
     
     (case (game-manager/game-state *game-manager*)
       (:game-state-campaign-scenario (setf prompt-str (format nil "[m] Return to Campaign Map  [Esc] High Scores")))
       (:game-state-custom-scenario (setf prompt-str (format nil "[m] Main menu  [Esc] High Scores"))))
-    (sdl:draw-string-solid-* prompt-str
-                             10 (- *window-height* 13 (sdl:char-height sdl:*default-font*))))
+    (cotd-render:draw-string-solid-* prompt-str
+                             10 (- *window-height* 13 (cotd-render:char-height cotd-render:*default-font*))))
   
-  (sdl:update-display))
+  (cotd-render:update-display))
 
 (defmethod run-window ((win final-stats-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
                      (declare (ignore mod unicode))

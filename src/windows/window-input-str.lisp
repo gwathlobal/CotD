@@ -19,37 +19,37 @@
     (setf (input win) (make-array (list (length (init-input win))) :element-type 'character :adjustable t :fill-pointer t :initial-contents (init-input win)))))
 
 (defmethod make-output ((win input-str-window))
-  (let* ((w (if (> (+ 10 (* (max (length (header-str win)) (length (format nil "~A: ~A" (main-str win) (input win))) (length (prompt-str win))) (sdl:char-width sdl:*default-font*)))
+  (let* ((w (if (> (+ 10 (* (max (length (header-str win)) (length (format nil "~A: ~A" (main-str win) (input win))) (length (prompt-str win))) (cotd-render:char-width cotd-render:*default-font*)))
                    (max-w win))
-              (+ 10 (* (max (length (header-str win)) (length (format nil "~A: ~A" (main-str win) (input win))) (length (prompt-str win))) (sdl:char-width sdl:*default-font*)))
+              (+ 10 (* (max (length (header-str win)) (length (format nil "~A: ~A" (main-str win) (input win))) (length (prompt-str win))) (cotd-render:char-width cotd-render:*default-font*)))
               (max-w win)))
-         (h (+ 11 (* (sdl:char-height sdl:*default-font*) 3)))
+         (h (+ 11 (* (cotd-render:char-height cotd-render:*default-font*) 3)))
          (x (- (truncate *window-width* 2) (truncate w 2)))
          (y (- (truncate *window-height* 2) (truncate h 2))))
 
     (setf (max-w win) w)
          
     ;; drawing a large rectangle in white
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
-      (sdl:fill-surface sdl:*white* :template a-rect))
+    (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x x :y y :w w :h h))
+      (cotd-render:fill-surface cotd-render:*white* :template a-rect))
     ;; drawing a smaller rectanagle in black to make a 1 pixel width border
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x (1+ x) :y (1+ y) :w (- w 2) :h (- h 2)))
-      (sdl:fill-surface sdl:*black* :template a-rect))
+    (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x (1+ x) :y (1+ y) :w (- w 2) :h (- h 2)))
+      (cotd-render:fill-surface cotd-render:*black* :template a-rect))
     ;; drawing a line to separate the header and main string
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y (+ y 3 (* (sdl:char-height sdl:*default-font*) 1)) :w w :h 1))
-      (sdl:fill-surface sdl:*white* :template a-rect))
+    (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x x :y (+ y 3 (* (cotd-render:char-height cotd-render:*default-font*) 1)) :w w :h 1))
+      (cotd-render:fill-surface cotd-render:*white* :template a-rect))
     ;; drawing a line to separate the prompt and main string
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y (+ y 6 (* (sdl:char-height sdl:*default-font*) 2)) :w w :h 1))
-      (sdl:fill-surface sdl:*white* :template a-rect))
+    (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x x :y (+ y 6 (* (cotd-render:char-height cotd-render:*default-font*) 2)) :w w :h 1))
+      (cotd-render:fill-surface cotd-render:*white* :template a-rect))
 
-    (sdl:draw-string-solid-* (header-str win) (+ x 5) (+ y 1) :color sdl:*white*)
-    (sdl:draw-string-solid-* (format nil "~A: ~A" (main-str win) (input win)) (+ x 5) (+ y 4 (* (sdl:char-height sdl:*default-font*) 1)) :color sdl:*white*)
-    (sdl:draw-string-solid-* (prompt-str win) (+ x 5) (+ y 8 (* (sdl:char-height sdl:*default-font*) 2)) :color sdl:*white*)
+    (cotd-render:draw-string-solid-* (header-str win) (+ x 5) (+ y 1) :color cotd-render:*white*)
+    (cotd-render:draw-string-solid-* (format nil "~A: ~A" (main-str win) (input win)) (+ x 5) (+ y 4 (* (cotd-render:char-height cotd-render:*default-font*) 1)) :color cotd-render:*white*)
+    (cotd-render:draw-string-solid-* (prompt-str win) (+ x 5) (+ y 8 (* (cotd-render:char-height cotd-render:*default-font*) 2)) :color cotd-render:*white*)
 
-    (sdl:update-display)))
+    (cotd-render:update-display)))
 
 (defmethod run-window ((win input-str-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
 

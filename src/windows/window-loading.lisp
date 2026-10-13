@@ -7,8 +7,8 @@
 
 (defmethod make-output ((win loading-window))
   ;; fill the screen black
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-    (sdl:fill-surface sdl:*black* :template a-rect))
+  (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+    (cotd-render:fill-surface cotd-render:*black* :template a-rect))
  
   ;; invoke the function to update the window
   (funcall (update-func win) win)
@@ -19,15 +19,15 @@
            (x x-margin)
            (w (- *window-width* (* x-margin 2)))
            (y-margin 30))
-      (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w w :h (* 1 (sdl:get-font-height))))
+      (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w w :h (* 1 (cotd-render:get-font-height))))
         (setf max-lines (write-text (loading-window/hint-text win) a-rect :count-only t)))
-      (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y (- *window-height* y-margin (* max-lines (sdl:get-font-height))) :w w :h (* max-lines (sdl:get-font-height))))
+      (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x x :y (- *window-height* y-margin (* max-lines (cotd-render:get-font-height))) :w w :h (* max-lines (cotd-render:get-font-height))))
         (write-text (loading-window/hint-text win) a-rect))))
   
-  (sdl:update-display))
+  (cotd-render:update-display))
 
 (defmethod run-window ((win loading-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:video-expose-event () (make-output *current-window*)))
   )

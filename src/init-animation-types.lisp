@@ -42,8 +42,8 @@
                                                                        (multiple-value-bind (sx sy) (calculate-start-coord (x *player*) (y *player*) (memo (level *world*)) *max-x-view* *max-y-view*)
                                                                          (when (and (check-tile-on-map dx dy dz sx sy *max-x-view* *max-y-view* (view-z *player*))
                                                                                     (get-single-memo-visibility (get-memo-* (level *world*) dx dy dz)))
-                                                                           (display-animation-on-map dx dy dz 5 sdl:*red* sdl:*black*)
-                                                                           (sdl:update-display)
+                                                                           (display-animation-on-map dx dy dz 5 cotd-render:*red* cotd-render:*black*)
+                                                                           (cotd-render:update-display)
                                                                            (sdl-cffi::sdl-delay 100))
                                                                        
                                                                        ;; place a blood stain along the path of the head

@@ -266,9 +266,9 @@
   (setf (name *player*) "Player")
 
   (add-message (format nil "This is a "))
-  (add-message (format nil "~(~A~)" (name mission)) sdl:*yellow*)
+  (add-message (format nil "~(~A~)" (name mission)) cotd-render:*yellow*)
   (add-message (format nil " in "))
-  (add-message (format nil "~(~A~)" (name (get-world-sector-type-by-id (wtype world-sector)))) sdl:*yellow*)
+  (add-message (format nil "~(~A~)" (name (get-world-sector-type-by-id (wtype world-sector)))) cotd-render:*yellow*)
   (add-message (format nil "!~%~%To view help, press '?'.~%To view your current objective, press 'j'.~%"))
 
   (when (player-outside-level *player*)
@@ -312,12 +312,12 @@
     ;; set parameters depending on options
     ;; the video subsystem must be initialized before any SDL surface
     ;; (e.g. the font strip below) can be created
-    (sdl:init-video)
+    (cotd-render:init-video)
     (init-glyph-front)
     ;; font
     (cond
-      ((equal (options-font *options*) 'font-6x13) (sdl:initialise-default-font sdl:*font-6x13*))
-      (t (sdl:initialise-default-font sdl:*font-8x13*)))
+      ((equal (options-font *options*) 'font-6x13) (cotd-render:initialise-default-font cotd-render:*font-6x13*))
+      (t (cotd-render:initialise-default-font cotd-render:*font-8x13*)))
     ;; name
     (cond
       ((options-player-name *options*) nil)
@@ -328,30 +328,30 @@
     (load-highscores-from-disk)
     (truncate-highscores *highscores*)
         
-    (setf *msg-box-window-height* (* (sdl:get-font-height) 8))
+    (setf *msg-box-window-height* (* (cotd-render:get-font-height) 8))
     (setf *random-state* (make-random-state t))
     
     (setf *window-width* (+ 540 (+ 30 (* *glyph-w* *max-x-view*))) 
-          *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height* (* 3 (sdl:char-height sdl:*default-font*))))
+          *window-height* (+ 30 (* *glyph-h* *max-y-view*) *msg-box-window-height* (* 3 (cotd-render:char-height cotd-render:*default-font*))))
     
     (when (<= *window-height* 384)
-      (incf *window-height* (+ (* 6 (sdl:char-height sdl:*default-font*)) 0)))
+      (incf *window-height* (+ (* 6 (cotd-render:char-height cotd-render:*default-font*)) 0)))
     
-    (sdl:window *window-width* *window-height*
+    (cotd-render:window *window-width* *window-height*
                 :title-caption "The City of the Damned"
                 :icon-caption "The City of the Damned")
-    (sdl:enable-key-repeat nil nil)
-    (sdl:enable-unicode)
+    (cotd-render:enable-key-repeat nil nil)
+    (cotd-render:enable-unicode)
 
-    (setf *start-logo* (sdl:load-image (sdl:create-path "data/logo.bmp" *asset-dir*)))
+    (setf *start-logo* (cotd-render:load-image (cotd-render:create-path "data/logo.bmp" *asset-dir*)))
 
     (setf *previous-scenario* nil)
     (setf *game-manager* (make-instance 'game-manager))
     (game-state-start->init))
 
 (defun enter-player-name ()
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-    (sdl:fill-surface sdl:*black* :template a-rect))
+  (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+    (cotd-render:fill-surface cotd-render:*black* :template a-rect))
   
   ;; let player enter his\her name
   (setf *current-window* (make-instance 'input-str-window 
@@ -385,10 +385,10 @@
                                                            (let ((str (format nil "~A... ~3D%"
                                                                               (cur-str win)
                                                                               (truncate (* 100 *cur-progress-bar*) *max-progress-bar*))))
-                                                             (sdl:draw-string-solid-*  str
-                                                                                       (truncate (- (/ *window-width* 2) (/ (* (length str) (sdl:char-width sdl:*default-font*)) 2)))
-                                                                                       (truncate (- (/ *window-height* 2) (/ (sdl:char-height sdl:*default-font*) 2)))
-                                                                                       :color sdl:*white*))
+                                                             (cotd-render:draw-string-solid-*  str
+                                                                                       (truncate (- (/ *window-width* 2) (/ (* (length str) (cotd-render:char-width cotd-render:*default-font*)) 2)))
+                                                                                       (truncate (- (/ *window-height* 2) (/ (cotd-render:char-height cotd-render:*default-font*) 2)))
+                                                                                       :color cotd-render:*white*))
                                                            ))))
   (init-game mission world-sector)
 
@@ -475,7 +475,7 @@
         (setf (world-game-time *world*) (set-current-date-time year month (1+ day) hour min sec)))
       
       ;; add date to the top
-      (add-message (format nil " === ~A ===~%~%" (show-date-time-ymd (world-game-time *world*))) sdl:*white* `(,(world/mission-message-box *world*)))
+      (add-message (format nil " === ~A ===~%~%" (show-date-time-ymd (world-game-time *world*))) cotd-render:*white* `(,(world/mission-message-box *world*)))
       
       ;; process missions 
       (loop with mission-result = nil
@@ -498,29 +498,29 @@
                
                (case (getf mission-result :mission-result)
                  (:game-over-angels-won (progn
-                                          (add-message (format nil " - The angels were victorious during a ") sdl:*white* `(,(world/mission-message-box *world*)))))
+                                          (add-message (format nil " - The angels were victorious during a ") cotd-render:*white* `(,(world/mission-message-box *world*)))))
                  (:game-over-church-won (progn
-                                          (add-message (format nil " - The priests were victorious during a ") sdl:*white* `(,(world/mission-message-box *world*)))))
+                                          (add-message (format nil " - The priests were victorious during a ") cotd-render:*white* `(,(world/mission-message-box *world*)))))
                  (:game-over-military-won (progn
-                                            (add-message (format nil " - The military were victorious during a ") sdl:*white* `(,(world/mission-message-box *world*)))))
+                                            (add-message (format nil " - The military were victorious during a ") cotd-render:*white* `(,(world/mission-message-box *world*)))))
                  (:game-over-demons-won (progn
-                                          (add-message (format nil " - The demons were victorious during a ") sdl:*white* `(,(world/mission-message-box *world*)))))
+                                          (add-message (format nil " - The demons were victorious during a ") cotd-render:*white* `(,(world/mission-message-box *world*)))))
                  (:game-over-satanists-won (progn
-                                             (add-message (format nil " - The satanists were victorious during a ") sdl:*white* `(,(world/mission-message-box *world*)))))
+                                             (add-message (format nil " - The satanists were victorious during a ") cotd-render:*white* `(,(world/mission-message-box *world*)))))
                  (:game-over-eater-won (progn
-                                         (add-message (format nil " - The primordials were victorious during a ") sdl:*white* `(,(world/mission-message-box *world*))))))
+                                         (add-message (format nil " - The primordials were victorious during a ") cotd-render:*white* `(,(world/mission-message-box *world*))))))
                
-               (add-message (format nil "~(~A~)" (name mission)) sdl:*yellow* `(,(world/mission-message-box *world*)))
-               (add-message (format nil " in ") sdl:*white* `(,(world/mission-message-box *world*)))
-               (add-message (format nil "~(~A~)" (name world-sector)) sdl:*yellow* `(,(world/mission-message-box *world*)))
-               (add-message (format nil ".") sdl:*white* `(,(world/mission-message-box *world*)))
+               (add-message (format nil "~(~A~)" (name mission)) cotd-render:*yellow* `(,(world/mission-message-box *world*)))
+               (add-message (format nil " in ") cotd-render:*white* `(,(world/mission-message-box *world*)))
+               (add-message (format nil "~(~A~)" (name world-sector)) cotd-render:*yellow* `(,(world/mission-message-box *world*)))
+               (add-message (format nil ".") cotd-render:*white* `(,(world/mission-message-box *world*)))
                
                (loop with campaign-mission-result = (find (getf mission-result :mission-result) (mission-type/campaign-result (get-mission-type-by-id (mission-type-id mission)))
                                                           :key #'(lambda (a) (first a)))
                      for transform-sector-func in (second campaign-mission-result) do
                        (funcall transform-sector-func world-map (x mission) (y mission)))
 
-               (add-message (format nil "~%") sdl:*white* `(,(world/mission-message-box *world*)))
+               (add-message (format nil "~%") cotd-render:*white* `(,(world/mission-message-box *world*)))
                
                ;; sum all flesh points
                (unless (getf (world/post-mission-results *world*) :flesh-points)
@@ -546,11 +546,11 @@
 
       (when (or (colored-txt-list (message-box-strings (world/event-message-box *world*)))
                 (colored-txt-list (message-box-strings (world/effect-message-box *world*))))
-        (add-message (format nil "~%") sdl:*white* `(,(world/mission-message-box *world*))))
+        (add-message (format nil "~%") cotd-render:*white* `(,(world/mission-message-box *world*))))
 
       (when (and (colored-txt-list (message-box-strings (world/event-message-box *world*)))
                  (colored-txt-list (message-box-strings (world/effect-message-box *world*))))
-        (add-message (format nil "~%") sdl:*white* `(,(world/event-message-box *world*))))
+        (add-message (format nil "~%") cotd-render:*white* `(,(world/event-message-box *world*))))
       
       ;; reset all missions and regenerate them
       (reset-all-missions-on-world-map *world*)
@@ -591,7 +591,7 @@
   (setup-log)
   (log:info "Start program")
 
-  (sdl:with-init ()
+  (cotd-render:with-init ()
     (handle-errors-to-ui
       (cotd-init)
       (tagbody
@@ -660,7 +660,7 @@ this falls back to the dev default rather than guessing."
   (setf *cotd-logging* :log-option-none)
   (setf *cotd-log-level* :error)
 
-  (sdl:with-init ()  
+  (cotd-render:with-init ()  
     (cotd-main))
   (ext:quit))
 
@@ -684,7 +684,7 @@ this falls back to the dev default rather than guessing."
   (setf *cotd-logging* :log-option-file)
   (setf *cotd-log-level* :error)
   
-  (sdl:with-init ()  
+  (cotd-render:with-init ()  
     (cotd-main))
   (sb-ext:exit))
 

@@ -7,7 +7,7 @@
 ;;   2 - removed the world's cur-mob-path / path-lock / path-cv slots with the
 ;;       speculative pathing thread
 ;;   3 - glyph-color/back-color slots and the memo array's colour fields are
-;;       now packed-color integers instead of sdl:color objects
+;;       now packed-color integers instead of cotd-render:color objects
 (defparameter *save-version* 3)
 
 (defenum:defenum save-game-type-enum (:save-game-campaign

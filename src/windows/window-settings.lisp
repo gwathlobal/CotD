@@ -75,10 +75,10 @@
 
 (defmethod make-output ((win settings-window))
   ;; fill the screen black
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-    (sdl:fill-surface sdl:*black* :template a-rect))
+  (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+    (cotd-render:fill-surface cotd-render:*black* :template a-rect))
 
-  (sdl:draw-string-solid-* "SETTINGS" (truncate *window-width* 2) 10 :justify :center :color sdl:*white*)
+  (cotd-render:draw-string-solid-* "SETTINGS" (truncate *window-width* 2) 10 :justify :center :color cotd-render:*white*)
 
   (let ((cur-str (cur-sel win))
         (color-list nil)
@@ -87,17 +87,17 @@
     
     (dotimes (i (length (options-list win)))
       (if (= i cur-str) 
-        (setf color-list (append color-list (list sdl:*yellow*)))
-        (setf color-list (append color-list (list sdl:*white*)))))
+        (setf color-list (append color-list (list cotd-render:*yellow*)))
+        (setf color-list (append color-list (list cotd-render:*white*)))))
     (draw-selection-list options-list cur-str (length options-list) 20 (+ 10 20) :color-list color-list :use-letters t))
     
-  (sdl:draw-string-solid-* (format nil "[Enter] Change  [Esc] Quit")
-                           10 (- *window-height* 13 (sdl:char-height sdl:*default-font*)))
+  (cotd-render:draw-string-solid-* (format nil "[Enter] Change  [Esc] Quit")
+                           10 (- *window-height* 13 (cotd-render:char-height cotd-render:*default-font*)))
   
-  (sdl:update-display))
+  (cotd-render:update-display))
 
 (defmethod run-window ((win settings-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
                      

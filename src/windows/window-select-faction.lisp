@@ -6,20 +6,20 @@
 
    (cur-sel :initform 0 :accessor select-faction-window/cur-sel)
       
-   (max-menu-length :initform (truncate (- (/ *window-height* 2) 60) (sdl:char-height sdl:*default-font*)) :initarg :max-menu-length :accessor select-faction-window/max-menu-length)
+   (max-menu-length :initform (truncate (- (/ *window-height* 2) 60) (cotd-render:char-height cotd-render:*default-font*)) :initarg :max-menu-length :accessor select-faction-window/max-menu-length)
    (window-title :initform "QUICK SCENARIO" :initarg :window-title :accessor select-faction-window/window-title)
    (window-subtitle :initform "Choose your faction & character:" :initarg :window-subtitle :accessor select-faction-window/window-subtitle)
    ))
 
 (defmethod make-output ((win select-faction-window))
   (with-slots (window-title window-subtitle cur-sel menu-descrs menu-items max-menu-length) win
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-      (sdl:fill-surface sdl:*black* :template a-rect))
+    (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+      (cotd-render:fill-surface cotd-render:*black* :template a-rect))
     
-    (sdl:draw-string-solid-* window-title (truncate *window-width* 2) 0 :justify :center :color sdl:*white*)
+    (cotd-render:draw-string-solid-* window-title (truncate *window-width* 2) 0 :justify :center :color cotd-render:*white*)
     
-    (sdl:draw-string-solid-* window-subtitle
-                             10 (+ 10 (sdl:char-height sdl:*default-font*)))
+    (cotd-render:draw-string-solid-* window-subtitle
+                             10 (+ 10 (cotd-render:char-height cotd-render:*default-font*)))
     
     ;; drawing selection list
     (let ((color-list nil))
@@ -31,25 +31,25 @@
         ;;(setf lst (append lst (list (aref (line-array win) i))))
         
         (if (= i cur-sel) 
-          (setf color-list (append color-list (list sdl:*yellow*)))
-          (setf color-list (append color-list (list sdl:*white*)))))
-      (draw-selection-list menu-items cur-sel max-menu-length 20 (+ 30 (sdl:char-height sdl:*default-font*)) :color-list color-list :use-letters t))
+          (setf color-list (append color-list (list cotd-render:*yellow*)))
+          (setf color-list (append color-list (list cotd-render:*white*)))))
+      (draw-selection-list menu-items cur-sel max-menu-length 20 (+ 30 (cotd-render:char-height cotd-render:*default-font*)) :color-list color-list :use-letters t))
     
     ;; drawing selection description
     (let ((descr (nth cur-sel menu-descrs)))
-      (sdl:with-rectangle (rect (sdl:rectangle :x 20 :y (+ (truncate *window-height* 2) 0)
+      (cotd-render:with-rectangle (rect (cotd-render:rectangle :x 20 :y (+ (truncate *window-height* 2) 0)
                                                :w (- *window-width* 40)
-                                               :h (- (truncate *window-height* 2) 20 0 (sdl:char-height sdl:*default-font*))))
+                                               :h (- (truncate *window-height* 2) 20 0 (cotd-render:char-height cotd-render:*default-font*))))
         (write-text descr rect :start-line 0)))
     
-    (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Exit")
-                             10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
+    (cotd-render:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Exit")
+                             10 (- *window-height* 10 (cotd-render:char-height cotd-render:*default-font*)))
     
-    (sdl:update-display)))
+    (cotd-render:update-display)))
 
 (defmethod run-window ((win select-faction-window))
   (with-slots (quit-func return-to cur-sel menu-items max-menu-length) win
-    (sdl:with-events ()
+    (cotd-render:with-events ()
       (:quit-event () (funcall quit-func) t)
       (:key-down-event (:key key :mod mod :unicode unicode)
                        

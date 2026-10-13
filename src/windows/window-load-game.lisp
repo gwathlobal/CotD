@@ -50,32 +50,32 @@
 (defmethod make-output ((win load-game-window))
   (with-slots (title-string display-str-list cur-sel) win
     ;; fill the screen black
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-      (sdl:fill-surface sdl:*black* :template a-rect))
+    (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+      (cotd-render:fill-surface cotd-render:*black* :template a-rect))
     
-    (sdl:draw-string-solid-* title-string (truncate *window-width* 2) 10 :justify :center :color sdl:*white*)
+    (cotd-render:draw-string-solid-* title-string (truncate *window-width* 2) 10 :justify :center :color cotd-render:*white*)
     
     (let ((color-list nil))
       (dotimes (i (length display-str-list))
         (if (= i cur-sel) 
-          (setf color-list (append color-list (list sdl:*yellow*)))
-          (setf color-list (append color-list (list sdl:*white*)))))
-      (draw-multiline-selection-list display-str-list cur-sel 20 (+ 10 10 (sdl:char-height sdl:*default-font*)) (- *window-width* 10) (- *window-height* (+ 10 (sdl:char-height sdl:*default-font*)) (sdl:char-height sdl:*default-font*) 20)
+          (setf color-list (append color-list (list cotd-render:*yellow*)))
+          (setf color-list (append color-list (list cotd-render:*white*)))))
+      (draw-multiline-selection-list display-str-list cur-sel 20 (+ 10 10 (cotd-render:char-height cotd-render:*default-font*)) (- *window-width* 10) (- *window-height* (+ 10 (cotd-render:char-height cotd-render:*default-font*)) (cotd-render:char-height cotd-render:*default-font*) 20)
                                      color-list)
-      ;;(draw-selection-list (menu-items win) cur-sel (length (menu-items win)) 20 (+ 10 30 20 (sdl:char-height sdl:*default-font*) (sdl:char-height sdl:*default-font*)) :color-list color-list :use-letters t)
+      ;;(draw-selection-list (menu-items win) cur-sel (length (menu-items win)) 20 (+ 10 30 20 (cotd-render:char-height cotd-render:*default-font*) (cotd-render:char-height cotd-render:*default-font*)) :color-list color-list :use-letters t)
       )
 
-    (sdl:draw-string-solid-* (format nil "~A[Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Quit"
+    (cotd-render:draw-string-solid-* (format nil "~A[Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Quit"
                                      (if display-str-list
                                        "[Enter] Load game  [d] Delete game  "
                                        ""))
-                             10 (- *window-height* 13 (sdl:char-height sdl:*default-font*)))
+                             10 (- *window-height* 13 (cotd-render:char-height cotd-render:*default-font*)))
     
-    (sdl:update-display)))
+    (cotd-render:update-display)))
 
 (defmethod run-window ((win load-game-window))
   (with-slots (display-str-list game-pathname-list descr-pathname-list cur-sel game-slot-list) win
-    (sdl:with-events ()
+    (cotd-render:with-events ()
       (:quit-event () (funcall (quit-func win)) t)
       (:key-down-event (:key key :mod mod :unicode unicode)
 

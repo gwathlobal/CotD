@@ -75,7 +75,7 @@
     (setf *current-window* (make-instance 'cell-window))
     (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
     (make-output *current-window*)
-    (sdl:with-events ()
+    (cotd-render:with-events ()
       (:quit-event () (funcall (quit-func *current-window*)) t)
       (:key-down-event () 
                        (setf *current-window* (make-instance 'final-stats-window :game-over-type tmp-game-over-type :highscores-place highscores-place
@@ -321,7 +321,7 @@
                                                                        (when (not (get-mob-* (level world) (x item) (y item) (z item)))
                                                                          (print-visible-message (x item) (y item) (z item) (level *world*) (format nil "An evil spirit has entered ~A. "
                                                                                                                                                    (prepend-article +article-the+ (visible-name item)))
-                                                                                                :color sdl:*white*
+                                                                                                :color cotd-render:*white*
                                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                               :singlemind)))
                                                                          (invoke-reanimate-body item)
@@ -353,7 +353,7 @@
                                                                                              (if (zerop (random 2))
                                                                                                (format nil "Malseraph giggles and grants its blessing. ")
                                                                                                (format nil "Malseraph cackles and grants its blessing. "))
-                                                                                             :color sdl:*magenta*
+                                                                                             :color cotd-render:*magenta*
                                                                                              :tags (list (when (and (find (id mob) (shared-visible-mobs *player*))
                                                                                                                     (not (find (id mob) (proper-visible-mobs *player*))))
                                                                                                            :singlemind)))
@@ -363,7 +363,7 @@
                                                                         (incf (cur-fp mob) pwr)
                                                                         (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                                (format nil "~A gains ~A unholy power.~%" (capitalize-name (prepend-article +article-the+ (visible-name mob))) pwr)
-                                                                                               :color sdl:*white*
+                                                                                               :color cotd-render:*white*
                                                                                                :tags (list (when (and (find (id mob) (shared-visible-mobs *player*))
                                                                                                                       (not (find (id mob) (proper-visible-mobs *player*))))
                                                                                                              :singlemind)))))))))

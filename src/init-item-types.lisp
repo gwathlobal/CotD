@@ -43,7 +43,7 @@
                                                        
                                                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                               (format nil "~A uses a medkit to heal itself for ~A. " (capitalize-name (visible-name actor)) heal-pwr)
-                                                                              :color sdl:*white*
+                                                                              :color cotd-render:*white*
                                                                               :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                             :singlemind))))
                                                      ;; remove after use
@@ -103,7 +103,7 @@
                                                          
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A uses a smoke bomb. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))))
                                                      ;; remove after use
@@ -181,7 +181,7 @@
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A draws the ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                         (name (get-card-type-by-id card-type-id)))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))
                                                          (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) actor))
@@ -224,7 +224,7 @@
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A draws the ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                         (name (get-card-type-by-id card-type-id)))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))
                                                          (funcall (on-use (get-card-type-by-id card-type-id)) (get-card-type-by-id card-type-id) actor)))
@@ -263,7 +263,7 @@
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                             (format nil "~A throws a parasite onto ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                     (prepend-article +article-the+ (visible-name target)))
-                                                                            :color sdl:*white*
+                                                                            :color cotd-render:*white*
                                                                             :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                           :singlemind)))
                                                      (set-mob-effect target :effect-type-id +mob-effect-parasite+ :actor-id (id actor) :cd 99)
@@ -380,7 +380,7 @@
                                                        
                                                        (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                               (format nil "~A uses a flare. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                              :color sdl:*white*
+                                                                              :color cotd-render:*white*
                                                                               :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                             :singlemind))))
                                                      
@@ -456,7 +456,7 @@
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                             (format nil "~A spawns a scarab and sets it on ~A. " (capitalize-name (prepend-article +article-the+ (visible-name actor)))
                                                                                     (prepend-article +article-the+ (visible-name target)))
-                                                                            :color sdl:*white*
+                                                                            :color cotd-render:*white*
                                                                             :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                           :singlemind)))
                                                      (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
@@ -537,7 +537,7 @@
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                             (format nil "One of the orifices of ~A spawns a small, but repulsive creature. " (prepend-article +article-the+ (visible-name actor)))
                                                                             :observed-mob actor
-                                                                            :color sdl:*white*
+                                                                            :color cotd-render:*white*
                                                                             :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                           :singlemind)))
                                                      (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
@@ -612,7 +612,7 @@
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                             (format nil "One of the orifices of ~A spawns a small harmless creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
                                                                             :observed-mob actor
-                                                                            :color sdl:*white*
+                                                                            :color cotd-render:*white*
                                                                             :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                           :singlemind)))
                                                      (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
@@ -680,7 +680,7 @@
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                             (format nil "One of the orifices of ~A spawns a huge hideous creature. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
                                                                             :observed-mob actor
-                                                                            :color sdl:*white*
+                                                                            :color cotd-render:*white*
                                                                             :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                           :singlemind)))
                                                      (generate-sound actor (x actor) (y actor) (z actor) 60 #'(lambda (str)
@@ -849,7 +849,7 @@
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*)
                                                                             (format nil "~A plants a bomb. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
                                                                             :observed-mob actor
-                                                                            :color sdl:*white*
+                                                                            :color cotd-render:*white*
                                                                             :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                           :singlemind)))
                                                      (generate-sound actor (x actor) (y actor) (z actor) 20 #'(lambda (str)

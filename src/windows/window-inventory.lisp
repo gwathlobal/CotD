@@ -12,18 +12,18 @@
   (fill-background-tiles)
 
   ;; a pane for inventory
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 10 :y 10 :w 305 :h 435))
-    (sdl:fill-surface sdl:*black* :template a-rect))
+  (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 10 :y 10 :w 305 :h 435))
+    (cotd-render:fill-surface cotd-render:*black* :template a-rect))
   ;; a pane for item description
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 325 :y 10 :w 305 :h (- *window-height* 20)))
-    (sdl:fill-surface sdl:*black* :template a-rect))
+  (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 325 :y 10 :w 305 :h (- *window-height* 20)))
+    (cotd-render:fill-surface cotd-render:*black* :template a-rect))
   ;; a pane for player chars
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 325 :y 245 :w 305 :h 200))
-    (sdl:fill-surface sdl:*black* :template a-rect))
+  (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 325 :y 245 :w 305 :h 200))
+    (cotd-render:fill-surface cotd-render:*black* :template a-rect))
   ;; a pane for displaying commands
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 10 :y (- *window-height* (* 2 (sdl:char-height sdl:*default-font*))) :w 620 :h 13))
-    (sdl:fill-surface sdl:*black* :template a-rect)
-    (sdl:draw-string-solid-* (format nil "~A~A~A[Esc] Exit"
+  (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 10 :y (- *window-height* (* 2 (cotd-render:char-height cotd-render:*default-font*))) :w 620 :h 13))
+    (cotd-render:fill-surface cotd-render:*black* :template a-rect)
+    (cotd-render:draw-string-solid-* (format nil "~A~A~A[Esc] Exit"
                                      (if (> (length (inv *player*)) 0)
                                        "[d] Drop all  "
                                        "")
@@ -37,7 +37,7 @@
                                               (funcall (on-check-applic (get-inv-item-by-pos (inv *player*) (cur-inv win))) *player* (get-inv-item-by-pos (inv *player*) (cur-inv win))))
                                        "[u] Use  "
                                        ""))
-                             10 (sdl:y a-rect) :color sdl:*white*))
+                             10 (cotd-render:y a-rect) :color cotd-render:*white*))
 
   ;; drawing the inventory list
   (let ((cur-str) (lst (make-list 0)) (color-list (make-list 0)))
@@ -48,8 +48,8 @@
           do
              (push (capitalize-name (prepend-article +article-a+ (visible-name item))) lst)
              (push (if (= i cur-str)
-                     sdl:*yellow*
-                     sdl:*white*)
+                     cotd-render:*yellow*
+                     cotd-render:*white*)
                    color-list))
     (setf lst (reverse lst) color-list (reverse color-list))
     
@@ -59,21 +59,21 @@
   (when (> (length (inv *player*)) 0)
     (let ((item (get-inv-item-by-pos (inv *player*) (cur-inv win)))
           (lines-count 0))
-      (setf lines-count (write-text (get-item-descr item) (sdl:rectangle :x 330 :y 15 :w (- *window-width* 330 20) :h (- *window-height* 50))))
+      (setf lines-count (write-text (get-item-descr item) (cotd-render:rectangle :x 330 :y 15 :w (- *window-width* 330 20) :h (- *window-height* 50))))
       (when (flavor-quote item)
         (cond
-          ((equal (options-font *options*) 'font-8x13) (sdl:initialise-default-font sdl:*font-8x13o*))
-          (t (sdl:initialise-default-font sdl:*font-6x13o*)))
-        (write-text (flavor-quote item) (sdl:rectangle :x 330 :y (+ 15 (* lines-count (sdl:char-height sdl:*default-font*))) :w (- *window-width* 330 20) :h (- *window-height* 50)))
+          ((equal (options-font *options*) 'font-8x13) (cotd-render:initialise-default-font cotd-render:*font-8x13o*))
+          (t (cotd-render:initialise-default-font cotd-render:*font-6x13o*)))
+        (write-text (flavor-quote item) (cotd-render:rectangle :x 330 :y (+ 15 (* lines-count (cotd-render:char-height cotd-render:*default-font*))) :w (- *window-width* 330 20) :h (- *window-height* 50)))
         (cond
-          ((equal (options-font *options*) 'font-8x13) (sdl:initialise-default-font sdl:*font-8x13*))
-          (t (sdl:initialise-default-font sdl:*font-6x13*))))
+          ((equal (options-font *options*) 'font-8x13) (cotd-render:initialise-default-font cotd-render:*font-8x13*))
+          (t (cotd-render:initialise-default-font cotd-render:*font-6x13*))))
       ))
 
-  (sdl:update-display))
+  (cotd-render:update-display))
 
 (defmethod run-window ((win inventory-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
 

@@ -6,8 +6,8 @@
 
 (defmethod make-output ((win campaign-over-window))
   ;; fill the screen black
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-    (sdl:fill-surface sdl:*black* :template a-rect))
+  (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+    (cotd-render:fill-surface cotd-render:*black* :template a-rect))
 
   (with-slots (player-won campaign-over-type) win
     
@@ -20,10 +20,10 @@
       (if player-won
         (progn
           (format header-str "VICTORY! ")
-          (setf color sdl:*green*))
+          (setf color cotd-render:*green*))
         (progn
           (format header-str "DEFEAT! ")
-          (setf color sdl:*red*)))
+          (setf color cotd-render:*red*)))
       
       (case campaign-over-type
         (:campaign-over-demons-conquer (progn
@@ -43,24 +43,24 @@
 
 
       ;; display header
-      (sdl:draw-string-solid-* header-str (truncate *window-width* 2) 10 :justify :center :color color)
+      (cotd-render:draw-string-solid-* header-str (truncate *window-width* 2) 10 :justify :center :color color)
 
       ;; display ending text
-      (sdl:with-rectangle (a-rect (sdl:rectangle :x 30 :y 30 :w (- *window-width* 60) :h (* 1 (sdl:get-font-height))))
+      (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 30 :y 30 :w (- *window-width* 60) :h (* 1 (cotd-render:get-font-height))))
         (setf max-lines (write-text long-text a-rect :count-only t)))
       
-      (sdl:with-rectangle (a-rect (sdl:rectangle :x 30 :y 30 :w (- *window-width* 60) :h (* max-lines (sdl:get-font-height))))
+      (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 30 :y 30 :w (- *window-width* 60) :h (* max-lines (cotd-render:get-font-height))))
         (write-text long-text a-rect))
 
       ;; display prompt
-      (sdl:draw-string-solid-* prompt-str
-                               10 (- *window-height* 13 (sdl:char-height sdl:*default-font*)))
+      (cotd-render:draw-string-solid-* prompt-str
+                               10 (- *window-height* 13 (cotd-render:char-height cotd-render:*default-font*)))
       )
     )
-  (sdl:update-display))
+  (cotd-render:update-display))
 
 (defmethod run-window ((win campaign-over-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
                      (declare (ignore mod unicode))

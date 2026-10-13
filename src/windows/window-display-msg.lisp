@@ -18,12 +18,12 @@
       (unless w
         (setf w max-w))
       
-      (sdl:with-rectangle (rect (sdl:rectangle :x 0 :y 0 :w (- w margin margin) :h 30))
+      (cotd-render:with-rectangle (rect (cotd-render:rectangle :x 0 :y 0 :w (- w margin margin) :h 30))
         
         (setf max-str (write-text msg-line rect :count-only t))
         
-      ;(when (< max-str (+ cur-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*))))
-      ;  (setf cur-str (- max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))))
+      ;(when (< max-str (+ cur-str (truncate (cotd-render:height rect) (cotd-render:char-height cotd-render:*default-font*))))
+      ;  (setf cur-str (- max-str (truncate (cotd-render:height rect) (cotd-render:char-height cotd-render:*default-font*)))))
         
         (when (< cur-str 0)
           (setf cur-str 0))
@@ -31,12 +31,12 @@
         (when (= max-str 1)
           (setf w (loop with max = max-w
                         for str in (list msg-line prompt-line)
-                        for try-max = (+ 10 (* (sdl:char-width sdl:*default-font*) (length str)))
+                        for try-max = (+ 10 (* (cotd-render:char-width cotd-render:*default-font*) (length str)))
                         when (> try-max max) do
                           (setf max try-max)
                         finally (return-from nil max))))
         
-        (setf h-txt (* (sdl:char-height sdl:*default-font*) max-str))
+        (setf h-txt (* (cotd-render:char-height cotd-render:*default-font*) max-str))
         
         (unless x
           (setf x (- (truncate *window-width* 2) (truncate w 2) margin)))
@@ -48,7 +48,7 @@
 
 (defmethod make-output ((win display-msg-window))
   (with-slots (msg-line prompt-line x y w margin h-txt) win
-    (let* ((h-prompt (sdl:char-height sdl:*default-font*))
+    (let* ((h-prompt (cotd-render:char-height cotd-render:*default-font*))
            
            (x-txt-rect x)
            (y-txt-rect y)
@@ -68,29 +68,29 @@
            )
 
       ;; draw rectangle for text
-      (sdl:with-rectangle (rect (sdl:rectangle :x x-txt-rect :y y-txt-rect :w w-txt-rect :h h-txt-rect))
-        (sdl:fill-surface sdl:*black* :template rect)
-        (sdl:draw-rectangle rect :color sdl:*white*))
+      (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x-txt-rect :y y-txt-rect :w w-txt-rect :h h-txt-rect))
+        (cotd-render:fill-surface cotd-render:*black* :template rect)
+        (cotd-render:draw-rectangle rect :color cotd-render:*white*))
 
       ;; draw text
-      (sdl:with-rectangle (rect (sdl:rectangle :x x-txt-text :y y-txt-text :w w-txt-text :h h-txt-text))
+      (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x-txt-text :y y-txt-text :w w-txt-text :h h-txt-text))
         (write-text msg-line rect :start-line (display-msg-window/cur-str win)))
 
       ;; draw rectangle for prompt
-      (sdl:with-rectangle (rect (sdl:rectangle :x x-txt-rect :y y-prompt-rect :w w-txt-rect :h h-prompt-rect))
-        (sdl:fill-surface sdl:*black* :template rect)
-        (sdl:draw-rectangle rect :color sdl:*white*))
+      (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x-txt-rect :y y-prompt-rect :w w-txt-rect :h h-prompt-rect))
+        (cotd-render:fill-surface cotd-render:*black* :template rect)
+        (cotd-render:draw-rectangle rect :color cotd-render:*white*))
 
        ;; draw prompt
-      (sdl:with-rectangle (rect (sdl:rectangle :x x-txt-text :y y-prompt-text :w w-txt-text :h h-prompt-text))
+      (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x-txt-text :y y-prompt-text :w w-txt-text :h h-prompt-text))
         (write-text prompt-line rect :start-line 0))
       
       ))
     
-    (sdl:update-display))
+    (cotd-render:update-display))
 
 (defmethod run-window ((win display-msg-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
                      (declare (ignore mod unicode))

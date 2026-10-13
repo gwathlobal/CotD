@@ -445,11 +445,11 @@ independent of RUN-HEADLESS-TURNS/TURN-CHECKSUM which only checks gameplay
 state. Does its own one-time SDL setup (see the comment above this section);
 callers do not need SDL:WITH-INIT around this."
   (sb-posix:setenv "SDL_VIDEODRIVER" "dummy" 1)
-  (sdl:with-init ()
-    (sdl:window 1 1)
+  (cotd-render:with-init ()
+    (cotd-render:window 1 1)
     (init-glyph-front)
     (let* ((level (generate-headless-level specific-faction-type :seed seed))
-           (surface (sdl:create-surface (* *glyph-w* *max-x-view*) (* *glyph-h* *max-y-view*))))
+           (surface (cotd-render:create-surface (* *glyph-w* *max-x-view*) (* *glyph-h* *max-y-view*))))
       (declare (ignorable level))
       ;; A freshly generated level's MEMO is all default/unrevealed cells
       ;; (see GENERATE-LEVEL.LISP), which real gameplay never renders: the
@@ -459,15 +459,15 @@ callers do not need SDL:WITH-INIT around this."
       ;; would actually show, not an unreachable pre-FOV state.
       (update-visible-mobs *player*)
       (update-visible-area level (x *player*) (y *player*) (z *player*))
-      (let ((sdl:*default-surface* surface))
+      (let ((cotd-render:*default-surface* surface))
         (update-map-area 0 0))
       ;; SDL:WITH-PIXEL is LISPBUILDER-SDL-BASE::WITH-PIXEL re-exported, and
       ;; the base package's WITH-LOCKED-SURFACE underneath it wants the raw
       ;; CFFI pointer, not the high-level SDL:SURFACE wrapper - hence (FP ...).
       (sdl:with-pixel (pix (sdl:fp surface))
         (loop with sum of-type (unsigned-byte 32) = 0
-              for y from 0 below (sdl:height surface)
-              do (loop for x from 0 below (sdl:width surface)
+              for y from 0 below (cotd-render:height surface)
+              do (loop for x from 0 below (cotd-render:width surface)
                        do (setf sum (logand #xFFFFFFFF (+ (* sum 31) (sdl:read-pixel pix x y)))))
               finally (return sum))))))
 
@@ -505,7 +505,7 @@ caught the startup-ordering bug described above."
   (sb-posix:setenv "SDL_VIDEODRIVER" "dummy" 1)
   (ensure-directories-exist *headless-startup-user-dir*)
   (let ((*user-dir* *headless-startup-user-dir*))
-    (sdl:with-init ()
+    (cotd-render:with-init ()
       (cotd-init)
       (unless (and (boundp '*window-width*) (plusp *window-width*)
                    (boundp '*window-height*) (plusp *window-height*)

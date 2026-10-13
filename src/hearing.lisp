@@ -123,7 +123,7 @@
                                     ((= sound-z -1) " below")
                                     (t ""))))
             (print-visible-message (x target) (y target) (z target) (level *world*) (funcall sound-str-func dir-str)
-                                   :color sdl:*white*
+                                   :color cotd-render:*white*
                                    :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                  :singlemind)))
             )))))

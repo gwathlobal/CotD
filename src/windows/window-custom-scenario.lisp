@@ -225,19 +225,19 @@
 (defmethod make-output ((win custom-scenario-window))
   (with-slots (cur-step cur-sel menu-items scenario cur-sector cur-faction cur-specific-faction) win
     (with-slots (world world-sector mission avail-world-sector-type-list overall-lvl-mods-list always-lvl-mods-list select-lvl-mods-list avail-faction-list cur-faction-list specific-faction-list) scenario
-      (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-        (sdl:fill-surface sdl:*black* :template a-rect))
+      (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+        (cotd-render:fill-surface cotd-render:*black* :template a-rect))
       
-      (sdl:draw-string-solid-* "CUSTOM SCENARIO" (truncate *window-width* 2) 0 :justify :center)
+      (cotd-render:draw-string-solid-* "CUSTOM SCENARIO" (truncate *window-width* 2) 0 :justify :center)
       
       (let ((text-str-num)
             (x-title (+ 10 10 (* *glyph-w* 5)))
-            (y-title (+ 10 (sdl:char-height sdl:*default-font*))))
+            (y-title (+ 10 (cotd-render:char-height cotd-render:*default-font*))))
         ;; draw the sector image
         (let ((*random-state* (make-random-state (world-map/random-state (world-map world)))))
           (draw-world-map-cell world-sector 10 (+ 10 y-title)))
         ;; draw the current scenario info
-        (sdl:with-rectangle (rect (sdl:rectangle :x x-title :y (+ 10 (sdl:char-height sdl:*default-font*)) :w (- *window-width* x-title 10) :h (- (truncate *window-height* 2) 20)))
+        (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x-title :y (+ 10 (cotd-render:char-height cotd-render:*default-font*)) :w (- *window-width* x-title 10) :h (- (truncate *window-height* 2) 20)))
           (setf text-str-num (write-text (format nil "Date&Time: ~A~%Mission: ~A~%Sector: ~A~%Feats: ~A~%Factions: ~A~%Player faction: ~A"
                                                  (show-date-time-YMD (world-game-time world))
                                                  (name (get-mission-type-by-id (mission-type-id mission)))
@@ -251,21 +251,21 @@
                                          rect)))
         
         ;; draw the steps of scenario customization
-        (let ((color-1 sdl:*white*) (color-2 sdl:*white*) (color-3 sdl:*white*) (color-4 sdl:*white*) (color-5 sdl:*white*) (color-6 sdl:*white*))
+        (let ((color-1 cotd-render:*white*) (color-2 cotd-render:*white*) (color-3 cotd-render:*white*) (color-4 cotd-render:*white*) (color-5 cotd-render:*white*) (color-6 cotd-render:*white*))
           (case cur-step
-            (:custom-scenario-tab-missions (setf color-1 sdl:*yellow*))
-            (:custom-scenario-tab-sectors (setf color-2 sdl:*yellow*))
-            (:custom-scenario-tab-months (setf color-3 sdl:*yellow*))
-            (:custom-scenario-tab-feats (setf color-4 sdl:*yellow*))
-            (:custom-scenario-tab-factions (setf color-5 sdl:*yellow*))
-            (:custom-scenario-tab-specific-factions (setf color-6 sdl:*yellow*)))
+            (:custom-scenario-tab-missions (setf color-1 cotd-render:*yellow*))
+            (:custom-scenario-tab-sectors (setf color-2 cotd-render:*yellow*))
+            (:custom-scenario-tab-months (setf color-3 cotd-render:*yellow*))
+            (:custom-scenario-tab-feats (setf color-4 cotd-render:*yellow*))
+            (:custom-scenario-tab-factions (setf color-5 cotd-render:*yellow*))
+            (:custom-scenario-tab-specific-factions (setf color-6 cotd-render:*yellow*)))
           
-          (sdl:draw-string-solid-* (format nil "1. Mission") 10 (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :left :color color-1)
-          (sdl:draw-string-solid-* (format nil "2. Sector") (* 4 (truncate *window-width* 20)) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :left :color color-2)
-          (sdl:draw-string-solid-* (format nil "3. Month") (* 8 (truncate *window-width* 20)) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :center :color color-3)
-          (sdl:draw-string-solid-* (format nil "4. Feats") (* 11 (truncate *window-width* 20)) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :center :color color-4)
-          (sdl:draw-string-solid-* (format nil "5. Factions") (* 14 (truncate *window-width* 20)) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :center :color color-5)
-          (sdl:draw-string-solid-* (format nil "6. Player faction") (- *window-width* 10) (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 2 text-str-num))) :justify :right :color color-6))
+          (cotd-render:draw-string-solid-* (format nil "1. Mission") 10 (+ 10 (* (cotd-render:char-height cotd-render:*default-font*) (+ 2 text-str-num))) :justify :left :color color-1)
+          (cotd-render:draw-string-solid-* (format nil "2. Sector") (* 4 (truncate *window-width* 20)) (+ 10 (* (cotd-render:char-height cotd-render:*default-font*) (+ 2 text-str-num))) :justify :left :color color-2)
+          (cotd-render:draw-string-solid-* (format nil "3. Month") (* 8 (truncate *window-width* 20)) (+ 10 (* (cotd-render:char-height cotd-render:*default-font*) (+ 2 text-str-num))) :justify :center :color color-3)
+          (cotd-render:draw-string-solid-* (format nil "4. Feats") (* 11 (truncate *window-width* 20)) (+ 10 (* (cotd-render:char-height cotd-render:*default-font*) (+ 2 text-str-num))) :justify :center :color color-4)
+          (cotd-render:draw-string-solid-* (format nil "5. Factions") (* 14 (truncate *window-width* 20)) (+ 10 (* (cotd-render:char-height cotd-render:*default-font*) (+ 2 text-str-num))) :justify :center :color color-5)
+          (cotd-render:draw-string-solid-* (format nil "6. Player faction") (- *window-width* 10) (+ 10 (* (cotd-render:char-height cotd-render:*default-font*) (+ 2 text-str-num))) :justify :right :color color-6))
         
         ;; draw the selection for each step
         (let ((color-list nil))
@@ -273,10 +273,10 @@
             (case cur-step
               (:custom-scenario-tab-feats (progn
                                             (cond
-                                              ((and (= i cur-sel) (find (nth i overall-lvl-mods-list) always-lvl-mods-list)) (setf color-list (append color-list (list (sdl:color :r 150 :g 150 :b 0)))))
-                                              ((and (= i cur-sel) (not (find (nth i overall-lvl-mods-list) always-lvl-mods-list))) (setf color-list (append color-list (list sdl:*yellow*))))
-                                              ((and (/= i cur-sel) (find (nth i overall-lvl-mods-list) always-lvl-mods-list)) (setf color-list (append color-list (list (sdl:color :r 150 :g 150 :b 150)))))
-                                              ((and (/= i cur-sel) (not (find (nth i overall-lvl-mods-list) always-lvl-mods-list))) (setf color-list (append color-list (list sdl:*white*)))))))
+                                              ((and (= i cur-sel) (find (nth i overall-lvl-mods-list) always-lvl-mods-list)) (setf color-list (append color-list (list (cotd-render:color :r 150 :g 150 :b 0)))))
+                                              ((and (= i cur-sel) (not (find (nth i overall-lvl-mods-list) always-lvl-mods-list))) (setf color-list (append color-list (list cotd-render:*yellow*))))
+                                              ((and (/= i cur-sel) (find (nth i overall-lvl-mods-list) always-lvl-mods-list)) (setf color-list (append color-list (list (cotd-render:color :r 150 :g 150 :b 150)))))
+                                              ((and (/= i cur-sel) (not (find (nth i overall-lvl-mods-list) always-lvl-mods-list))) (setf color-list (append color-list (list cotd-render:*white*)))))))
               (:custom-scenario-tab-factions (progn
                                                (let* ((current-faction (first (nth i cur-faction-list)))
                                                       (ref-faction-obj (find current-faction
@@ -286,17 +286,17 @@
                                                                        t
                                                                        nil)))
                                                  (cond
-                                                   ((and (= i cur-sel) (not more-than-one)) (setf color-list (append color-list (list (sdl:color :r 150 :g 150 :b 0)))))
-                                                   ((and (= i cur-sel) more-than-one) (setf color-list (append color-list (list sdl:*yellow*))))
-                                                   ((and (/= i cur-sel) (not more-than-one)) (setf color-list (append color-list (list (sdl:color :r 150 :g 150 :b 150)))))
-                                                   ((and (/= i cur-sel) more-than-one) (setf color-list (append color-list (list sdl:*white*))))))))
+                                                   ((and (= i cur-sel) (not more-than-one)) (setf color-list (append color-list (list (cotd-render:color :r 150 :g 150 :b 0)))))
+                                                   ((and (= i cur-sel) more-than-one) (setf color-list (append color-list (list cotd-render:*yellow*))))
+                                                   ((and (/= i cur-sel) (not more-than-one)) (setf color-list (append color-list (list (cotd-render:color :r 150 :g 150 :b 150)))))
+                                                   ((and (/= i cur-sel) more-than-one) (setf color-list (append color-list (list cotd-render:*white*))))))))
               (t (if (= i cur-sel) 
-                   (setf color-list (append color-list (list sdl:*yellow*)))
-                   (setf color-list (append color-list (list sdl:*white*)))))))
-          (draw-selection-list menu-items cur-sel (length menu-items) 20 (+ 10 (* (sdl:char-height sdl:*default-font*) (+ 4 text-str-num))) :color-list color-list))
+                   (setf color-list (append color-list (list cotd-render:*yellow*)))
+                   (setf color-list (append color-list (list cotd-render:*white*)))))))
+          (draw-selection-list menu-items cur-sel (length menu-items) 20 (+ 10 (* (cotd-render:char-height cotd-render:*default-font*) (+ 4 text-str-num))) :color-list color-list))
         )
       
-      (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (- *window-height* 10 (* 2 (sdl:char-height sdl:*default-font*))) :w (- *window-width* 20) :h (* 2 (sdl:char-height sdl:*default-font*))))
+      (cotd-render:with-rectangle (rect (cotd-render:rectangle :x 10 :y (- *window-height* 10 (* 2 (cotd-render:char-height cotd-render:*default-font*))) :w (- *window-width* 20) :h (* 2 (cotd-render:char-height cotd-render:*default-font*))))
         (let ((str (create-string)))
           (case cur-step
             (:custom-scenario-tab-missions (format str "[Enter/Right] Select  [Up/Down] Move selection  [Esc] Exit"))
@@ -329,10 +329,10 @@
             )
           (write-text str rect)))
       
-      (sdl:update-display))))
+      (cotd-render:update-display))))
 
 (defmethod run-window ((win custom-scenario-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
                      (with-slots (cur-step cur-sel menu-items scenario months-list cur-mission-type cur-sector cur-month cur-feat cur-faction cur-specific-faction) win

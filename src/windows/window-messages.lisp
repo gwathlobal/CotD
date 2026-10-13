@@ -12,16 +12,16 @@
 
 (defmethod make-output ((win message-window))
   (with-slots (cur-str message-box header-str) win
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-      (sdl:fill-surface sdl:*black* :template a-rect))
+    (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+      (cotd-render:fill-surface cotd-render:*black* :template a-rect))
     
-    (sdl:draw-string-solid-* header-str (truncate *window-width* 2) 0 :justify :center)
+    (cotd-render:draw-string-solid-* header-str (truncate *window-width* 2) 0 :justify :center)
     
-    (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (+ 10 (sdl:char-height sdl:*default-font*)) :w (- *window-width* 10) :h (- *window-height* (+ 10 (sdl:char-height sdl:*default-font*)) (sdl:char-height sdl:*default-font*) 20)))
+    (cotd-render:with-rectangle (rect (cotd-render:rectangle :x 10 :y (+ 10 (cotd-render:char-height cotd-render:*default-font*)) :w (- *window-width* 10) :h (- *window-height* (+ 10 (cotd-render:char-height cotd-render:*default-font*)) (cotd-render:char-height cotd-render:*default-font*) 20)))
       (let ((max-str (write-colored-text (colored-txt-list (message-box-strings message-box)) rect :count-only t)))
         
-        (when (< max-str (+ cur-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*))))
-          (setf cur-str (- max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))))
+        (when (< max-str (+ cur-str (truncate (cotd-render:height rect) (cotd-render:char-height cotd-render:*default-font*))))
+          (setf cur-str (- max-str (truncate (cotd-render:height rect) (cotd-render:char-height cotd-render:*default-font*)))))
         
         (when (< cur-str 0)
           (setf cur-str 0))
@@ -30,15 +30,15 @@
         )
       )
     
-    (sdl:draw-string-solid-* (format nil "[Shift+Up/Down] Scroll page  [Up/Down] Scroll text  [Esc] Exit")
-                             10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
+    (cotd-render:draw-string-solid-* (format nil "[Shift+Up/Down] Scroll page  [Up/Down] Scroll text  [Esc] Exit")
+                             10 (- *window-height* 10 (cotd-render:char-height cotd-render:*default-font*)))
     
-    (sdl:update-display)))
+    (cotd-render:update-display)))
 
 
 (defmethod run-window ((win message-window))
   (with-slots (cur-str) win
-    (sdl:with-events ()
+    (cotd-render:with-events ()
       (:quit-event () (funcall (quit-func win)) t)
       (:key-down-event (:key key :mod mod :unicode unicode)
                        (declare (ignore unicode))

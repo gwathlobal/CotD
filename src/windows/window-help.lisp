@@ -35,73 +35,73 @@
   (let ((str (nth txt-n (help-txt win)))
         (max-str))
 
-    (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20 30 (sdl:char-height sdl:*default-font*))))
+    (cotd-render:with-rectangle (rect (cotd-render:rectangle :x 10 :y 20 :w (- *window-width* 20) :h (- *window-height* 20 30 (cotd-render:char-height cotd-render:*default-font*))))
       ;; calculate the maximum number of lines
       (setf max-str (write-text str rect :count-only t))
       
-      (when (< max-str (+ (cur-str win) (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*))))
-        (setf (cur-str win) (- max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))))
+      (when (< max-str (+ (cur-str win) (truncate (cotd-render:height rect) (cotd-render:char-height cotd-render:*default-font*))))
+        (setf (cur-str win) (- max-str (truncate (cotd-render:height rect) (cotd-render:char-height cotd-render:*default-font*)))))
       
       (when (< (cur-str win) 0)
         (setf (cur-str win) 0))
       
       (write-text str rect :start-line (cur-str win))
       
-      (sdl:draw-string-solid-* (format nil "~A[Esc] Exit" (if (> max-str (truncate (sdl:height rect) (sdl:char-height sdl:*default-font*)))
+      (cotd-render:draw-string-solid-* (format nil "~A[Esc] Exit" (if (> max-str (truncate (cotd-render:height rect) (cotd-render:char-height cotd-render:*default-font*)))
                                                             "[Shift+Up/Down] Page Up/Down  [Up/Down] Scroll text  "
                                                             ""))
-                               10 (- *window-height* 10 (sdl:char-height sdl:*default-font*)))
+                               10 (- *window-height* 10 (cotd-render:char-height cotd-render:*default-font*)))
       )))
 
 (defmethod make-output ((win help-window))
-  (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-    (sdl:fill-surface sdl:*black* :template a-rect))
+  (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+    (cotd-render:fill-surface cotd-render:*black* :template a-rect))
   
   (cond
     ;; draw overview page
     ((= (cur-page win) +win-help-page-overview+) 
-     (sdl:draw-string-solid-* "OVERVIEW" (truncate *window-width* 2) 0 :justify :center)
+     (cotd-render:draw-string-solid-* "OVERVIEW" (truncate *window-width* 2) 0 :justify :center)
      (show-help-text win +win-help-page-overview+))
     ;; draw combat page
     ((= (cur-page win) +win-help-page-concepts-combat+) 
-     (sdl:draw-string-solid-* "CONCEPTS: COMBAT" (truncate *window-width* 2) 0 :justify :center)
+     (cotd-render:draw-string-solid-* "CONCEPTS: COMBAT" (truncate *window-width* 2) 0 :justify :center)
      (show-help-text win +win-help-page-concepts-combat+))
     ;; draw environment page
     ((= (cur-page win) +win-help-page-concepts-environment+) 
-     (sdl:draw-string-solid-* "CONCEPTS: ENVIRONMENT" (truncate *window-width* 2) 0 :justify :center)
+     (cotd-render:draw-string-solid-* "CONCEPTS: ENVIRONMENT" (truncate *window-width* 2) 0 :justify :center)
      (show-help-text win +win-help-page-concepts-environment+))
     ;; draw gods page
     ((= (cur-page win) +win-help-page-concepts-gods+) 
-     (sdl:draw-string-solid-* "CONCEPTS: GODS" (truncate *window-width* 2) 0 :justify :center)
+     (cotd-render:draw-string-solid-* "CONCEPTS: GODS" (truncate *window-width* 2) 0 :justify :center)
      (show-help-text win +win-help-page-concepts-gods+))
     ;; draw keybindings page
     ((= (cur-page win) +win-help-page-keybindings+) 
-     (sdl:draw-string-solid-* "KEYBINDINGS" (truncate *window-width* 2) 0 :justify :center)
+     (cotd-render:draw-string-solid-* "KEYBINDINGS" (truncate *window-width* 2) 0 :justify :center)
      (show-help-text win +win-help-page-keybindings+))
     ;; draw credits page
     ((= (cur-page win) +win-help-page-credits+) 
-     (sdl:draw-string-solid-* "CREDITS" (truncate *window-width* 2) 0 :justify :center)
+     (cotd-render:draw-string-solid-* "CREDITS" (truncate *window-width* 2) 0 :justify :center)
      (show-help-text win +win-help-page-credits+))
     (t ;; draw the menu
-     (sdl:draw-string-solid-* "HELP" (truncate *window-width* 2) 0 :justify :center)
+     (cotd-render:draw-string-solid-* "HELP" (truncate *window-width* 2) 0 :justify :center)
      (let ((cur-str) (color-list nil))
       (setf cur-str (cur-sel win))
        (dotimes (i (length (menu-items win)))
          (if (= i cur-str) 
-           (setf color-list (append color-list (list sdl:*yellow*)))
-           (setf color-list (append color-list (list sdl:*white*)))))
+           (setf color-list (append color-list (list cotd-render:*yellow*)))
+           (setf color-list (append color-list (list cotd-render:*white*)))))
        (draw-selection-list (menu-items win) cur-str (length (menu-items win)) 20 (+ 10 10) :color-list color-list :use-letters t))
 
-     (sdl:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Exit")
-                           10 (- *window-height* 10 (sdl:char-height sdl:*default-font*))))
+     (cotd-render:draw-string-solid-* (format nil "[Enter] Select  [Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Esc] Exit")
+                           10 (- *window-height* 10 (cotd-render:char-height cotd-render:*default-font*))))
     )
 
   
   
-  (sdl:update-display))
+  (cotd-render:update-display))
 
 (defmethod run-window ((win help-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
 

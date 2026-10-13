@@ -72,23 +72,23 @@
                    (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) 
                    (get-single-memo-visibility (get-memo-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)))
                    (check-mob-visible (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*)) :observer *player*))
-            (setf color sdl:*red*)
-            (setf color sdl:*yellow*))
+            (setf color cotd-render:*red*)
+            (setf color cotd-render:*yellow*))
           
           
           ;; draw the rectangle
-          (sdl:with-rectangle (l-rect (sdl:rectangle :x x1 :y y1 :w 1 :h *glyph-h*))
-            (sdl:fill-surface color :template l-rect))
-          (sdl:with-rectangle (r-rect (sdl:rectangle :x (+ x1 (1- *glyph-w*)) :y y1 :w 1 :h *glyph-h*))
-            (sdl:fill-surface color :template r-rect))
-          (sdl:with-rectangle (t-rect (sdl:rectangle :x x1 :y y1 :w *glyph-w* :h 1))
-            (sdl:fill-surface color :template t-rect))
-          (sdl:with-rectangle (b-rect (sdl:rectangle :x x1 :y (+ y1 (1- *glyph-h*)) :w *glyph-w* :h 1))
-            (sdl:fill-surface color :template b-rect))))
+          (cotd-render:with-rectangle (l-rect (cotd-render:rectangle :x x1 :y y1 :w 1 :h *glyph-h*))
+            (cotd-render:fill-surface color :template l-rect))
+          (cotd-render:with-rectangle (r-rect (cotd-render:rectangle :x (+ x1 (1- *glyph-w*)) :y y1 :w 1 :h *glyph-h*))
+            (cotd-render:fill-surface color :template r-rect))
+          (cotd-render:with-rectangle (t-rect (cotd-render:rectangle :x x1 :y y1 :w *glyph-w* :h 1))
+            (cotd-render:fill-surface color :template t-rect))
+          (cotd-render:with-rectangle (b-rect (cotd-render:rectangle :x x1 :y (+ y1 (1- *glyph-h*)) :w *glyph-w* :h 1))
+            (cotd-render:fill-surface color :template b-rect))))
       
       ;; drawing a list of objects in the grid-cell instead of a message box
-      (sdl:with-rectangle (obj-list-rect (sdl:rectangle :x 10 :y (- *window-height* *msg-box-window-height* 10) :w (- *window-width* 260 10) :h *msg-box-window-height*))
-        (sdl:fill-surface sdl:*black* :template obj-list-rect))
+      (cotd-render:with-rectangle (obj-list-rect (cotd-render:rectangle :x 10 :y (- *window-height* *msg-box-window-height* 10) :w (- *window-width* 260 10) :h *msg-box-window-height*))
+        (cotd-render:fill-surface cotd-render:*black* :template obj-list-rect))
       (let ((str (create-string))
             (feature-list)
             (mob (get-mob-* (level *world*) (view-x *player*) (view-y *player*) (view-z *player*))))
@@ -138,17 +138,17 @@
           
           
           )
-        (sdl:with-rectangle (rect (sdl:rectangle :x 10 :y (- *window-height* *msg-box-window-height* 20) :w (- *window-width* 260 10) :h (- *msg-box-window-height* (* 2 (sdl:get-font-height)))))
+        (cotd-render:with-rectangle (rect (cotd-render:rectangle :x 10 :y (- *window-height* *msg-box-window-height* 20) :w (- *window-width* 260 10) :h (- *msg-box-window-height* (* 2 (cotd-render:get-font-height)))))
           (write-text str rect)))
       
       ;; drawing the propmt line
-      (let ((x 10) (y (- *window-height* 5 (sdl:char-height sdl:*default-font*))) (w (- *window-width* 260 10)) (h (sdl:get-font-height)))
-        (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
-          (sdl:fill-surface sdl:*black* :template a-rect)
+      (let ((x 10) (y (- *window-height* 5 (cotd-render:char-height cotd-render:*default-font*))) (w (- *window-width* 260 10)) (h (cotd-render:get-font-height)))
+        (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x x :y y :w w :h h))
+          (cotd-render:fill-surface cotd-render:*black* :template a-rect)
           (cond
-            ((= (cur-tab win) +map-select-win-mobs+) (sdl:draw-string-solid-* (format nil "[Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Ctrl+l] Map select  [Esc] Quit") x y :color sdl:*white*))
-            ((and (= (cur-tab win) +map-select-win-map+) (sel-list win)) (sdl:draw-string-solid-* (format nil "~A[Ctrl+l] Mob select  [Esc] Quit" (nth +map-select-win-map+ (cmd-str win))) x y :color sdl:*white*))
-            (t (sdl:draw-string-solid-* (format nil "~A[Esc] Quit" (first (cmd-str win))) x y :color sdl:*white*)))
+            ((= (cur-tab win) +map-select-win-mobs+) (cotd-render:draw-string-solid-* (format nil "[Up/Down] Move selection  [Shift+Up/Down] Scroll page  [Ctrl+l] Map select  [Esc] Quit") x y :color cotd-render:*white*))
+            ((and (= (cur-tab win) +map-select-win-map+) (sel-list win)) (cotd-render:draw-string-solid-* (format nil "~A[Ctrl+l] Mob select  [Esc] Quit" (nth +map-select-win-map+ (cmd-str win))) x y :color cotd-render:*white*))
+            (t (cotd-render:draw-string-solid-* (format nil "~A[Esc] Quit" (first (cmd-str win))) x y :color cotd-render:*white*)))
           
           ))))
 
@@ -157,7 +157,7 @@
 
   (show-char-properties (+ *start-map-x* 20 (* *glyph-w* *max-x-view*)) 10 (idle-calcing win))
   ;(show-small-message-box *glyph-w* (- *window-height* *msg-box-window-height* 10) (+ 250 (+ 10 (* *glyph-w* *max-x-view*))))
-    (show-level-weather (+ *start-map-x* 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -2 (sdl:char-height sdl:*default-font*))))
+    (show-level-weather (+ *start-map-x* 20 (* *glyph-w* *max-x-view*)) (+ (- *window-height* *msg-box-window-height* 20) (* -2 (cotd-render:char-height cotd-render:*default-font*))))
     (cond
       ((and (= (cur-tab win) +map-select-win-mobs+) (sel-list win))
        (progn
@@ -166,13 +166,13 @@
            (dotimes (i (length (sel-list win)))
              
              (if (= i (cur-sel win)) 
-               (setf color-list (append color-list (list sdl:*yellow*)))
-               (setf color-list (append color-list (list sdl:*white*)))))
+               (setf color-list (append color-list (list cotd-render:*yellow*)))
+               (setf color-list (append color-list (list cotd-render:*white*)))))
            (draw-selection-list (sel-list win) (cur-sel win) 6 (- *window-width* 260) (- *window-height* *msg-box-window-height* 20)
                                 :color-list color-list
-                                :char-height (if (> *glyph-h* (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
+                                :char-height (if (> *glyph-h* (+ (cotd-render:char-height cotd-render:*default-font*) *sel-y-offset*))
                                                *glyph-h*
-                                               (+ (sdl:char-height sdl:*default-font*) *sel-y-offset*))
+                                               (+ (cotd-render:char-height cotd-render:*default-font*) *sel-y-offset*))
                                 :str-func #'(lambda (x y color str use-letters)
                                               ;; the list of strings to display is basically a list of visible mob IDs, so 'str' param is a mob ID here
                                               ;; use-letters here can be
@@ -180,11 +180,11 @@
                                               ;;   (list i str-per-page)
                                               (if use-letters
                                                 (progn
-                                                  (sdl:draw-string-solid-* (if (< (first use-letters) (second use-letters))
+                                                  (cotd-render:draw-string-solid-* (if (< (first use-letters) (second use-letters))
                                                                              (format nil "[~A]  " (nth (first use-letters) *char-list*))
                                                                              (format nil "     "))
                                                                            x y :color color)
-                                                  (draw-visible-mob-func (+ x (* 5 (sdl:char-width sdl:*default-font*))) y (get-mob-by-id str) *player* color))
+                                                  (draw-visible-mob-func (+ x (* 5 (cotd-render:char-width cotd-render:*default-font*))) y (get-mob-by-id str) *player* color))
                                                 (progn
                                                   (draw-visible-mob-func x y (get-mob-by-id str) *player* color))))
                                 :use-letters t))))
@@ -192,10 +192,10 @@
     
     (map-select-update win)
   
-  (sdl:update-display))
+  (cotd-render:update-display))
 
 (defmethod run-window ((win map-select-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
                      

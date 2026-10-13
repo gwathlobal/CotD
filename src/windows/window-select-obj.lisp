@@ -31,17 +31,17 @@
                                          (line-list win)
                                          (loop for prompt-func in prompt-list
                                                collect (return-prompt-str prompt-func cur-sel :can-esc can-esc)))
-                      for try-max = (+ 10 (* (sdl:char-width sdl:*default-font*) (+ 10 (length str))))
+                      for try-max = (+ 10 (* (cotd-render:char-width cotd-render:*default-font*) (+ 10 (length str))))
                       when (> try-max max) do
                         (setf max try-max)
                       finally (return-from nil max))))
 
       ;; find the maximum height of the description text depending on the found width
       (if descr-list
-        (sdl:with-rectangle (rect (sdl:rectangle :x 0 :y 0 :w (- w margin margin) :h 30))
+        (cotd-render:with-rectangle (rect (cotd-render:rectangle :x 0 :y 0 :w (- w margin margin) :h 30))
           (setf h-descr (loop with max = 0
                               for descr in descr-list
-                              for try-max = (* (sdl:char-height sdl:*default-font*) (write-text descr rect :count-only t))
+                              for try-max = (* (cotd-render:char-height cotd-render:*default-font*) (write-text descr rect :count-only t))
                               when (> try-max max) do
                                 (setf max try-max)
                               finally (return-from nil max))))
@@ -49,7 +49,7 @@
 
       ;; find the height of the list
       (unless h-list
-        (setf h-list (* (sdl:char-height sdl:*default-font*) (length line-list))))
+        (setf h-list (* (cotd-render:char-height cotd-render:*default-font*) (length line-list))))
       
       ;; set x if necessary
       (unless x
@@ -68,8 +68,8 @@
 
 (defmethod make-output ((win select-obj-window))
   (with-slots (x y w h-list h-descr margin cur-sel header-line line-list descr-list prompt-list can-esc select-color-func color-list) win
-    (let* ((h-header (sdl:char-height sdl:*default-font*))
-           (h-prompt (sdl:char-height sdl:*default-font*))
+    (let* ((h-header (cotd-render:char-height cotd-render:*default-font*))
+           (h-prompt (cotd-render:char-height cotd-render:*default-font*))
            (cur-y y)
 
            (x-rect x)
@@ -109,11 +109,11 @@
               h-header-txt (- h-header-rect margin margin)
               cur-y (+ cur-y h-header-rect -1))
         ;; draw rectangle for header
-        (sdl:with-rectangle (rect (sdl:rectangle :x x-rect :y y-header-rect :w w-rect :h h-header-rect))
-          (sdl:fill-surface sdl:*black* :template rect)
-          (sdl:draw-rectangle rect :color sdl:*white*))
+        (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x-rect :y y-header-rect :w w-rect :h h-header-rect))
+          (cotd-render:fill-surface cotd-render:*black* :template rect)
+          (cotd-render:draw-rectangle rect :color cotd-render:*white*))
         ;; draw text for header
-        (sdl:with-rectangle (rect (sdl:rectangle :x x-txt :y y-header-txt :w w-txt :h h-header-txt))
+        (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x-txt :y y-header-txt :w w-txt :h h-header-txt))
           (write-text header-line rect)))
 
       (when line-list
@@ -123,19 +123,19 @@
               y-list-txt (+ y-list-rect margin)
               cur-y (+ cur-y h-list-rect -1))
         ;; draw rectangle for list
-        (sdl:with-rectangle (rect (sdl:rectangle :x x-rect :y y-list-rect :w w-rect :h h-list-rect))
-          (sdl:fill-surface sdl:*black* :template rect)
-          (sdl:draw-rectangle rect :color sdl:*white*))
+        (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x-rect :y y-list-rect :w w-rect :h h-list-rect))
+          (cotd-render:fill-surface cotd-render:*black* :template rect)
+          (cotd-render:draw-rectangle rect :color cotd-render:*white*))
         ;; draw list
         (loop with final-color-list = ()
               for i from 0 below (length line-list) do
                 (if (= i cur-sel) 
                   (if select-color-func
                     (push (funcall select-color-func cur-sel) final-color-list)
-                    (push sdl:*yellow* final-color-list))
+                    (push cotd-render:*yellow* final-color-list))
                   (if color-list
                     (push (nth i color-list) final-color-list)
-                    (push sdl:*white* final-color-list)))
+                    (push cotd-render:*white* final-color-list)))
               finally
                  (setf final-color-list (reverse final-color-list))
                  (draw-selection-list line-list cur-sel (length line-list) x-txt y-list-txt :color-list final-color-list :use-letters t)))
@@ -148,12 +148,12 @@
               h-descr-txt (- h-descr-rect margin margin)
               cur-y (+ cur-y h-descr-rect -1))
         ;; draw rectangle for description
-        (sdl:with-rectangle (rect (sdl:rectangle :x x-rect :y y-descr-rect :w w-rect :h h-descr-rect))
-          (sdl:fill-surface sdl:*black* :template rect)
-          (sdl:draw-rectangle rect :color sdl:*white*))
+        (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x-rect :y y-descr-rect :w w-rect :h h-descr-rect))
+          (cotd-render:fill-surface cotd-render:*black* :template rect)
+          (cotd-render:draw-rectangle rect :color cotd-render:*white*))
         ;; draw description text
-        (sdl:with-rectangle (rect (sdl:rectangle :x x-txt :y y-descr-txt :w w-txt :h h-descr-txt))
-          (write-text (nth cur-sel descr-list) rect :color sdl:*white*)))
+        (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x-txt :y y-descr-txt :w w-txt :h h-descr-txt))
+          (write-text (nth cur-sel descr-list) rect :color cotd-render:*white*)))
       
       (when prompt-list
         ;; setting up coordiantes
@@ -163,18 +163,18 @@
               h-prompt-txt (- h-prompt-rect margin margin)
               cur-y (+ cur-y h-prompt-rect -1))
         ;; draw rectangle for prompt
-        (sdl:with-rectangle (rect (sdl:rectangle :x x-rect :y y-prompt-rect :w w-rect :h h-prompt-rect))
-          (sdl:fill-surface sdl:*black* :template rect)
-          (sdl:draw-rectangle rect :color sdl:*white*))
+        (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x-rect :y y-prompt-rect :w w-rect :h h-prompt-rect))
+          (cotd-render:fill-surface cotd-render:*black* :template rect)
+          (cotd-render:draw-rectangle rect :color cotd-render:*white*))
         ;; draw text for prompt
-        (sdl:with-rectangle (rect (sdl:rectangle :x x-txt :y y-prompt-txt :w w-txt :h h-prompt-txt))
+        (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x-txt :y y-prompt-txt :w w-txt :h h-prompt-txt))
           (write-text (return-prompt-str (nth cur-sel prompt-list) cur-sel :can-esc can-esc) rect)))
       ))
-  (sdl:update-display))
+  (cotd-render:update-display))
 
 (defmethod run-window ((win select-obj-window))
   (tagbody
-     (sdl:with-events ()
+     (cotd-render:with-events ()
        (:quit-event () (funcall (quit-func win)) t)
        (:key-down-event (:key key :mod mod :unicode unicode)
 			

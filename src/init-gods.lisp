@@ -67,7 +67,7 @@
                                                                   (piety-gain (second (nth r deck-of-damnation))))
                                                              (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                     (format nil "Malseraph draws the ~A. " (name (get-card-type-by-id card-type-id)))
-                                                                                    :color sdl:*magenta*
+                                                                                    :color cotd-render:*magenta*
                                                                                     :tags (list (when (and (find (id mob) (shared-visible-mobs *player*))
                                                                                                            (not (find (id mob) (proper-visible-mobs *player*))))
                                                                                                   :singlemind)))
@@ -91,7 +91,7 @@
                                                                       (when (>= enemy-strength (strength mob))
                                                                         (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                                (format nil "Malseraph bursts with laughter. ")
-                                                                                               :color sdl:*magenta*
+                                                                                               :color cotd-render:*magenta*
                                                                                                :tags (list (when (and (find (id mob) (shared-visible-mobs *player*))
                                                                                                                       (not (find (id mob) (proper-visible-mobs *player*))))
                                                                                                              :singlemind)))
@@ -122,7 +122,7 @@
                                                                               (eq mob *player*)))
                                                                  (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                         (format nil "Malseraph draws the ~A. " (name (get-card-type-by-id card-type-id)))
-                                                                                        :color sdl:*magenta*
+                                                                                        :color cotd-render:*magenta*
                                                                                         :tags (list (when (and (find (id mob) (shared-visible-mobs *player*))
                                                                                                                (not (find (id mob) (proper-visible-mobs *player*))))
                                                                                                       :singlemind))))
@@ -139,7 +139,7 @@
                                                                   (card-type-id (first (nth r deck-of-neutrality))))
                                                              (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                     (format nil "Malseraph draws the ~A. " (name (get-card-type-by-id card-type-id)))
-                                                                                    :color sdl:*magenta*
+                                                                                    :color cotd-render:*magenta*
                                                                                     :tags (list (when (and (find (id mob) (shared-visible-mobs *player*))
                                                                                                            (not (find (id mob) (proper-visible-mobs *player*))))
                                                                                                   :singlemind)))
@@ -159,7 +159,7 @@
                                                                   (when (> enemy-strength (+ (get-worshiped-god-param1 (worshiped-god mob)) (strength mob)))
                                                                         (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                                (format nil "Malseraph giggles. ")
-                                                                                               :color sdl:*magenta*
+                                                                                               :color cotd-render:*magenta*
                                                                                                :tags (list (when (and (find (id mob) (shared-visible-mobs *player*))
                                                                                                                       (not (find (id mob) (proper-visible-mobs *player*))))
                                                                                                              :singlemind)))

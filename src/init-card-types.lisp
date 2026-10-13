@@ -50,7 +50,7 @@
                                                                 (setf (visible-mobs mob) nil))
                                                               (print-visible-message (x mob) (y mob) (z mob) (level *world*) 
                                                                                      (format nil "~A is blind. " (capitalize-name (prepend-article +article-the+ (visible-name mob))))
-                                                                                     :color sdl:*white*
+                                                                                     :color cotd-render:*white*
                                                                                      :tags (list (when (and (find (id mob) (shared-visible-mobs *player*))
                                                                                                             (not (find (id mob) (proper-visible-mobs *player*))))
                                                                                        :singlemind)))
@@ -73,7 +73,7 @@
                                                               (set-mob-effect target :effect-type-id +mob-effect-slow+ :actor-id (id actor) :cd 5)
                                                               (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                      (format nil "~A is slown. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
-                                                                                     :color sdl:*white*
+                                                                                     :color cotd-render:*white*
                                                                                      :tags (list (when (and (find (id target) (shared-visible-mobs *player*))
                                                                                                             (not (find (id target) (proper-visible-mobs *player*))))
                                                                                        :singlemind)))
@@ -91,7 +91,7 @@
                                                               (set-mob-effect target :effect-type-id +mob-effect-silence+ :actor-id (id actor) :cd 5)
                                                               (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                      (format nil "~A is silenced. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
-                                                                                     :color sdl:*white*
+                                                                                     :color cotd-render:*white*
                                                                                      :tags (list (when (and (find (id target) (shared-visible-mobs *player*))
                                                                                                             (not (find (id target) (proper-visible-mobs *player*))))
                                                                                        :singlemind)))
@@ -110,7 +110,7 @@
                                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                          (format nil "~A is confused. "
                                                                                                  (capitalize-name (prepend-article +article-the+ (visible-name target))))
-                                                                                         :color sdl:*white*
+                                                                                         :color cotd-render:*white*
                                                                                          :tags (list (when (and (find (id target) (shared-visible-mobs *player*))
                                                                                                                 (not (find (id target) (proper-visible-mobs *player*))))
                                                                                                        :singlemind)))
@@ -120,7 +120,7 @@
                                                                   (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                          (format nil "~A resists confusion. "
                                                                                                  (capitalize-name (prepend-article +article-the+ (visible-name target))))
-                                                                                         :color sdl:*white*
+                                                                                         :color cotd-render:*white*
                                                                                          :tags (list (when (and (find (id target) (shared-visible-mobs *player*))
                                                                                                                 (not (find (id target) (proper-visible-mobs *player*))))
                                                                                                        :singlemind)))))
@@ -144,7 +144,7 @@
                                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                            (format nil "~A resists polymorph. "
                                                                                                    (capitalize-name (prepend-article +article-the+ (visible-name target))))
-                                                                                           :color sdl:*white*
+                                                                                           :color cotd-render:*white*
                                                                                            :tags (list (when (and (find (id target) (shared-visible-mobs *player*))
                                                                                                                   (not (find (id target) (proper-visible-mobs *player*))))
                                                                                                          :singlemind)))))
@@ -163,7 +163,7 @@
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A resists polymorph. "
                                                                                         (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))))
                                                      )))
@@ -183,7 +183,7 @@
                                                                   (set-mob-effect target :effect-type-id +mob-effect-irradiated+ :actor-id (id actor) :cd t :param1 (+ 2 (random 3)))))
                                                               (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                      (format nil "~A is irradiated. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
-                                                                                     :color sdl:*white*
+                                                                                     :color cotd-render:*white*
                                                                                      :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                    :singlemind)))
                                                            ))))
@@ -217,7 +217,7 @@
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A resists confusion. "
                                                                                         (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind))))))))
 
@@ -228,7 +228,7 @@
                                                      (set-mob-effect actor :effect-type-id +mob-effect-silence+ :actor-id (id actor) :cd 5)
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                             (format nil "~A is silenced. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                            :color sdl:*white*
+                                                                            :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))
                                                      )))
@@ -240,7 +240,7 @@
                                                      (set-mob-effect actor :effect-type-id +mob-effect-slow+ :actor-id (id actor) :cd 5)
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                             (format nil "~A is slown. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                            :color sdl:*white*
+                                                                            :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))
                                                      )))
@@ -255,14 +255,14 @@
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A is feared. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
                                                                                 :observed-mob actor
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind))))
                                                        (progn
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A resists fear. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
                                                                                 :observed-mob actor
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind))))))))
 
@@ -276,7 +276,7 @@
                                                        (setf (visible-mobs actor) nil))
                                                      (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                             (format nil "~A is blind. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                            :color sdl:*white*
+                                                                            :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))
                                                      )))
@@ -301,7 +301,7 @@
                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                   (format nil "Malseraph's curse removed divine protection from ~A. "
                                                                                           (prepend-article +article-the+ (visible-name actor)))
-                                                                                  :color sdl:*white*
+                                                                                  :color cotd-render:*white*
                                                                                   :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                 :singlemind)))
                                                            )
@@ -310,7 +310,7 @@
                                                            (set-mob-effect actor :effect-type-id +mob-effect-cursed+ :actor-id (id actor) :cd 5)
                                                            (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                   (format nil "~A is cursed. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                  :color sdl:*white*
+                                                                                  :color cotd-render:*white*
                                                                                   :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                 :singlemind)))))
                                                        ))))
@@ -326,7 +326,7 @@
                                                                  (not (mob-effect-p actor +mob-effect-disguised+)))
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "Malseraph grants ~A ~A. " (prepend-article +article-the+ (visible-name actor)) (prepend-article +article-a+ (visible-name deck-item)))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind))))
                                                        (mob-pick-item actor deck-item :spd nil :silent t))
@@ -353,7 +353,7 @@
                                                          (set-mob-effect target :effect-type-id +mob-effect-glowing+ :actor-id (id actor) :cd 5)
                                                          (print-visible-message (x target) (y target) (z target) (level *world*) 
                                                                                 (format nil "~A is glowing. " (capitalize-name (prepend-article +article-the+ (visible-name target))))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))))
                                                      )))
@@ -375,7 +375,7 @@
                                                        (when was-cured
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A is cured of all malmutations. " (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))))
                                                      )))
@@ -398,7 +398,7 @@
                                                                     (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                            (format nil "~A resists polymorph. "
                                                                                                    (capitalize-name (prepend-article +article-the+ (visible-name target))))
-                                                                                           :color sdl:*white*
+                                                                                           :color cotd-render:*white*
                                                                                            :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                                          :singlemind)))))
                                                            finally (when polymorphed-once
@@ -416,7 +416,7 @@
                                                          (print-visible-message (x actor) (y actor) (z actor) (level *world*) 
                                                                                 (format nil "~A resists polymorph. "
                                                                                         (capitalize-name (prepend-article +article-the+ (visible-name actor))))
-                                                                                :color sdl:*white*
+                                                                                :color cotd-render:*white*
                                                                                 :tags (list (when (if-cur-mob-seen-through-shared-vision *player*)
                                                                                               :singlemind)))))
                                                      )))

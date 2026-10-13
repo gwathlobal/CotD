@@ -62,11 +62,11 @@
     (loop for campaign-effect in (world/campaign-effects *world*)
           when (campaign-effect/displayed campaign-effect)
             do
-               (add-message (format nil "~A" (campaign-effect/name campaign-effect)) sdl:*yellow* message-box-list)
+               (add-message (format nil "~A" (campaign-effect/name campaign-effect)) cotd-render:*yellow* message-box-list)
                (if (campaign-effect/cd campaign-effect)
-                 (add-message (format nil " [~A turn~:P left]~%" (campaign-effect/cd campaign-effect)) sdl:*white* message-box-list)
-                 (add-message (format nil "~%") sdl:*white* message-box-list))
-               (add-message (format nil "~A~%~%" (campaign-effect/descr campaign-effect)) sdl:*white* message-box-list))
+                 (add-message (format nil " [~A turn~:P left]~%" (campaign-effect/cd campaign-effect)) cotd-render:*white* message-box-list)
+                 (add-message (format nil "~%") cotd-render:*white* message-box-list))
+               (add-message (format nil "~A~%~%" (campaign-effect/descr campaign-effect)) cotd-render:*white* message-box-list))
     
     (when (not (eq (campaign-window/cur-mode win) :campaign-window-effects-mode))
       (setf (campaign-window/prev-mode win) (campaign-window/cur-mode win))
@@ -94,11 +94,11 @@
          (keys-txt (get-txt-from-file "help/campaign_keybindings.txt")))
     (when (find (get-general-faction-from-specific (world/player-specific-faction *world*)) text-list :key #'(lambda (a) (first a)))
       (let ((objective-text (funcall (descr-func (get-game-event-by-id (second (find (get-general-faction-from-specific (world/player-specific-faction *world*)) text-list :key #'(lambda (a) (first a)))))))))
-        (add-message objective-text sdl:*white* msg-box-list)))
+        (add-message objective-text cotd-render:*white* msg-box-list)))
 
     (when keys-txt
-      (add-message (format nil "~%~%~%") sdl:*white* msg-box-list)
-      (add-message keys-txt sdl:*white* msg-box-list))
+      (add-message (format nil "~%~%~%") cotd-render:*white* msg-box-list)
+      (add-message keys-txt cotd-render:*white* msg-box-list))
     
     (setf *current-window* (make-instance 'message-window 
                                           :return-to win
@@ -223,8 +223,8 @@
 (defmethod make-output ((win campaign-window))
   (with-slots (cur-mode cur-sector cur-sel avail-missions reveal-lair) win
 
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
-      (sdl:fill-surface sdl:*black* :template a-rect))
+    (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))
+      (cotd-render:fill-surface cotd-render:*black* :template a-rect))
 
     (let* ((x1 20) (y1 20) (map-w (* *glyph-w* 5 *max-x-world-map*)) (map-h (* *glyph-h* 5 *max-y-world-map*))
            (x2 (+ x1 map-w 20)) (y2 (+ y1 20))
@@ -242,7 +242,7 @@
                                        (setf prompt-str (format nil "[Enter] Accept map  [r] Randomize map  [Arrows/Numpad] Move selection"))
 
                                        ;; draw subheader
-                                       (sdl:draw-string-solid-* init-campaign-str (- (truncate *window-width* 2) (truncate (* (length init-campaign-str) (sdl:char-width sdl:*default-font*)) 2)) y1 :justify :left :color sdl:*white*)))
+                                       (cotd-render:draw-string-solid-* init-campaign-str (- (truncate *window-width* 2) (truncate (* (length init-campaign-str) (cotd-render:char-width cotd-render:*default-font*)) 2)) y1 :justify :left :color cotd-render:*white*)))
           (:game-state-campaign-map (progn
                                       (let* ((player-faction (get-general-faction-from-specific (world/player-specific-faction *world*)))
                                              (demon-win-cond (get-win-condition-by-id :win-cond-demon-campaign))
@@ -280,17 +280,17 @@
                                           (setf demon-str (format nil "Flesh gathered: ~A of ~A, inhabited districts left: ~A, sectors corrupted: ~A, satanists' lairs left: ~A, dimensional engines left: ~A~%~%Command: ~A"
                                                                   (world/flesh-points *world*) max-flesh-points normal-sectors-left corrupted-sectors-left satanist-lairs-left machines-left command-str)))
                                         
-                                        (sdl:with-rectangle (a-rect (sdl:rectangle :x (+ x1 0) :y (+ y1 map-h 50) :w (- *window-width* x1 20) :h (* 1 (sdl:get-font-height))))
+                                        (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x (+ x1 0) :y (+ y1 map-h 50) :w (- *window-width* x1 20) :h (* 1 (cotd-render:get-font-height))))
                                           (setf max-lines (write-text demon-str a-rect :count-only t)))
-                                        (sdl:with-rectangle (a-rect (sdl:rectangle :x (+ x1 0) :y (+ y1 map-h 50) :w (- *window-width* x1 20) :h (* max-lines (sdl:get-font-height))))
+                                        (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x (+ x1 0) :y (+ y1 map-h 50) :w (- *window-width* x1 20) :h (* max-lines (cotd-render:get-font-height))))
                                           (write-text demon-str a-rect))
                                         )
                                       
                                       
                                       ;; draw subheader
                                       (if (eq cur-mode :campaign-window-map-mode)
-                                        (sdl:draw-string-solid-* select-mission-sector-str (+ x1 (truncate map-w 2)) y1 :justify :center :color sdl:*white*)
-                                        (sdl:draw-string-solid-* select-avail-mission-str (+ x2 (truncate (- *window-width* x2 20) 2)) y1 :justify :center :color sdl:*white*)))))
+                                        (cotd-render:draw-string-solid-* select-mission-sector-str (+ x1 (truncate map-w 2)) y1 :justify :center :color cotd-render:*white*)
+                                        (cotd-render:draw-string-solid-* select-avail-mission-str (+ x2 (truncate (- *window-width* x2 20) 2)) y1 :justify :center :color cotd-render:*white*)))))
         )
 
       ;; draw map
@@ -298,12 +298,12 @@
       (highlight-world-map-tile (+ x1 (* (car cur-sector) (* *glyph-w* 5))) (+ y2 (* (cdr cur-sector) (* *glyph-h* 5))))
 
       ;; draw date
-      (sdl:draw-string-solid-* date-str (+ x1 (truncate map-w 2)) (+ y1 map-h 30) :justify :center :color sdl:*white*)
+      (cotd-render:draw-string-solid-* date-str (+ x1 (truncate map-w 2)) (+ y1 map-h 30) :justify :center :color cotd-render:*white*)
 
       ;; display missions
       (case cur-mode
         (:campaign-window-map-mode (progn
-                                     (sdl:with-rectangle (rect (sdl:rectangle :x x2 :y y2 :w (- *window-width* x2 20) :h map-h))
+                                     (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x2 :y y2 :w (- *window-width* x2 20) :h map-h))
                                        (write-text (description (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)) :reveal-lair reveal-lair)
                                                    rect))))
         (:campaign-window-mission-mode (progn
@@ -317,33 +317,33 @@
                                                  do
                                                     (push (name mission) mission-names-list)
                                                     (cond
-                                                      ((and (= i cur-sel) faction-present) (push sdl:*yellow* color-list))
-                                                      ((and (= i cur-sel) (not faction-present)) (push (sdl:color :r 150 :g 150 :b 0) color-list))
-                                                      ((and (/= i cur-sel) faction-present) (push sdl:*white* color-list))
-                                                      ((and (/= i cur-sel) (not faction-present)) (push (sdl:color :r 150 :g 150 :b 150) color-list)))
+                                                      ((and (= i cur-sel) faction-present) (push cotd-render:*yellow* color-list))
+                                                      ((and (= i cur-sel) (not faction-present)) (push (cotd-render:color :r 150 :g 150 :b 0) color-list))
+                                                      ((and (/= i cur-sel) faction-present) (push cotd-render:*white* color-list))
+                                                      ((and (/= i cur-sel) (not faction-present)) (push (cotd-render:color :r 150 :g 150 :b 150) color-list)))
                                                  finally
                                                     (setf mission-names-list (reverse mission-names-list))
                                                     (setf color-list (reverse color-list)))
                                            
                                            (draw-selection-list mission-names-list cur-sel str-per-page x2 y2 :color-list color-list)
                                            
-                                           (sdl:with-rectangle (rect (sdl:rectangle :x x2
-                                                                                    :y (+ y2 10 (* (sdl:char-height sdl:*default-font*) str-per-page))
+                                           (cotd-render:with-rectangle (rect (cotd-render:rectangle :x x2
+                                                                                    :y (+ y2 10 (* (cotd-render:char-height cotd-render:*default-font*) str-per-page))
                                                                                     :w (- *window-width* x2 20)
-                                                                                    :h (- *window-height* 40 (+ 10 10 (* (sdl:char-height sdl:*default-font*) str-per-page)))))
+                                                                                    :h (- *window-height* 40 (+ 10 10 (* (cotd-render:char-height cotd-render:*default-font*) str-per-page)))))
                                              (write-text (description (aref (cells (world-map *world*)) (car cur-sector) (cdr cur-sector)) :reveal-lair reveal-lair)
                                                          rect))))))
       
       ;; draw header
-      (sdl:draw-string-solid-* header-str (truncate *window-width* 2) 0 :justify :center :color sdl:*white*)
+      (cotd-render:draw-string-solid-* header-str (truncate *window-width* 2) 0 :justify :center :color cotd-render:*white*)
 
       ;; draw prompt
-      (sdl:draw-string-solid-* prompt-str 10 (- *window-height* 10 (sdl:char-height sdl:*default-font*))))
+      (cotd-render:draw-string-solid-* prompt-str 10 (- *window-height* 10 (cotd-render:char-height cotd-render:*default-font*))))
 
-    (sdl:update-display)))
+    (cotd-render:update-display)))
 
 (defmethod run-window ((win campaign-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
                                           

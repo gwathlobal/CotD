@@ -16,7 +16,8 @@
   :author "Gwathlobal"    
   :depends-on (lispbuilder-sdl bordeaux-threads cffi defenum cl-store log4cl uiop)
   :components
-    ((:file "pathfinding")
+    ((:file "render")
+     (:file "pathfinding")
      (:file "glyph-globals")
      (:file "globals")
      (:file "key-bindings")

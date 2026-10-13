@@ -6,15 +6,15 @@
 (defmethod make-output ((win journal-window))
   (fill-background-tiles)
 
-  (sdl:draw-string-solid-* "JOURNAL" (truncate *window-width* 2) 0 :justify :center)
+  (cotd-render:draw-string-solid-* "JOURNAL" (truncate *window-width* 2) 0 :justify :center)
 
   (let* ((x 10)
-         (y (+ 0 (* 2 (sdl:char-height sdl:*default-font*))))
+         (y (+ 0 (* 2 (cotd-render:char-height cotd-render:*default-font*))))
          (w (- *window-width* 20))
-         (h (- *window-height* 20 (sdl:char-height sdl:*default-font*) y))
+         (h (- *window-height* 20 (cotd-render:char-height cotd-render:*default-font*) y))
          (txt-struct (make-colored-txt)))
-    (sdl:with-rectangle (a-rect (sdl:rectangle :x x :y y :w w :h h))
-      (sdl:fill-surface sdl:*black* :template a-rect)
+    (cotd-render:with-rectangle (a-rect (cotd-render:rectangle :x x :y y :w w :h h))
+      (cotd-render:fill-surface cotd-render:*black* :template a-rect)
 
       (when (find (loyal-faction *player*) (win-condition-list (get-mission-type-by-id (mission-type-id (mission (level *world*))))) :key #'(lambda (a)
                                                                                                                                          (first a)))
@@ -35,13 +35,13 @@
       (write-colored-text (colored-txt-list txt-struct) a-rect))
     )
 
-  (sdl:draw-string-solid-* (format nil "[Esc] Exit")
-                           10 (- *window-height* 13 (sdl:char-height sdl:*default-font*)))
+  (cotd-render:draw-string-solid-* (format nil "[Esc] Exit")
+                           10 (- *window-height* 13 (cotd-render:char-height cotd-render:*default-font*)))
   
-  (sdl:update-display))
+  (cotd-render:update-display))
 
 (defmethod run-window ((win journal-window))
-  (sdl:with-events ()
+  (cotd-render:with-events ()
     (:quit-event () (funcall (quit-func win)) t)
     (:key-down-event (:key key :mod mod :unicode unicode)
                      (declare (ignore mod unicode))
