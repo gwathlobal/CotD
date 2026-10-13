@@ -46,3 +46,13 @@
 ;;;; cl-sdl2 (TODO.txt) means reimplementing the exports above against
 ;;;; cl-sdl2 in this one file; no call site elsewhere needs to change, the
 ;;;; same way src/key-bindings.lisp already isolated key constants.
+;;;;
+;;;; Contract that is not visible from the symbol list, and that a
+;;;; replacement must keep:
+;;;;  - *DEFAULT-SURFACE* is NIL during normal play, and a NIL surface (the
+;;;;    default of every :SURFACE keyword) means "draw to the window". Call
+;;;;    sites pass :SURFACE COTD-RENDER:*DEFAULT-SURFACE* explicitly and rely
+;;;;    on that NIL; only the headless oracles bind it to an offscreen surface.
+;;;;
+;;;; COMPARE-GOLDEN-SCREENS in headless-test.lisp checks a replacement against
+;;;; whole-screen baselines captured from lispbuilder-sdl (test/golden/).

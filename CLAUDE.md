@@ -41,6 +41,7 @@ Pick the right check for what you touched — see the project's `verification-re
 - type tables / initargs / id spaces -> dump every trait/ability/AI-package/armor of all type instances **with `type-of`**, plus all id constants, diff
 - memo / FOV / gameplay logic -> checksum memo fields via public readers after N seeded AI turns
 - rendering -> render old vs new into two surfaces, compare every pixel (`sdl:with-pixel`/`sdl:read-pixel`, not `sdl:read-pixel-*` - that doesn't exist)
+- the render backend / `cotd-render` shim / fonts / any window's `make-output` -> `(compare-golden-screens)`: renders 24 whole screens (12 windows x both fonts, through the real `cotd-init`) and compares every pixel against baseline PPMs in `test/golden/`. Baselines are local, not committed (`test/golden/` is gitignored): run `(capture-golden-screens)` on the code *before* your change, then `(compare-golden-screens)` after it, like `run-headless-regression`; anything not `:same` is also written there as `<name>.actual.ppm` for viewing
 - a predicate's definition -> exhaustively compare old vs new over its full input space
 - anything timed -> run 4x and report a band; same-build variance is ~5%
 - `cotd-init` / `init-glyph-front` / anything touching their call order -> `(run-headless-startup-check)` first; it is the only oracle that calls `cotd-init` itself (the others each do their own minimal SDL setup and skip it), so it is the only one that would catch a regression in `cotd-init`'s own ordering

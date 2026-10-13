@@ -513,3 +513,215 @@ caught the startup-ordering bug described above."
                    (boundp '*start-logo*) *start-logo*)
         (error "RUN-HEADLESS-STARTUP-CHECK: COTD-INIT returned without setting up render state"))
       t)))
+
+;;; ---------------------------------------------------------------------
+;;; Deliverable 5: golden screens (sdl2 migration, phase 0).
+;;;
+;;; RENDER-CHECKSUM only covers the map area and only answers "same or not".
+;;; Moving the render backend off lispbuilder-sdl touches everything drawn:
+;;; text in both fonts, the logo, rectangles, every window's layout. So this
+;;; renders a fixed set of whole screens through COTD-INIT and each window's
+;;; real MAKE-OUTPUT, and saves each as an RGB PPM file. The old and the new
+;;; backend cannot be loaded into one process (SDL 1.2 and SDL2 export the
+;;; same C symbol names), so the files are what carries the baseline across
+;;; builds: CAPTURE-GOLDEN-SCREENS on the code before a change, then
+;;; COMPARE-GOLDEN-SCREENS after it. They are written to test/golden/, which
+;;; is gitignored: baselines are captured locally, never committed.
+;;;
+;;; Pixels are stored decoded to 8-bit RGB, not as raw surface values, so the
+;;; files do not depend on whichever pixel format a backend picks.
+;;; ---------------------------------------------------------------------
+
+(defparameter *golden-dir* (asdf:system-relative-pathname :cotd "../test/golden/")
+  "Where CAPTURE-GOLDEN-SCREENS writes, and COMPARE-GOLDEN-SCREENS reads, the
+baseline PPM files.")
+
+(defparameter *golden-user-dir* (merge-pathnames "cotd-headless-golden-oracle/" (uiop:temporary-directory))
+  "*USER-DIR* for a golden run: holds the options.cfg that selects the font,
+and keeps COTD-INIT's highscores writes out of the repo.")
+
+(defparameter *golden-fonts* '(font-6x13 font-8x13)
+  "Both font options, since the font also decides the window size and every
+text-based layout.")
+
+(defparameter *golden-level-seeds* '(1 2 3))
+
+(defun surface-rgb-bytes (surface)
+  "SURFACE's pixels as a fresh (UNSIGNED-BYTE 8) vector, 3 bytes (R G B) per
+pixel, row-major. Decoding goes through SDL_GetRGB with the surface's own
+pixel format, so the result is backend-format independent."
+  (let* ((w (cotd-render:width surface))
+         (h (cotd-render:height surface))
+         (bytes (make-array (* w h 3) :element-type '(unsigned-byte 8)))
+         (format (sdl-base::pixel-format (sdl:fp surface))))
+    (cffi:with-foreign-objects ((r :unsigned-char) (g :unsigned-char) (b :unsigned-char))
+      (sdl:with-pixel (pix (sdl:fp surface))
+        (loop for y from 0 below h
+              do (loop for x from 0 below w
+                       for i = (* 3 (+ x (* y w)))
+                       do (sdl-cffi::sdl-get-rgb (sdl:read-pixel pix x y) format r g b)
+                          (setf (aref bytes i) (cffi:mem-ref r :unsigned-char)
+                                (aref bytes (+ i 1)) (cffi:mem-ref g :unsigned-char)
+                                (aref bytes (+ i 2)) (cffi:mem-ref b :unsigned-char))))))
+    (values bytes w h)))
+
+(defun write-ppm (path bytes w h)
+  (ensure-directories-exist path)
+  (with-open-file (s path :direction :output :if-exists :supersede :element-type '(unsigned-byte 8))
+    (write-sequence (map '(vector (unsigned-byte 8)) #'char-code (format nil "P6~%~D ~D~%255~%" w h)) s)
+    (write-sequence bytes s))
+  path)
+
+(defun read-ppm (path)
+  "Inverse of WRITE-PPM (binary P6, maxval 255, no comments). Returns BYTES, W, H."
+  (with-open-file (s path :element-type '(unsigned-byte 8))
+    (flet ((next-token ()
+             (loop for c = (read-byte s)
+                   while (member c '(9 10 13 32)))
+             (file-position s (1- (file-position s)))
+             (let ((chars (loop for c = (read-byte s)
+                                until (member c '(9 10 13 32))
+                                collect (code-char c))))
+               (coerce chars 'string))))
+      (unless (string= (next-token) "P6")
+        (error "READ-PPM: ~A is not a binary PPM" path))
+      (let* ((w (parse-integer (next-token)))
+             (h (parse-integer (next-token)))
+             (maxval (parse-integer (next-token)))
+             (bytes (make-array (* w h 3) :element-type '(unsigned-byte 8))))
+        (unless (= maxval 255)
+          (error "READ-PPM: ~A has maxval ~A, expected 255" path maxval))
+        (read-sequence bytes s)
+        (values bytes w h)))))
+
+(defun golden-screen-specs ()
+  "The screens to capture, as (NAME . THUNK). Each thunk sets up whatever state
+its window needs, sets *CURRENT-WINDOW*, and calls MAKE-OUTPUT; the caller then
+reads the window's surface. Thunks run in order, after COTD-INIT, so the
+level-based ones see the level the GOLDEN-LEVEL-n thunk before them generated."
+  (flet ((show (win)
+           (setf *current-window* win)
+           (make-output win)))
+    (append
+     (list (cons "main-menu" (lambda () (show (make-instance 'main-menu-window))))
+           (cons "highscores" (lambda () (show (make-instance 'highscores-window))))
+           (cons "help" (lambda () (show (make-instance 'help-window))))
+           (cons "input-str" (lambda ()
+                               (show (make-instance 'input-str-window
+                                                    :init-input "Golden"
+                                                    :header-str "Choose name"
+                                                    :main-str "Enter you name"
+                                                    :prompt-str "[Enter] Confirm"))))
+           (cons "display-msg" (lambda ()
+                                 (show (make-instance 'display-msg-window
+                                                      :msg-line "ERROR: a golden-screen test message, long enough to wrap across more than one line of the box."
+                                                      :w (truncate (* *window-width* 2) 3)
+                                                      :prompt-line "[Esc] Exit")))))
+     (loop for seed in *golden-level-seeds*
+           collect (let ((seed seed))
+                     (cons (format nil "level-~D" seed)
+                           (lambda ()
+                             (generate-headless-level +specific-faction-type-player+ :seed seed)
+                             (update-visible-mobs *player*)
+                             (update-visible-area (level *world*) (x *player*) (y *player*) (z *player*))
+                             (show (make-instance 'cell-window))))))
+     ;; these read *PLAYER*/*WORLD*, i.e. the last level generated above
+     (list (cons "character" (lambda () (show (make-instance 'character-window :return-to nil))))
+           (cons "inventory" (lambda ()
+                               ;; the selected item (the coin, first in the list) has
+                               ;; a flavor quote, which is the only text drawn in the
+                               ;; outlined *FONT-6X13O*/*FONT-8X13O* fonts
+                               (dolist (item-type (list +item-type-smoke-bomb+ +item-type-medkit+ +item-type-coin+))
+                                 (setf (inv *player*)
+                                       (add-to-inv (make-instance 'item :item-type item-type :x (x *player*) :y (y *player*) :z (z *player*) :qty 3)
+                                                   (inv *player*) (id *player*))))
+                               (show (make-instance 'inventory-window :return-to nil))))
+           (cons "journal" (lambda () (show (make-instance 'journal-window :return-to nil))))
+           (cons "select-obj" (lambda ()
+                                (show (make-instance 'select-obj-window
+                                                     :return-to nil
+                                                     :header-line "Are you sure you want to delete this game?"
+                                                     :line-list (list "Yes" "No")
+                                                     :prompt-list ()
+                                                     :enter-func (lambda (cur-sel) (declare (ignore cur-sel)) nil)))))))))
+
+(defun golden-screen-name (font name)
+  (format nil "~(~A~)-~A" font name))
+
+(defun call-with-golden-screens (fn)
+  "For each font in *GOLDEN-FONTS*: fresh SDL init with the dummy driver,
+COTD-INIT with that font selected, then each of GOLDEN-SCREEN-SPECS, calling
+FN with the screen's full name and its RGB BYTES, W, H. A screen whose thunk
+signals an error is reported to FN with BYTES = the condition, so one broken
+window doesn't hide the rest."
+  (sb-posix:setenv "SDL_VIDEODRIVER" "dummy" 1)
+  (ensure-directories-exist *golden-user-dir*)
+  (dolist (font *golden-fonts*)
+    (with-open-file (s (merge-pathnames "options.cfg" *golden-user-dir*) :direction :output :if-exists :supersede)
+      (format s "(font ~(~A~))~%(name \"Golden\")~%" font))
+    (let ((*user-dir* *golden-user-dir*)
+          (*current-window* nil))
+      (cotd-render:with-init ()
+        (cotd-init)
+        (dolist (spec (golden-screen-specs))
+          (let ((name (golden-screen-name font (car spec))))
+            ;; screens must not depend on anything random left over from the
+            ;; previous one (COTD-INIT seeds *RANDOM-STATE* from the clock)
+            (setf *random-state* (sb-ext:seed-random-state 0))
+            (handler-case
+                (progn
+                  (funcall (cdr spec))
+                  ;; lispbuilder-sdl leaves *DEFAULT-SURFACE* NIL and draws to
+                  ;; the window (*DEFAULT-DISPLAY*) when a surface argument is NIL
+                  (multiple-value-bind (bytes w h) (surface-rgb-bytes (or cotd-render:*default-surface* sdl:*default-display*))
+                    (funcall fn name bytes w h)))
+              (error (c) (funcall fn name c nil nil)))))))))
+
+(defun capture-golden-screens (&key (dir *golden-dir*))
+  "Render every golden screen and write it to DIR as <font>-<screen>.ppm.
+Run this on the code before a change. Returns the list of
+(NAME :OK) / (NAME :ERROR condition-text)."
+  (let ((results ()))
+    (call-with-golden-screens
+     (lambda (name bytes w h)
+       (if (typep bytes 'condition)
+           (push (list name :error (princ-to-string bytes)) results)
+           (progn
+             (write-ppm (merge-pathnames (format nil "~A.ppm" name) dir) bytes w h)
+             (push (list name :ok) results)))))
+    (nreverse results)))
+
+(defun compare-golden-screens (&key (dir *golden-dir*) (write-actual t))
+  "Render every golden screen and compare it pixel for pixel with DIR's PPM.
+Returns a list of (NAME STATUS . DETAILS), STATUS one of :SAME, :SIZE (window
+size differs), :DIFF (with the differing-pixel count and the first differing
+x y), :MISSING (no baseline file) or :ERROR. With WRITE-ACTUAL, every screen
+that is not :SAME is also written as <name>.actual.ppm next to the baseline,
+for looking at."
+  (let ((results ()))
+    (call-with-golden-screens
+     (lambda (name bytes w h)
+       (let ((path (merge-pathnames (format nil "~A.ppm" name) dir)))
+         (push
+          (cond
+            ((typep bytes 'condition) (list name :error (princ-to-string bytes)))
+            ((not (probe-file path)) (list name :missing))
+            (t (multiple-value-bind (gold gw gh) (read-ppm path)
+                 (if (or (/= w gw) (/= h gh))
+                     (list name :size (list gw gh) (list w h))
+                     (let ((count 0) (first-diff nil))
+                       (loop for i from 0 below (* w h)
+                             unless (and (= (aref bytes (* 3 i)) (aref gold (* 3 i)))
+                                         (= (aref bytes (+ 1 (* 3 i))) (aref gold (+ 1 (* 3 i))))
+                                         (= (aref bytes (+ 2 (* 3 i))) (aref gold (+ 2 (* 3 i)))))
+                               do (incf count)
+                                  (unless first-diff
+                                    (setf first-diff (list (mod i w) (floor i w)))))
+                       (if (zerop count)
+                           (list name :same)
+                           (list name :diff count first-diff)))))))
+          results)
+         (when (and write-actual bytes (not (typep bytes 'condition))
+                    (not (eq (second (first results)) :same)))
+           (write-ppm (merge-pathnames (format nil "~A.actual.ppm" name) dir) bytes w h)))))
+    (nreverse results)))

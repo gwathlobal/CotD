@@ -45,3 +45,6 @@ mono_crash.*.json
 .idea/
 
 log.txt
+# golden-screen baselines and mismatches: captured locally by
+# capture-golden-screens / compare-golden-screens, never committed
+test/golden/
