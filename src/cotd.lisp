@@ -310,6 +310,9 @@
       )
     
     ;; set parameters depending on options
+    ;; the video subsystem must be initialized before any SDL surface
+    ;; (e.g. the font strip below) can be created
+    (sdl:init-video)
     (init-glyph-front)
     ;; font
     (cond
@@ -571,9 +574,12 @@
          (setf *cotd-log-level* :info)
          (setup-log)
          (log:error "~A" c)
+         ;; *WINDOW-WIDTH* may not be bound yet if the error happened inside
+         ;; COTD-INIT before it got set - fall back to a fixed width rather
+         ;; than crash the error handler itself on an unbound variable.
          (setf *current-window* (make-instance 'display-msg-window
                                                :msg-line (format nil "ERROR: ~A" c)
-                                               :w (truncate (* *window-width* 2/3))
+                                               :w (truncate (* (if (boundp '*window-width*) *window-width* 800) 2/3))
                                                :prompt-line "[Esc] Exit"))
          (make-output *current-window*)
          (run-window *current-window*)

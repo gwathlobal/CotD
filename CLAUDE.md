@@ -43,8 +43,15 @@ Pick the right check for what you touched — see the project's `verification-re
 - rendering -> render old vs new into two surfaces, compare every pixel (`sdl:with-pixel`/`sdl:read-pixel`, not `sdl:read-pixel-*` - that doesn't exist)
 - a predicate's definition -> exhaustively compare old vs new over its full input space
 - anything timed -> run 4x and report a band; same-build variance is ~5%
+- `cotd-init` / `init-glyph-front` / anything touching their call order -> `(run-headless-startup-check)` first; it is the only oracle that calls `cotd-init` itself (the others each do their own minimal SDL setup and skip it), so it is the only one that would catch a regression in `cotd-init`'s own ordering
 
 Always verify through the **public accessor**, not the underlying structure, so the test survives representation changes.
+
+### `sdl:window` must run before any SDL surface is created
+
+lispbuilder-sdl requires the video subsystem to be initialized (`sdl:init-video`, or `sdl:window` which calls it) before any `sdl-surface` instance exists - `sdl:load-image`, `sdl:create-surface`, etc. all create one. Violating this raises "ERROR: The SDL library must be initialized prior to use." from inside `handle-errors-to-ui`'s handler, which then tries to render that error in a `display-msg-window` sized from `*window-width*` - unbound if the failure happened before `cotd-init` set it - crashing the error handler itself with an unrelated `UNBOUND-VARIABLE` and hiding the real cause.
+
+This has happened once already: a refactor moved `init-glyph-front` (which loads the font strip, i.e. creates a surface) to the top of `cotd-init`, ahead of the `sdl:window` call — compiled clean, every headless oracle stayed green (none of them calls `cotd-init` itself; see the table above), and the real executable crashed on startup. `cotd-init` now calls `sdl:init-video` before `init-glyph-front` to restore the order. Run `(run-headless-startup-check)` after touching `cotd-init`'s init sequence — it is the regression test for this specific ordering.
 
 ## Line endings (CRLF)
 

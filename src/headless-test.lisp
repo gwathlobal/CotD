@@ -470,3 +470,46 @@ callers do not need SDL:WITH-INIT around this."
               do (loop for x from 0 below (sdl:width surface)
                        do (setf sum (logand #xFFFFFFFF (+ (* sum 31) (sdl:read-pixel pix x y)))))
               finally (return sum))))))
+
+;;; ---------------------------------------------------------------------
+;;; Deliverable 4: startup oracle.
+;;;
+;;; None of the three oracles above call COTD-INIT itself - they each do their
+;;; own minimal SDL setup (SDL:WINDOW then INIT-GLYPH-FRONT, in that order) and
+;;; call into generation/gameplay/render code below it. That is exactly why
+;;; this harness did not catch a COTD-INIT regression that shipped alongside
+;;; it: a refactor moved INIT-GLYPH-FRONT (which calls SDL:LOAD-IMAGE, i.e.
+;;; creates an SDL surface) to the top of COTD-INIT, ahead of the SDL:WINDOW
+;;; call that initializes the video subsystem - lispbuilder-sdl requires video
+;;; to be initialized before any surface exists. The real executable crashed
+;;; on startup; every oracle above stayed green because none of them run
+;;; COTD-INIT's own ordering. RUN-HEADLESS-STARTUP-CHECK closes that gap by
+;;; calling COTD-INIT exactly as COTD-MAIN does and is the first thing to run
+;;; after touching COTD-INIT or anything it calls.
+;;; ---------------------------------------------------------------------
+
+(defparameter *headless-startup-user-dir* (merge-pathnames "cotd-headless-startup-oracle/" (uiop:temporary-directory))
+  "Where RUN-HEADLESS-STARTUP-CHECK points *USER-DIR* for the duration of a
+run, so COTD-INIT's options.cfg/highscores writes land outside the repo - see
+*HEADLESS-TURN-USER-DIR* for the same reasoning.")
+
+(defun run-headless-startup-check ()
+  "Runs COTD-INIT exactly as COTD-MAIN does (SDL:WITH-INIT, then COTD-INIT),
+with SDL_VIDEODRIVER=dummy so it needs no real display, and *USER-DIR*
+pointed outside the repo. Signals whatever error COTD-INIT signals - callers
+want it to fail loudly, not report T/NIL - and otherwise returns T, having
+confirmed *WINDOW-WIDTH*/*WINDOW-HEIGHT*/*GLYPH-FRONT*/*START-LOGO* all ended
+up bound. Run this first after any change to COTD-INIT, INIT-GLYPH-FRONT, or
+their call order - it is cheap and it is the only oracle here that would have
+caught the startup-ordering bug described above."
+  (sb-posix:setenv "SDL_VIDEODRIVER" "dummy" 1)
+  (ensure-directories-exist *headless-startup-user-dir*)
+  (let ((*user-dir* *headless-startup-user-dir*))
+    (sdl:with-init ()
+      (cotd-init)
+      (unless (and (boundp '*window-width*) (plusp *window-width*)
+                   (boundp '*window-height*) (plusp *window-height*)
+                   (boundp '*glyph-front*) *glyph-front*
+                   (boundp '*start-logo*) *start-logo*)
+        (error "RUN-HEADLESS-STARTUP-CHECK: COTD-INIT returned without setting up render state"))
+      t)))
