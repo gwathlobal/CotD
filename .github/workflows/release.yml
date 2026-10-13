@@ -125,31 +125,48 @@ jobs:
         run: |
           set -uo pipefail
           cd src
-          for driver in dummy native; do
-            echo "=== video driver: $driver ==="
-            if [ "$driver" = dummy ]; then export SDL_VIDEODRIVER=dummy; else unset SDL_VIDEODRIVER; fi
+
+          # Each case runs in its own SBCL, so a fault in one still leaves the
+          # others to report. The cases differ in what happened before the
+          # push: the event check that crashed is the *second* SDL session in
+          # its process (the startup check did SDL_Init/SDL_Quit first), and it
+          # pushes only after a renderer exists - SDL dispatches every pushed
+          # event to the watcher SDL_CreateRenderer installs.
+          probe () {
+            echo "--- $1"
             sbcl --non-interactive \
               --eval '(asdf:load-system :cotd)' \
               --eval '(in-package :cotd)' \
-              --eval '(flet ((step-done (what) (format t "  ok: ~A~%" what) (finish-output)))
-                        (cotd-render:with-init ()
-                          (step-done "SDL_Init")
-                          (cotd-render:window 10 10)
-                          (step-done "window")
-                          (cotd-render:push-quit-event)
-                          (step-done "push quit")
-                          (cotd-render:push-expose-event)
-                          (step-done "push expose")
-                          (cotd-render:push-key-down-event 97)
-                          (step-done "push key, no unicode")
-                          (cotd-render:push-key-down-event 97 :unicode 97)
-                          (step-done "push key, with unicode")
-                          (cotd-render:with-events ()
-                            (:quit-event () t)
-                            (:key-down-event (:key key) (format t "  got key ~A~%" key))
-                            (:video-expose-event () (format t "  got expose~%"))
-                            (:idle () (cotd-render:push-quit-event)))
-                          (step-done "drained the queue")))' || echo "  FAULTED on the $driver driver (exit $?)"
+              --eval "$2" || echo "  FAULTED (exit $?)"
+          }
+
+          # Keywords rather than strings in the probe forms: they travel
+          # through the shell without quoting trouble.
+          note='(note (what) (format t "  ok: ~A~%" what) (finish-output))'
+          pushes='(cotd-render:push-quit-event) (note :push-quit)
+                  (cotd-render:push-expose-event) (note :push-expose)
+                  (cotd-render:push-key-down-event 97) (note :push-key)
+                  (cotd-render:push-key-down-event 97 :unicode 97) (note :push-key-with-unicode)'
+
+          for driver in dummy native; do
+            echo "=== video driver: $driver ==="
+            if [ "$driver" = dummy ]; then export SDL_VIDEODRIVER=dummy; else unset SDL_VIDEODRIVER; fi
+
+            probe "one session, no window (so no renderer, so no event watcher)" \
+              "(flet ($note)
+                 (cotd-render:with-init () (note :sdl-init) $pushes))"
+
+            probe "one session, with a window" \
+              "(flet ($note)
+                 (cotd-render:with-init ()
+                   (note :sdl-init) (cotd-render:window 10 10) (note :window) $pushes))"
+
+            probe "second session, with a window - what the event check does" \
+              "(flet ($note)
+                 (cotd-render:with-init () (cotd-render:window 10 10))
+                 (note :first-session-torn-down)
+                 (cotd-render:with-init ()
+                   (note :second-sdl-init) (cotd-render:window 10 10) (note :window) $pushes))"
           done
 
       - name: Headless oracles
