@@ -181,7 +181,7 @@
                                          :name "Connectivity map (size 3) thread"))
            )
       ;; Redraw from this thread while the workers run. They only bump the
-      ;; progress counter; SDL 1.2 rendering is not thread-safe, and having both
+      ;; progress counter; SDL rendering is not thread-safe, and having both
       ;; workers blit and flip concurrently is undefined behaviour. Waiting on a
       ;; semaphore rather than polling thread-alive-p means the wait ends the
       ;; moment a worker finishes, instead of up to one poll interval later.

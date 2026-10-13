@@ -36,10 +36,11 @@
 ;;;;    sites pass :SURFACE COTD-RENDER:*DEFAULT-SURFACE* explicitly and rely
 ;;;;    on that NIL; only the headless oracles bind it to an offscreen surface.
 ;;;;  - Colours are packed #xRRGGBB integers.
-;;;;  - Everything drawn is pixel-identical to the lispbuilder-sdl (SDL 1.2)
-;;;;    backend this replaced: COMPARE-GOLDEN-SCREENS in headless-test.lisp
-;;;;    checked that against whole-screen captures of it, and
-;;;;    RUN-HEADLESS-EVENT-CHECK checks the event loop.
+;;;;
+;;;; Checks: COMPARE-GOLDEN-SCREENS (whole screens) and RUN-HEADLESS-EVENT-CHECK
+;;;; (the event loop) in headless-test.lisp. Both run on SDL's dummy video
+;;;; driver; tools/smoke-test runs the real game on a real X display, which
+;;;; is the only way to see the window system's side of this file.
 
 (in-package :cotd-render)
 
@@ -291,7 +292,6 @@ error if PTR is null."
   (declare (type (unsigned-byte 8) r g b))
   (logior (ash r 16) (ash g 8) b))
 
-;; the same values as lispbuilder-sdl's colours of these names
 (defparameter *black* #x000000)
 (defparameter *white* #xFFFFFF)
 (defparameter *red* #xFF0000)
@@ -452,14 +452,13 @@ result does not depend on which pixel format the backend picked."
 ;;; ---------------------------------------------------------------------
 ;;; Bitmap fonts.
 ;;;
-;;; These replace lispbuilder-sdl's built-in fonts of the same names, pixel
-;;; for pixel: the glyph data was exported from lispbuilder-sdl into
-;;; data/fonts/*.bmp by tools/export-lispbuilder-fonts.lisp. Each file is one
-;;; row of 256 glyphs, glyph N (char-code N) at x = N * char-width, white where
-;;; the glyph has a pixel and black elsewhere.
+;;; Four fixed-size fonts - 6x13 and 8x13, and their oblique variants 6x13o
+;;; and 8x13o - each a file in data/fonts/: one row of 256 glyphs, glyph N
+;;; (char-code N) at x = N * char-width, white where the glyph has a pixel and
+;;; black elsewhere.
 ;;;
 ;;; Drawing text writes the text colour on the glyph's pixels and leaves every
-;;; other pixel alone, like lispbuilder-sdl's DRAW-STRING-SOLID-*. For that,
+;;; other pixel alone. For that,
 ;;; each (font, colour) pair gets a strip of all 256 glyphs already in that
 ;;; colour, on a colour-keyed background, built once from the glyph bits; a
 ;;; character is then one blit out of the strip.
@@ -570,29 +569,27 @@ Only the glyph pixels are written."
 ;;; ---------------------------------------------------------------------
 ;;; Events and the frame loop.
 ;;;
-;;; WITH-EVENTS keeps the clause syntax of lispbuilder-sdl's macro of the same
-;;; name, for the four clauses CotD uses:
+;;; WITH-EVENTS is the event loop of every window. Its clauses:
 ;;;
 ;;;   (:quit-event () body)            - body's value T ends the loop
 ;;;   (:key-down-event (:key k :mod m :unicode u) body)  - any subset of keys
 ;;;   (:video-expose-event () body)
 ;;;   (:idle () body)                  - once per frame, after the queue is empty
 ;;;
-;;; and its behaviour: in :POLL mode every pending event is dispatched (even
+;;; In :POLL mode every pending event is dispatched (even
 ;;; ones still queued behind a quit), then, unless quitting, the :IDLE forms
 ;;; run and the loop sleeps to hold *FRAME-RATE*. :WAIT blocks for each event
 ;;; and has no idle step. KEY is an SDL2 keycode (*KEY-BINDINGS* in
 ;;; key-bindings.lisp names them), MOD the modifier bitmask, UNICODE the code
 ;;; of the character the key typed, 0 if none.
 ;;;
-;;; SDL 1.2 put that character in the key event itself; SDL2 sends it as a
-;;; separate SDL_TEXTINPUT event right behind the SDL_KEYDOWN. NEXT-EVENT pairs
+;;; SDL2 sends that character as a separate SDL_TEXTINPUT event right behind
+;;; the SDL_KEYDOWN. NEXT-EVENT pairs
 ;;; the two back up. Text input that arrives with no key event in front of it
 ;;; (an input method composing a character, say) becomes a key-down event of
 ;;; its own with KEY 0, which matches no binding, so it only ever reaches
-;;; code that reads UNICODE. Unlike SDL 1.2, keys that type no printable
-;;; character (Enter, Escape, Ctrl+letter) get UNICODE 0; nothing reads those
-;;; through UNICODE.
+;;; code that reads UNICODE. Keys that type no printable character (Enter,
+;;; Escape, Ctrl+letter) get UNICODE 0.
 ;;; ---------------------------------------------------------------------
 
 (defvar *event-key* 0)
@@ -706,8 +703,7 @@ drives WITH-EVENTS with these."
   (sdl-call "SDL_Delay" :uint32 ms :void))
 
 (defparameter *frame-rate* 30
-  "Frames per second WITH-EVENTS holds its :POLL loop to (lispbuilder-sdl's
-default, which CotD always ran at).")
+  "Frames per second WITH-EVENTS holds its :POLL loop to.")
 
 (defvar *frame-count* 0)
 (defvar *frame-base-ticks* nil)
@@ -718,7 +714,7 @@ default, which CotD always ran at).")
 
 (defun run-frame (idle-fn)
   "Run IDLE-FN, then sleep for whatever is left of this frame. The schedule is
-SDL_gfx's (as in lispbuilder-sdl): frame N is due at base + N * 1000/rate ms;
+SDL_gfx's: frame N is due at base + N * 1000/rate ms;
 a frame that is already late restarts the schedule from now instead of
 trying to catch up."
   (let ((now (ticks)))

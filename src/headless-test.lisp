@@ -81,7 +81,7 @@ checksum differs between the two runs, or NIL if nothing changed."
 ;;; effect/card/animation/faction) plus every +...+ id constant, with TYPE-OF
 ;;; on every slot value as well as the value itself. TYPE-OF is what catches a
 ;;; slot's *representation* changing even when it prints the same, e.g. the
-;;; glyph/back-color slots moving from SDL:COLOR objects to packed-color
+;;; glyph/back-color slots changing from colour objects to packed-color
 ;;; fixnums - exactly the case this oracle exists for.
 ;;; ---------------------------------------------------------------------
 
@@ -334,12 +334,10 @@ per-mob position/stats/effects (exactly, so a diff says which mob and field
 changed), a folded hash of the memo array's glyph/visibility/revealed/light
 fields, PLAYER-GAME-TIME, and the mob/item/feature counts.
 
-Deliberately excluded: the memo's glyph-color/back-color fields. The ongoing
-packed-colour migration (see CLAUDE.md commit history) is what this oracle is
-meant to stay decoupled from while that work is in flight, so colour is left
-out on purpose rather than because of what the fields currently hold. Add
-them back as the last step of that work, once the representation is settled
-for good."
+Deliberately excluded: the memo's glyph-color/back-color fields. They were
+left out while colours moved to packed integers; that is finished, so they
+could be added now - which changes every checksum, so record new baselines
+when doing it."
   (list :mobs (loop for mob-id in (mob-id-list level)
                      for mob = (get-mob-by-id mob-id)
                      collect (list (id mob) (x mob) (y mob) (z mob)
@@ -421,20 +419,18 @@ either run is skipped rather than compared - see RUN-HEADLESS-TURNS."
 ;;; Four things that cost real time to find out, kept here so the next person
 ;;; doesn't have to re-discover them:
 ;;;  1. SDL_VIDEODRIVER=dummy lets SDL initialize with no real display - its
-;;;     headless video driver, works in CI; SDL2's gives the window a 32-bit
-;;;     RGB888 surface like a real display. (SDL 1.2's defaulted to an 8-bit
-;;;     palette, which quietly quantized every colour the old baselines held.)
-;;;     The dummy driver never runs the real window system's code, so it can't
-;;;     catch what only happens there - see the float-trap and text-input
-;;;     notes in render.lisp; run the real game for those.
+;;;     headless video driver, works in CI, and gives the window a 32-bit
+;;;     RGB888 surface like a real display. It never runs the real window
+;;;     system's code, so it can't catch what only happens there - see the
+;;;     float-trap and text-input notes in render.lisp; tools/smoke-test runs
+;;;     the real game for those.
 ;;;  2. UPDATE-MAP-AREA (window-methods.lisp) has no :SURFACE parameter; the
 ;;;     surface only reaches DRAW-GLYPH through COTD-RENDER:*DEFAULT-SURFACE*'s
 ;;;     default, so that special variable is rebound around the call instead
 ;;;     of threading a new keyword through every caller.
 ;;;  3. Pixels are read back through COTD-RENDER:SURFACE-RGB-BYTES, decoded
-;;;     to RGB, so the checksum is independent of the backend's pixel format
-;;;     (and of its pixel-access API - lispbuilder-sdl's needs a WITH-PIXEL
-;;;     context, there is no READ-PIXEL-* taking a surface and coordinates).
+;;;     to RGB, so the checksum is independent of the surface's pixel
+;;;     format.
 ;;;  4. COTD-INIT's render setup (glyph-w/h, *GLYPH-FRONT*, the strip cache,
 ;;;     *TEMP-RECT*) is needed here too; it is factored out as INIT-GLYPH-FRONT
 ;;;     in window-methods.lisp rather than duplicated.
@@ -446,7 +442,7 @@ gameplay does (UPDATE-MAP-AREA / DRAW-GLYPH), and fold every pixel of the
 result into one hash - a regression oracle for the render path itself,
 independent of RUN-HEADLESS-TURNS/TURN-CHECKSUM which only checks gameplay
 state. Does its own one-time SDL setup (see the comment above this section);
-callers do not need SDL:WITH-INIT around this."
+callers do not need COTD-RENDER:WITH-INIT around this."
   (sb-posix:setenv "SDL_VIDEODRIVER" "dummy" 1)
   (cotd-render:with-init ()
     (cotd-render:window 1 1)
@@ -475,15 +471,11 @@ callers do not need SDL:WITH-INIT around this."
 ;;; Deliverable 4: startup oracle.
 ;;;
 ;;; None of the three oracles above call COTD-INIT itself - they each do their
-;;; own minimal SDL setup (SDL:WINDOW then INIT-GLYPH-FRONT, in that order) and
-;;; call into generation/gameplay/render code below it. That is exactly why
-;;; this harness did not catch a COTD-INIT regression that shipped alongside
-;;; it: a refactor moved INIT-GLYPH-FRONT (which calls SDL:LOAD-IMAGE, i.e.
-;;; creates an SDL surface) to the top of COTD-INIT, ahead of the SDL:WINDOW
-;;; call that initializes the video subsystem - lispbuilder-sdl requires video
-;;; to be initialized before any surface exists. The real executable crashed
-;;; on startup; every oracle above stayed green because none of them run
-;;; COTD-INIT's own ordering. RUN-HEADLESS-STARTUP-CHECK closes that gap by
+;;; own minimal SDL setup (COTD-RENDER:WINDOW then INIT-GLYPH-FRONT) and call
+;;; into generation/gameplay/render code below it, so none of them would catch
+;;; a mistake in COTD-INIT's own sequence - such as loading the tile sheet
+;;; (INIT-GLYPH-FRONT creates a surface) before video is initialized, which
+;;; once crashed the real executable on startup with every oracle green. RUN-HEADLESS-STARTUP-CHECK closes that gap by
 ;;; calling COTD-INIT exactly as COTD-MAIN does and is the first thing to run
 ;;; after touching COTD-INIT or anything it calls.
 ;;; ---------------------------------------------------------------------
@@ -494,7 +486,7 @@ run, so COTD-INIT's options.cfg/highscores writes land outside the repo - see
 *HEADLESS-TURN-USER-DIR* for the same reasoning.")
 
 (defun run-headless-startup-check ()
-  "Runs COTD-INIT exactly as COTD-MAIN does (SDL:WITH-INIT, then COTD-INIT),
+  "Runs COTD-INIT exactly as COTD-MAIN does (COTD-RENDER:WITH-INIT, then COTD-INIT),
 with SDL_VIDEODRIVER=dummy so it needs no real display, and *USER-DIR*
 pointed outside the repo. Signals whatever error COTD-INIT signals - callers
 want it to fail loudly, not report T/NIL - and otherwise returns T, having
@@ -515,29 +507,21 @@ caught the startup-ordering bug described above."
       t)))
 
 ;;; ---------------------------------------------------------------------
-;;; Deliverable 5: golden screens (sdl2 migration, phase 0).
+;;; Deliverable 5: golden screens.
 ;;;
 ;;; RENDER-CHECKSUM only covers the map area and only answers "same or not".
-;;; Moving the render backend off lispbuilder-sdl touches everything drawn:
-;;; text in both fonts, the logo, rectangles, every window's layout. So this
+;;; Changes to the renderer, the fonts or any window's MAKE-OUTPUT touch whole
+;;; screens: text in both fonts, the logo, rectangles, layouts. So this
 ;;; renders a fixed set of whole screens through COTD-INIT and each window's
-;;; real MAKE-OUTPUT, and saves each as an RGB PPM file. The old and the new
-;;; backend cannot be loaded into one process (SDL 1.2 and SDL2 export the
-;;; same C symbol names), so the files are what carries the baseline across
-;;; builds: CAPTURE-GOLDEN-SCREENS on the code before a change, then
-;;; COMPARE-GOLDEN-SCREENS after it. They are written to test/golden/, which
-;;; is gitignored: baselines are captured locally, never committed.
-;;;
-;;; The baselines the migration ended on are the SDL2 backend's own output,
-;;; accepted only after comparing it with lispbuilder-sdl (SDL 1.2) rendering
-;;; into a 32-bit window: 22 of the 24 screens are byte-identical, and the 2
-;;; main menus differ only inside the logo, a 16-bit (RGB565) BMP, where every
-;;; pixel holds the same 5/6-bit values and only the expansion of the low bits
-;;; to 8 bits differs (SDL2 reaches 255 at full intensity, SDL 1.2 stopped at
-;;; 248).
+;;; real MAKE-OUTPUT, and saves each as an RGB PPM file: CAPTURE-GOLDEN-SCREENS
+;;; on the code before a change, then COMPARE-GOLDEN-SCREENS after it, which
+;;; reports every screen that differs and where. The files go to
+;;; test/golden/, which is gitignored: baselines are captured locally, never
+;;; committed. Files rather than an in-process comparison, so a baseline can
+;;; also come from a different build or checkout.
 ;;;
 ;;; Pixels are stored decoded to 8-bit RGB, not as raw surface values, so the
-;;; files do not depend on whichever pixel format a backend picks.
+;;; files do not depend on the surface's pixel format.
 ;;; ---------------------------------------------------------------------
 
 (defparameter *golden-dir* (asdf:system-relative-pathname :cotd "../test/golden/")
@@ -720,17 +704,17 @@ for looking at."
     (nreverse results)))
 
 ;;; ---------------------------------------------------------------------
-;;; Deliverable 6: event loop oracle (sdl2 migration).
+;;; Deliverable 6: event loop oracle.
 ;;;
-;;; COTD-RENDER:WITH-EVENTS replaced lispbuilder-sdl's macro of the same name;
-;;; the golden screens can't see input handling at all. This queues a fixed
+;;; The golden screens can't see input handling at all. This queues a fixed
 ;;; script of synthetic events through COTD-RENDER:PUSH-*-EVENT and checks the
-;;; exact order and content of the clauses WITH-EVENTS runs, including the two
-;;; easy-to-lose details of the original: every queued event is still
+;;; exact order and content of the clauses COTD-RENDER:WITH-EVENTS runs,
+;;; including two easy-to-lose details: every queued event is still
 ;;; dispatched after a quit clause returns T in :POLL mode, and a quit clause
-;;; returning NIL does not end the loop. Keys are named by our own :KEY-x ids
+;;; returning NIL does not end the loop. Synthetic text events carry junk
+;;; after their NUL, as real SDL ones do. Keys are named by our own :KEY-x ids
 ;;; and checked with KEY= and the modifier predicates, so the expected trace
-;;; is backend-independent and must hold on any render backend.
+;;; does not depend on SDL's key values.
 ;;; ---------------------------------------------------------------------
 
 (defun headless-key-name (key)

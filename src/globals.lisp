@@ -13,7 +13,7 @@
   (declare (type (unsigned-byte 8) r g b) (optimize (speed 3)))
   (logior (ash r 16) (ash g 8) b))
 
-;; Match lispbuilder-sdl's sdl:*white*/*black*/etc. (sdl/default-colors.lisp) exactly.
+;; The same values as cotd-render:*white*, *black*, etc.
 (defconstant +color-white+   #xFFFFFF)
 (defconstant +color-black+   #x000000)
 (defconstant +color-red+     #xFF0000)
@@ -851,7 +851,7 @@ hand-written methods this replaces."
 
 ;; *cur-progress-bar* is bumped from the connectivity-map worker threads during
 ;; level generation, so the increment needs guarding - two unsynchronised incfs
-;; lose updates. The workers must not draw: SDL 1.2 rendering is not
+;; lose updates. The workers must not draw: SDL rendering is not
 ;; thread-safe, so only the thread that owns the screen calls
 ;; *update-screen-closure*.
 (defparameter *progress-bar-lock* (bt:make-lock "progress bar"))

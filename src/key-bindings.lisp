@@ -5,10 +5,9 @@
 ;;; Every window checks :key-down-event data through KEY= and the modifier
 ;;; predicates below instead of using SDL key constants directly. This is the
 ;;; single choke point for physical keys: the values are SDL2 keycodes (the
-;;; key's unshifted symbol in the current layout, as SDL 1.2's keysyms were),
-;;; and the modifier masks are SDL2's KMOD bits, which have the same values as
-;;; SDL 1.2's. Remapping a key for a player means overriding one entry in
-;;; *KEY-BINDINGS*.
+;;; key's unshifted symbol in the current layout) and the modifier masks are
+;;; SDL2's KMOD bits. Remapping a key for a player means overriding one entry
+;;; in *KEY-BINDINGS*.
 
 (defparameter *key-bindings*
   `((:key-2 . ,sdl2-ffi:+sdlk-2+)
