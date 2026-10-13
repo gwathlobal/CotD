@@ -25,7 +25,7 @@
    #:*default-font* #:*font-6x13* #:*font-8x13* #:*font-6x13o* #:*font-8x13o*
    #:color #:*default-surface*
    #:*white* #:*black* #:*red* #:*yellow* #:*magenta* #:*green* #:*cyan* #:*blue*
-   #:surface-rgb-bytes))
+   #:surface-rgb-bytes #:window-surface))
 
 ;;;; The render backend boundary.
 ;;;;
@@ -50,9 +50,13 @@
 
 (in-package :cotd-render)
 
+(defun window-surface ()
+  "The window's own surface: what is on screen after UPDATE-DISPLAY."
+  sdl:*default-display*)
+
 (defun target-surface (surface)
   "SURFACE, or the window when it is NIL (see the contract above)."
-  (or surface sdl:*default-display*))
+  (or surface (window-surface)))
 
 (defun blit (src x y &key (surface *default-surface*)
                           (src-x 0) (src-y 0) (src-w (width src)) (src-h (height src)))

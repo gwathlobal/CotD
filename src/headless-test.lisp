@@ -424,14 +424,13 @@ either run is skipped rather than compared - see RUN-HEADLESS-TURNS."
 ;;;     SDL 1.2's headless video driver, works in CI. Without it SDL:LOAD-IMAGE
 ;;;     and surface blits fail outright on a machine with no X server.
 ;;;  2. UPDATE-MAP-AREA (window-methods.lisp) has no :SURFACE parameter; the
-;;;     surface only reaches DRAW-GLYPH through SDL:*DEFAULT-SURFACE*'s
+;;;     surface only reaches DRAW-GLYPH through COTD-RENDER:*DEFAULT-SURFACE*'s
 ;;;     default, so that special variable is rebound around the call instead
 ;;;     of threading a new keyword through every caller.
-;;;  3. SDL:READ-PIXEL-* does not exist (CLAUDE.md used to say otherwise -
-;;;     fixed). lispbuilder-sdl exports READ-PIXEL/WITH-PIXEL/WITH-PIXELS
-;;;     (re-exported from lispbuilder-sdl-base; see sdl/package.lisp), and
-;;;     READ-PIXEL takes a pixel context from WITH-PIXEL, not a surface and
-;;;     coordinates directly.
+;;;  3. Pixels are read back through COTD-RENDER:SURFACE-RGB-BYTES, decoded
+;;;     to RGB, so the checksum is independent of the backend's pixel format
+;;;     (and of its pixel-access API - lispbuilder-sdl's needs a WITH-PIXEL
+;;;     context, there is no READ-PIXEL-* taking a surface and coordinates).
 ;;;  4. COTD-INIT's render setup (glyph-w/h, *GLYPH-FRONT*, the strip cache,
 ;;;     *TEMP-RECT*) is needed here too; it is factored out as INIT-GLYPH-FRONT
 ;;;     in window-methods.lisp rather than duplicated.
@@ -461,15 +460,12 @@ callers do not need SDL:WITH-INIT around this."
       (update-visible-area level (x *player*) (y *player*) (z *player*))
       (let ((cotd-render:*default-surface* surface))
         (update-map-area 0 0))
-      ;; SDL:WITH-PIXEL is LISPBUILDER-SDL-BASE::WITH-PIXEL re-exported, and
-      ;; the base package's WITH-LOCKED-SURFACE underneath it wants the raw
-      ;; CFFI pointer, not the high-level SDL:SURFACE wrapper - hence (FP ...).
-      (sdl:with-pixel (pix (sdl:fp surface))
-        (loop with sum of-type (unsigned-byte 32) = 0
-              for y from 0 below (cotd-render:height surface)
-              do (loop for x from 0 below (cotd-render:width surface)
-                       do (setf sum (logand #xFFFFFFFF (+ (* sum 31) (sdl:read-pixel pix x y)))))
-              finally (return sum))))))
+      ;; hash the decoded RGB, not raw pixel values, so the checksum doesn't
+      ;; depend on the backend's pixel format
+      (loop with sum of-type (unsigned-byte 32) = 0
+            for byte across (cotd-render:surface-rgb-bytes surface)
+            do (setf sum (logand #xFFFFFFFF (+ (* sum 31) byte)))
+            finally (return sum)))))
 
 ;;; ---------------------------------------------------------------------
 ;;; Deliverable 4: startup oracle.
@@ -657,9 +653,8 @@ window doesn't hide the rest."
             (handler-case
                 (progn
                   (funcall (cdr spec))
-                  ;; lispbuilder-sdl leaves *DEFAULT-SURFACE* NIL and draws to
-                  ;; the window (*DEFAULT-DISPLAY*) when a surface argument is NIL
-                  (multiple-value-bind (bytes w h) (cotd-render:surface-rgb-bytes (or cotd-render:*default-surface* sdl:*default-display*))
+                  ;; *DEFAULT-SURFACE* is NIL in normal play, meaning the window
+                  (multiple-value-bind (bytes w h) (cotd-render:surface-rgb-bytes (or cotd-render:*default-surface* (cotd-render:window-surface)))
                     (funcall fn name bytes w h)))
               (error (c) (funcall fn name c nil nil)))))))))
 

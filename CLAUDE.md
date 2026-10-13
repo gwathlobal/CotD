@@ -40,7 +40,7 @@ Pick the right check for what you touched — see the project's `verification-re
 - level gen / terrain / connectivity -> checksum terrain + every `(x y z move-mode)` via `get-level-connect-map-value`, several seeds
 - type tables / initargs / id spaces -> dump every trait/ability/AI-package/armor of all type instances **with `type-of`**, plus all id constants, diff
 - memo / FOV / gameplay logic -> checksum memo fields via public readers after N seeded AI turns
-- rendering -> render old vs new into two surfaces, compare every pixel (`sdl:with-pixel`/`sdl:read-pixel`, not `sdl:read-pixel-*` - that doesn't exist)
+- rendering -> render old vs new into two surfaces, compare every pixel (`cotd-render:surface-rgb-bytes`); `(render-checksum faction :seed n)` hashes the map area the same way
 - the render backend / `cotd-render` shim / fonts / any window's `make-output` -> `(compare-golden-screens)`: renders 24 whole screens (12 windows x both fonts, through the real `cotd-init`) and compares every pixel against baseline PPMs in `test/golden/`. Baselines are local, not committed (`test/golden/` is gitignored): run `(capture-golden-screens)` on the code *before* your change, then `(compare-golden-screens)` after it, like `run-headless-regression`; anything not `:same` is also written there as `<name>.actual.ppm` for viewing
 - the event loop (`cotd-render:with-events`), key/modifier/unicode handling, or `key-bindings.lisp` -> `(run-headless-event-check)`: pushes a scripted sequence of synthetic key/expose/quit events and checks the exact clause trace, by our own `:key-x` names, so it is backend-independent
 - a predicate's definition -> exhaustively compare old vs new over its full input space

@@ -44,7 +44,7 @@
                                                                                     (get-single-memo-visibility (get-memo-* (level *world*) dx dy dz)))
                                                                            (display-animation-on-map dx dy dz 5 cotd-render:*red* cotd-render:*black*)
                                                                            (cotd-render:update-display)
-                                                                           (sdl-cffi::sdl-delay 100))
+                                                                           (cotd-render:delay 100))
                                                                        
                                                                        ;; place a blood stain along the path of the head
                                                                          (add-feature-to-level-list (level *world*) 

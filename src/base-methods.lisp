@@ -126,7 +126,7 @@
               do
                  (play-animation animation))
         (cotd-render:update-display)
-        (sdl-cffi::sdl-delay 100)
+        (cotd-render:delay 100)
         (setf (animation-queue (level *world*)) nil)
         (update-map-area *start-map-x* 0)
         ;;(format t "~%TIME-ELAPSED AI ~A [~A] after all animations: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
