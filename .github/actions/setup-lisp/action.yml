@@ -1,0 +1,125 @@
+name: Set up SBCL and Quicklisp
+description: >
+  Installs SBCL, a pinned Quicklisp dist and the game's Lisp dependencies, and
+  points ASDF at the checkout. SDL2 is deliberately not installed here: the
+  game declares libSDL2 to CFFI itself and opens it only when it runs, so
+  nothing in a build needs it. Jobs that run the game (the oracles, the smoke
+  test, the built executable) install SDL2 themselves.
+
+inputs:
+  sbcl-version:
+    description: >
+      SBCL version to install on Linux and Windows. Ignored on macOS, for
+      which SBCL publishes no binaries - that one is Homebrew's current
+      version, so a macOS job is the one place the compiler is not pinned.
+    required: true
+  quicklisp-dist:
+    description: >
+      Quicklisp dist to pin, as a date, e.g. 2024-10-12. Pinning it is what
+      keeps an upstream library change from breaking a release build that has
+      no repository change behind it.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install SBCL (Linux)
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        set -euo pipefail
+        v='${{ inputs.sbcl-version }}'
+        curl -fsSL --retry 5 --retry-delay 4 -o sbcl-binary.tar.bz2 \
+          "https://downloads.sourceforge.net/project/sbcl/sbcl/$v/sbcl-$v-x86-64-linux-binary.tar.bz2"
+        tar -xjf sbcl-binary.tar.bz2
+        (cd "sbcl-$v-x86-64-linux" && sudo sh install.sh)
+        rm -rf sbcl-binary.tar.bz2 "sbcl-$v-x86-64-linux"
+        sbcl --version
+
+    - name: Install SBCL (macOS)
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        set -euo pipefail
+        brew install sbcl
+        sbcl --version
+
+    - name: Install SBCL (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $v = '${{ inputs.sbcl-version }}'
+        $url = "https://downloads.sourceforge.net/project/sbcl/sbcl/$v/sbcl-$v-x86-64-windows-binary.msi"
+        curl.exe -fsSL --retry 5 --retry-delay 4 -o sbcl.msi $url
+        # msiexec is a GUI-subsystem program: -Wait -PassThru is the only way
+        # to get both completion and an exit code out of it.
+        $p = Start-Process msiexec.exe -Wait -PassThru -ArgumentList '/i', "$pwd\sbcl.msi", '/quiet', '/norestart'
+        if ($p.ExitCode -ne 0) { throw "msiexec failed with exit code $($p.ExitCode)" }
+        Remove-Item sbcl.msi
+        $exe = Get-ChildItem -Path 'C:\Program Files' -Filter sbcl.exe -Recurse -ErrorAction SilentlyContinue |
+               Select-Object -First 1
+        if (-not $exe) { throw 'sbcl.exe is not where the MSI was expected to put it' }
+        Add-Content -Path $env:GITHUB_PATH -Value $exe.DirectoryName
+        # sbcl.core and the contribs (asdf among them) sit next to the binary
+        Add-Content -Path $env:GITHUB_ENV -Value "SBCL_HOME=$($exe.DirectoryName)"
+
+    - name: Report the SBCL that will be used
+      shell: bash
+      run: sbcl --version
+
+    - name: Cache Quicklisp and the fasl cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/quicklisp
+          ~/.cache/common-lisp
+          ~/AppData/Local/cache/common-lisp
+        key: lisp-${{ runner.os }}-${{ runner.arch }}-sbcl${{ inputs.sbcl-version }}-ql${{ inputs.quicklisp-dist }}-${{ hashFiles('src/cotd.asd') }}
+        restore-keys: |
+          lisp-${{ runner.os }}-${{ runner.arch }}-sbcl${{ inputs.sbcl-version }}-ql${{ inputs.quicklisp-dist }}-
+
+    - name: Install Quicklisp
+      shell: bash
+      run: |
+        set -euo pipefail
+        # Every path below is either relative or computed inside Lisp:
+        # git-bash's /c/... paths mean nothing to a native Windows sbcl.exe.
+        if [ ! -f "$HOME/quicklisp/setup.lisp" ]; then
+          curl -fsSL --retry 5 --retry-delay 4 -o quicklisp.lisp https://beta.quicklisp.org/quicklisp.lisp
+          sbcl --non-interactive --load quicklisp.lisp \
+            --eval '(quicklisp-quickstart:install
+                     :path (merge-pathnames "quicklisp/" (user-homedir-pathname))
+                     :dist-url "http://beta.quicklisp.org/dist/quicklisp/${{ inputs.quicklisp-dist }}/distinfo.txt")'
+          rm -f quicklisp.lisp
+        fi
+        # what COMPILING.txt's (ql:add-to-init-file) writes, minus its prompt.
+        # Lisp computes the path itself - a git-bash /c/... path would mean
+        # nothing to a native Windows sbcl.exe.
+        sbcl --non-interactive \
+          --eval '(with-open-file (s (merge-pathnames ".sbclrc" (user-homedir-pathname))
+                                     :direction :output :if-exists :supersede)
+                   (write-line "(load (merge-pathnames \"quicklisp/setup.lisp\" (user-homedir-pathname)))" s))'
+        sbcl --non-interactive \
+          --eval '(format t "~&quicklisp dist: ~A~%" (ql-dist:version (ql-dist:dist "quicklisp")))'
+
+    - name: Compile the Lisp dependencies
+      shell: bash
+      run: |
+        set -euo pipefail
+        # Separately from the game, so that a dependency's own compiler
+        # warnings cannot trip the game's zero-warning gate.
+        sbcl --non-interactive \
+          --eval '(ql:quickload (list :bordeaux-threads :cffi :defenum :cl-store :log4cl :uiop))'
+
+    - name: Point ASDF at the checkout
+      shell: bash
+      run: |
+        set -euo pipefail
+        # A trailing // tells ASDF to recurse, which finds both src/cotd.asd
+        # and tools/smoke-test/cotd-smoke-test.asd.
+        if [ "${RUNNER_OS}" = "Windows" ]; then
+          echo "CL_SOURCE_REGISTRY=$(pwd -W)//" >> "$GITHUB_ENV"
+        else
+          echo "CL_SOURCE_REGISTRY=$(pwd)//" >> "$GITHUB_ENV"
+        fi

@@ -1,0 +1,281 @@
+name: Release
+
+# Pushing a v* tag builds every platform and publishes a GitHub Release.
+# Running this by hand (workflow_dispatch) does everything except publish, so
+# the whole pipeline can be exercised without inventing a tag.
+#
+# SBCL images cannot be cross-compiled, so there is one job per target and no
+# way around it.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SBCL_VERSION: '2.4.10'
+  QUICKLISP_DIST: '2024-10-12'
+  # Shipped next to cotd.exe on Windows, where there is no system SDL2.
+  SDL2_VERSION: '2.32.10'
+
+jobs:
+  build:
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # ubuntu-22.04 rather than the newest image on purpose: the binary
+          # cannot run on a glibc older than the one it was built against.
+          - os: ubuntu-22.04
+            platform: linux-x86_64
+            archive: tar.gz
+          - os: windows-2022
+            platform: windows-x86_64
+            archive: zip
+          # macos-13 is retired and macos-14 retires 2026-11-02; macos-15 is
+          # Apple silicon. macos-15-intel is the last x86_64 macOS image if an
+          # Intel build is ever wanted.
+          - os: macos-15
+            platform: macos-arm64
+            archive: tar.gz
+    steps:
+      - name: Keep line endings as committed
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-lisp
+        with:
+          sbcl-version: ${{ env.SBCL_VERSION }}
+          quicklisp-dist: ${{ env.QUICKLISP_DIST }}
+
+      - name: Install SDL2 (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libsdl2-2.0-0
+
+      - name: Install SDL2 (macOS)
+        if: runner.os == 'macOS'
+        run: brew install sdl2
+
+      - name: Install SDL2 (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The same runtime zip COMPILING.txt points at. It is needed twice:
+          # to run the oracles here, and to ship inside the release archive.
+          curl -fsSL --retry 5 --retry-delay 4 -o sdl2.zip \
+            "https://github.com/libsdl-org/SDL/releases/download/release-${SDL2_VERSION}/SDL2-${SDL2_VERSION}-win32-x64.zip"
+          mkdir -p sdl2-runtime
+          unzip -o -j sdl2.zip -d sdl2-runtime
+          rm sdl2.zip
+          ls sdl2-runtime
+          # on PATH for this job, so a LOAD-FOREIGN-LIBRARY here finds it
+          echo "$(pwd -W)/sdl2-runtime" >> "$GITHUB_PATH"
+
+      - name: Work out the version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(grep -oE ':version "[^"]+"' src/cotd.asd | head -1 | sed 's/.*"\(.*\)"/\1/')"
+          [ -n "$version" ] || { echo "::error::no :version in src/cotd.asd"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Version from src/cotd.asd: $version"
+          # A tag that does not match the version in the system definition is
+          # a release tagged without bumping cotd.asd - stop before building.
+          if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
+            tag="${GITHUB_REF_NAME#v}"
+            if [ "$tag" != "$version" ]; then
+              echo "::error::tag $GITHUB_REF_NAME does not match :version $version in src/cotd.asd"
+              exit 1
+            fi
+            echo "Tag $GITHUB_REF_NAME agrees with cotd.asd"
+          fi
+
+      - name: Headless oracles
+        shell: bash
+        run: |
+          set -euo pipefail
+          # These run SDL on its dummy video driver, so they are the only check
+          # that exercises render.lisp on this platform at all.
+          cd src
+          sbcl --non-interactive \
+            --eval '(asdf:load-system :cotd)' \
+            --eval '(in-package :cotd)' \
+            --eval '(let ((failed ()))
+                      (unless (run-headless-startup-check) (push "startup check" failed))
+                      (unless (run-headless-event-check) (push "event check" failed))
+                      (let* ((entries (run-headless-regression))
+                             (expected (* (length *headless-test-seeds*)
+                                          (length *headless-test-faction-types*))))
+                        (with-open-file (s "../level-checksums.txt" :direction :output
+                                           :if-exists :supersede)
+                          (dolist (e entries) (format s "~S~%" e)))
+                        (unless (= (length entries) expected)
+                          (push "level-gen regression" failed)))
+                      (when failed
+                        (format t "~&FAILED: ~{~A~^, ~}~%" failed)
+                        (sb-ext:exit :code 1))
+                      (format t "~&all oracles passed~%"))'
+        env:
+          SDL_VIDEODRIVER: dummy
+
+      - name: Build the executable
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${RUNNER_OS}" = "Windows" ]; then
+            # through cmd rather than letting bash run it, so that build.bat's
+            # own %~dp0 and exit code behave as they do for a player
+            cmd //c build.bat
+          else
+            ./build.sh
+          fi
+
+      - name: Stage and archive the release
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          name="cotd-${{ steps.version.outputs.version }}-${{ matrix.platform }}"
+          mkdir -p "dist/$name"
+          # data/ and help/ have to sit next to the executable: a release build
+          # resolves its asset directory from the executable's own path.
+          cp -R src/data src/help "dist/$name/"
+          cp README.md CHANGELOG.txt LICENSE "dist/$name/"
+          if [ "${RUNNER_OS}" = "Windows" ]; then
+            cp src/cotd.exe "dist/$name/"
+            cp sdl2-runtime/SDL2.dll "dist/$name/"
+            (cd dist && 7z a -tzip "$name.zip" "$name" >/dev/null)
+            echo "archive=dist/$name.zip" >> "$GITHUB_OUTPUT"
+          else
+            cp src/cotd "dist/$name/"
+            (cd dist && tar -czf "$name.tar.gz" "$name")
+            echo "archive=dist/$name.tar.gz" >> "$GITHUB_OUTPUT"
+          fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          ls -l dist
+
+      # Unpacking the archive somewhere else and running --check from a third
+      # directory is what proves the thing that matters: the archive carries
+      # its data, and the executable finds it from wherever it was installed.
+      - name: Verify the archive (Linux, macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          set -euo pipefail
+          verify="${RUNNER_TEMP}/verify"
+          rm -rf "$verify" && mkdir -p "$verify"
+          tar -xzf "${{ steps.package.outputs.archive }}" -C "$verify"
+          exe="$verify/${{ steps.package.outputs.name }}/cotd"
+          cd "$HOME"
+          reported="$("$exe" --version)"
+          echo "$reported"
+          case "$reported" in
+            *"${{ steps.version.outputs.version }}"*) ;;
+            *) echo "::error::the binary reports '$reported', not version ${{ steps.version.outputs.version }}"; exit 1 ;;
+          esac
+          "$exe" --check
+        env:
+          XDG_DATA_HOME: ${{ runner.temp }}/cotd-data
+
+      - name: Verify the archive (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $verify = Join-Path $env:RUNNER_TEMP 'verify'
+          Remove-Item -Recurse -Force $verify -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $verify | Out-Null
+          7z x "${{ steps.package.outputs.archive }}" "-o$verify" | Out-Null
+          $exe = Join-Path $verify '${{ steps.package.outputs.name }}\cotd.exe'
+          # cotd.exe is a GUI-subsystem program: neither cmd nor PowerShell
+          # waits for one, and it has no console to print to. -Wait -PassThru
+          # gets a real exit code, and a redirected handle is inherited even
+          # with no console attached.
+          function Invoke-Cotd($argument, $outFile) {
+            $p = Start-Process -FilePath $exe -ArgumentList $argument -Wait -PassThru `
+                   -WorkingDirectory $env:USERPROFILE -RedirectStandardOutput $outFile
+            Get-Content $outFile | Write-Host
+            return $p.ExitCode
+          }
+          $code = Invoke-Cotd '--version' (Join-Path $env:RUNNER_TEMP 'version.txt')
+          if ($code -ne 0) { throw "cotd.exe --version exited with $code" }
+          $reported = Get-Content (Join-Path $env:RUNNER_TEMP 'version.txt') -Raw
+          if ($reported -notlike '*${{ steps.version.outputs.version }}*') {
+            throw "the binary reports '$reported', not version ${{ steps.version.outputs.version }}"
+          }
+          $code = Invoke-Cotd '--check' (Join-Path $env:RUNNER_TEMP 'check.txt')
+          if ($code -ne 0) { throw "cotd.exe --check exited with $code (data files missing from the archive)" }
+        env:
+          XDG_DATA_HOME: ${{ runner.temp }}/cotd-data
+
+      - name: Upload the archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.package.outputs.name }}
+          path: ${{ steps.package.outputs.archive }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload this platform's level checksums
+        uses: actions/upload-artifact@v4
+        with:
+          name: level-checksums-${{ matrix.platform }}
+          path: level-checksums.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  publish:
+    name: Publish the GitHub Release
+    needs: build
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: cotd-*
+          merge-multiple: true
+
+      - name: Write the release notes
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          cat > notes.md <<EOF
+          City of the Damned $version
+
+          **Windows** - SDL2.dll ships in the zip, next to cotd.exe. Nothing else to install.
+
+          **Linux** - install your distribution's SDL2 runtime (\`libsdl2-2.0-0\` on Debian and Ubuntu).
+
+          **macOS (Apple silicon)** - \`brew install sdl2\` first. The build is unsigned, so
+          Gatekeeper quarantines it: \`xattr -dr com.apple.quarantine cotd\`. macOS is built and
+          started in CI, but the game itself is untested there.
+
+          Keep \`data/\` and \`help/\` next to the executable. \`cotd --check\` verifies an
+          installation and lists anything missing. Saves, options and the log go to a
+          per-user directory, not into the install, so a read-only install works.
+          EOF
+          cat notes.md
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ls -l artifacts
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "City of the Damned ${GITHUB_REF_NAME#v}" \
+            --notes-file notes.md \
+            artifacts/*

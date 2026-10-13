@@ -1,0 +1,131 @@
+name: CI
+
+# Linux only: it is the one platform where every check can run - the headless
+# oracles, the real-game smoke test in Xephyr, and a release build. The other
+# platforms are built by the release workflow, which can be run on demand
+# (workflow_dispatch) to check them without tagging anything.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  SBCL_VERSION: '2.4.10'
+  QUICKLISP_DIST: '2024-10-12'
+
+jobs:
+  check:
+    name: Build and check (Linux)
+    runs-on: ubuntu-22.04
+    steps:
+      # The repository mixes CRLF and LF files on purpose, so the checkout has
+      # to leave them alone. This has to come before the checkout to have any
+      # effect on it.
+      - name: Keep line endings as committed
+        run: git config --global core.autocrlf false
+
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup-lisp
+        with:
+          sbcl-version: ${{ env.SBCL_VERSION }}
+          quicklisp-dist: ${{ env.QUICKLISP_DIST }}
+
+      - name: Install SDL2 and the X servers the smoke test needs
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libsdl2-2.0-0 xvfb xserver-xephyr libx11-6 libxtst6
+
+      - name: Compile, and fail on any warning
+        run: |
+          set -euo pipefail
+          cd src
+          sbcl --non-interactive --eval '(asdf:load-system :cotd :force (list :cotd))' 2>&1 | tee ../build.log
+          # The dependencies were compiled in the setup step, so a compiler
+          # diagnostic here is the game's own. uiop's "redefining ..." notices
+          # are load-time warnings from a newer uiop replacing SBCL's, not
+          # compiler diagnostics, and are not matched.
+          if grep -qE 'caught (WARNING|STYLE-WARNING|ERROR)' ../build.log; then
+            echo "::error::the build is not warning-free"
+            grep -nE -B 6 'caught (WARNING|STYLE-WARNING|ERROR)' ../build.log
+            exit 1
+          fi
+          echo "no compiler diagnostics"
+
+      - name: Headless oracles
+        run: |
+          set -euo pipefail
+          cd src
+          sbcl --non-interactive \
+            --eval '(asdf:load-system :cotd)' \
+            --eval '(in-package :cotd)' \
+            --eval '(let ((failed ()))
+                      (unless (run-headless-startup-check) (push "startup check" failed))
+                      (unless (run-headless-event-check) (push "event check" failed))
+                      (let* ((entries (run-headless-regression))
+                             (expected (* (length *headless-test-seeds*)
+                                          (length *headless-test-faction-types*))))
+                        (with-open-file (s "../level-checksums.txt" :direction :output
+                                           :if-exists :supersede)
+                          (dolist (e entries) (format s "~S~%" e)))
+                        (format t "~&level generation: ~D of ~D expected entries~%"
+                                (length entries) expected)
+                        (unless (= (length entries) expected)
+                          (push "level-gen regression" failed)))
+                      (when failed
+                        (format t "~&FAILED: ~{~A~^, ~}~%" failed)
+                        (sb-ext:exit :code 1))
+                      (format t "~&all oracles passed~%"))'
+
+      - name: Build the executable and check it
+        run: |
+          set -euo pipefail
+          ./build.sh
+          # from another directory, so this exercises the release asset lookup
+          # rather than the current directory
+          (cd "$HOME" && "$GITHUB_WORKSPACE/src/cotd" --version)
+          (cd "$HOME" && "$GITHUB_WORKSPACE/src/cotd" --check)
+        env:
+          # never touch a real ~/.local/share/cotd
+          XDG_DATA_HOME: ${{ runner.temp }}/cotd-data
+
+      - name: Smoke test the real game in Xephyr
+        run: |
+          set -euo pipefail
+          # Xephyr needs a host display to put its window on; a runner has none
+          Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp &
+          for _ in $(seq 1 30); do [ -S /tmp/.X11-unix/X99 ] && break; sleep 1; done
+          [ -S /tmp/.X11-unix/X99 ] || { echo "::error::Xvfb did not come up"; exit 1; }
+          export DISPLAY=:99
+
+          run_smoke () {
+            (cd src && sbcl --non-interactive \
+               --eval '(asdf:load-system :cotd-smoke-test)' \
+               --eval '(multiple-value-bind (passed failures)
+                           (cotd-smoke-test:run-smoke-test :game :release)
+                         (dolist (f failures) (format t "~&  - ~A~%" f))
+                         (unless passed (sb-ext:exit :code 1)))')
+          }
+
+          # The route is driven by synthetic key presses and inherits the host
+          # keyboard state, which has been seen to desync it on a binary that
+          # passes on a re-run. One retry, then it counts.
+          if ! run_smoke; then
+            echo "::warning::smoke test failed; retrying once (its key route is known to flake)"
+            rm -rf /tmp/cotd-smoke-test
+            run_smoke
+          fi
+
+      - name: Keep the screenshots and checksums
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-checks
+          path: |
+            /tmp/cotd-smoke-test/screens/
+            level-checksums.txt
+          if-no-files-found: ignore
+          retention-days: 14
