@@ -30,6 +30,18 @@ no more near-duplicate strips for two equal-but-distinct colour objects.")
   "Drop the tinted strips. Call after (re)loading *glyph-front*."
   (clrhash *glyph-strip-cache*))
 
+(defun init-glyph-front ()
+  "Load the font strip and the render globals DRAW-GLYPH/UPDATE-MAP-AREA need
+\(*GLYPH-W*, *GLYPH-H*, *GLYPH-FRONT*, *TEMP-RECT*). Shared by COTD-INIT and
+the headless render oracle in headless-test.lisp, which needs these same
+globals but none of COTD-INIT's options/highscores/window-caption setup."
+  (setf *glyph-w* 15 *glyph-h* 15)
+  (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 *glyph-w* *glyph-h*))
+  (setf *glyph-front* (sdl:load-image (sdl:create-path "data/font_large.bmp" *asset-dir*)
+                                      :color-key sdl:*white*))
+  ;; the tinted strips are derived from *glyph-front*, so drop them with it
+  (reset-glyph-strip-cache))
+
 (defun colorized-glyph-strip (front-color)
   "The whole font strip tinted with FRONT-COLOR (a packed-color), built once per colour.
 

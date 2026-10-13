@@ -40,7 +40,7 @@ Pick the right check for what you touched — see the project's `verification-re
 - level gen / terrain / connectivity -> checksum terrain + every `(x y z move-mode)` via `get-level-connect-map-value`, several seeds
 - type tables / initargs / id spaces -> dump every trait/ability/AI-package/armor of all type instances **with `type-of`**, plus all id constants, diff
 - memo / FOV / gameplay logic -> checksum memo fields via public readers after N seeded AI turns
-- rendering -> render old vs new into two surfaces, compare every pixel (`sdl:read-pixel-*`)
+- rendering -> render old vs new into two surfaces, compare every pixel (`sdl:with-pixel`/`sdl:read-pixel`, not `sdl:read-pixel-*` - that doesn't exist)
 - a predicate's definition -> exhaustively compare old vs new over its full input space
 - anything timed -> run 4x and report a band; same-build variance is ~5%
 

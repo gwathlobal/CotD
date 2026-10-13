@@ -282,7 +282,6 @@
   (run-window *current-window*))
 
 (defun cotd-init ()
-  (let ((tiles-path))
     ;; create default options
     (setf *options* (make-options))
     
@@ -311,7 +310,7 @@
       )
     
     ;; set parameters depending on options
-    (setf *glyph-w* 15 *glyph-h* 15 tiles-path "data/font_large.bmp")
+    (init-glyph-front)
     ;; font
     (cond
       ((equal (options-font *options*) 'font-6x13) (sdl:initialise-default-font sdl:*font-6x13*))
@@ -340,23 +339,12 @@
                 :icon-caption "The City of the Damned")
     (sdl:enable-key-repeat nil nil)
     (sdl:enable-unicode)
-    
-    (setf *temp-rect* (sdl::rectangle-from-edges-* 0 0 *glyph-w* *glyph-h*))
-    
-    
-    (log:info "asset-dir = ~A" *asset-dir*)
-    (log:info "path = ~A" (sdl:create-path tiles-path *asset-dir*))
-
-    (setf *glyph-front* (sdl:load-image (sdl:create-path tiles-path *asset-dir*)
-                                        :color-key sdl:*white*))
-    ;; the tinted strips are derived from *glyph-front*, so drop them with it
-    (reset-glyph-strip-cache)
 
     (setf *start-logo* (sdl:load-image (sdl:create-path "data/logo.bmp" *asset-dir*)))
-    
+
     (setf *previous-scenario* nil)
     (setf *game-manager* (make-instance 'game-manager))
-    (game-state-start->init)))
+    (game-state-start->init))
 
 (defun enter-player-name ()
   (sdl:with-rectangle (a-rect (sdl:rectangle :x 0 :y 0 :w *window-width* :h *window-height*))

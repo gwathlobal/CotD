@@ -235,7 +235,7 @@
     (loop for x from 0 below max-x do
       (loop for y from 0 below max-y do
         (loop for z from 0 below max-z do
-          (set-memo-* level x y z (create-single-memo 0 sdl:*white* sdl:*black* nil nil 0 nil)))))
+          (set-memo-* level x y z (create-single-memo 0 +color-white+ +color-black+ nil nil 0 nil)))))
     level))
 
 (defun reserve-build-on-grid (template-building-id gx gy gz template-level)

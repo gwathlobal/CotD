@@ -114,16 +114,24 @@
 
 (defun process-animations-on-level (level)
   (when (animation-queue level)
-    ;;(format t "~%TIME-ELAPSED AI ~A [~A] before animations: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
-    (loop for animation in (animation-queue (level *world*))
-          do
-             (play-animation animation))
-    (sdl:update-display)
-    (sdl-cffi::sdl-delay 100)
-    (setf (animation-queue (level *world*)) nil)
-    (update-map-area *start-map-x* 0)
-    ;;(format t "~%TIME-ELAPSED AI ~A [~A] after all animations: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
-    ))
+    ;; *GLYPH-FRONT* is only ever bound by COTD-INIT/INIT-GLYPH-FRONT, i.e.
+    ;; when there is real SDL render state to draw into. Headless callers
+    ;; (headless-test.lisp) run real gameplay - including ability/attack code
+    ;; that queues animations straight from here, not just from GAME-LOOP -
+    ;; with no such state, so there is nothing to play; just drop the queue.
+    (if (boundp '*glyph-front*)
+      (progn
+        ;;(format t "~%TIME-ELAPSED AI ~A [~A] before animations: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+        (loop for animation in (animation-queue (level *world*))
+              do
+                 (play-animation animation))
+        (sdl:update-display)
+        (sdl-cffi::sdl-delay 100)
+        (setf (animation-queue (level *world*)) nil)
+        (update-map-area *start-map-x* 0)
+        ;;(format t "~%TIME-ELAPSED AI ~A [~A] after all animations: ~A~%" (name mob) (id mob) (- (get-internal-real-time) *time-at-end-of-player-turn*))
+        )
+      (setf (animation-queue level) nil))))
 
 (defun check-move-on-level (mob dx dy dz)
   (let ((sx) (sy)
