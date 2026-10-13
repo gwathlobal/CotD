@@ -4,7 +4,7 @@
 # relative to the executable's own path).
 #
 # Works on Linux and should work on macOS as well - see the macOS notes in
-# COMPILING.txt, which is where SDL 1.2 gets interesting. Set SBCL to point at
+# COMPILING.txt. SDL2 has to be installed (see COMPILING.txt). Set SBCL to point at
 # a specific SBCL if it is not on PATH.
 set -euo pipefail
 

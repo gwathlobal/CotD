@@ -116,10 +116,10 @@ The key strings here are:
 
 7. Install dependencies
 
-Download SDL 1.2 runtime library from www.libsdl.org and put SDL.dll into C:\Lisp\SBCL\1.3.12.
+Download the SDL2 runtime library for Windows (SDL2-2.x.y-win32-x64.zip from https://github.com/libsdl-org/SDL/releases - any 2.0.5 or newer) and put SDL2.dll into C:\Lisp\SBCL\1.3.12.
 Start Emacs, press Alt + X (M x) and enter the word "slime" (without quotes) to run SLIME.
-In the SLIME prompt enter the following command to load LISPBUILDER-SDL:
-(ql:quickload "lispbuilder-sdl")
+In the SLIME prompt enter the following command to load SDL2 (the cl-sdl2 bindings; Quicklisp fetches the libraries it needs along with it):
+(ql:quickload "sdl2")
 Enter the following command to load BORDEAUX-THREADS:
 (ql:quickload "bordeaux-threads")
 Enter the following command to load CFFI:
@@ -159,7 +159,9 @@ sbcl --non-interactive --load ../build.lisp
 
 build.lisp loads the cotd system and calls (cotd:make-exec). It is shared by both scripts so that the two cannot drift apart, and you can equally well run that one command by hand from src/.
 
-All the dependencies from the "Install dependencies" step above have to be installed first, since the build loads the whole system. On Windows SDL.dll has to be findable as well, exactly as it is when running from the REPL.
+All the dependencies from the "Install dependencies" step above have to be installed first, since the build loads the whole system. On Windows SDL2.dll has to be findable as well, exactly as it is when running from the REPL.
+
+The executable loads the SDL2 library when it starts, so wherever the game is run, SDL2 has to be present: on Windows put SDL2.dll next to cotd.exe (when you hand the game to someone else, ship SDL2.dll with it); on Linux the system's SDL2 package (e.g. libsdl2-2.0-0 on Debian/Ubuntu) has to be installed.
 
 If sbcl is not on PATH - the Emacs and SLIME setup above does not put it there, it only tells Emacs where SBCL lives - point the SBCL variable at it before running the script:
 
@@ -176,13 +178,13 @@ Leave it there, or copy data/ and help/ along with it: a release build resolves 
 
 NOTES FOR LINUX AND MACOS
 
-The instructions above are written for Windows, but nothing in the game is Windows-specific. The shape is the same: install SBCL, install Quicklisp and run (ql:add-to-init-file), install SDL 1.2, put the repository somewhere ASDF can find it (~/common-lisp/ is searched by default), then (asdf:load-system :cotd) and (cotd:cotd-main).
+The instructions above are written for Windows, but nothing in the game is Windows-specific. The shape is the same: install SBCL, install Quicklisp and run (ql:add-to-init-file), install SDL2 (e.g. "apt install libsdl2-2.0-0" on Debian/Ubuntu), put the repository somewhere ASDF can find it (~/common-lisp/ is searched by default), then (asdf:load-system :cotd) and (cotd:cotd-main).
 
 Instead of the environment variables in step 3 ("Set up Environmental Variables"), the usual places for configuration are ~/.config/common-lisp/source-registry.conf for the source registry and ~/.sbclrc for the Quicklisp init.
 
 macOS is UNTESTED. What follows is what to expect, not a verified recipe - if you get it working, corrections are welcome.
 
  - SBCL is available from www.sbcl.org or via "brew install sbcl".
- - SDL 1.2 has been end-of-life for years and is no longer a normal Homebrew formula. "brew install sdl12-compat", which reimplements SDL 1.2 on top of SDL 2, is the thing to try first. A Homebrew dylib lives under /opt/homebrew/lib on Apple silicon or /usr/local/lib on Intel, which may have to be added to cffi:*foreign-library-directories* or to DYLD_LIBRARY_PATH before CFFI will find it. A release build looks for the SDL framework first and then for libSDL (see cotd-exec in src/cotd.lisp); running from the REPL instead relies on lispbuilder-sdl's own lookup.
- - The likeliest real obstacle is threading. On macOS, Cocoa insists that a window and its event loop live on the process's main thread, while the game drives SDL from code that also uses bordeaux-threads. Expect that to need work rather than to just run.
+ - "brew install sdl2" installs SDL2. A Homebrew dylib lives under /opt/homebrew/lib on Apple silicon or /usr/local/lib on Intel, which may have to be added to cffi:*foreign-library-directories* or to DYLD_LIBRARY_PATH before CFFI will find it. Both the REPL and a release build use cl-sdl2's library definition, which looks for the SDL2 framework first and then for libSDL2.
+ - On macOS a window and its event loop have to live on the process's main thread. The release executable runs the game on the main thread, so it should be fine. Running from SLIME is the catch: SLIME evaluates REPL input on a worker thread, so (cotd:cotd-main) typed there will fail to open the window. Start it on the main thread instead with (sb-thread:interrupt-thread (sb-thread:main-thread) #'cotd:cotd-main), or set swank:*communication-style* to :fd-handler or nil so that SLIME itself evaluates on the main thread. The level generator's worker threads never touch SDL.
  - build.sh itself is portable - plain bash, no GNU-only constructs - and writes src/cotd there the same way it does on Linux.

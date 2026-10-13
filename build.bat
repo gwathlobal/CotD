@@ -6,7 +6,8 @@ rem
 rem SBCL must be on PATH, or set the SBCL variable to the full path of
 rem sbcl.exe first, e.g.:
 rem     set "SBCL=C:\Lisp\SBCL\2.4.10\sbcl.exe"
-rem SDL.dll has to be findable too - see COMPILING.txt.
+rem SDL2.dll has to be findable too, and has to ship next to cotd.exe -
+rem see COMPILING.txt.
 rem
 rem Run this from a cmd.exe prompt rather than by double-clicking it, so the
 rem output stays on screen when it finishes.

@@ -2,6 +2,10 @@
 ;;;; built-in bitmap fonts CotD uses into src/data/fonts/*.bmp, so that text
 ;;;; rendering no longer depends on lispbuilder-sdl (sdl2 migration, phase 1).
 ;;;;
+;;;; Kept as the record of where src/data/fonts/ came from. CotD no longer
+;;;; depends on lispbuilder-sdl, so running it again needs lispbuilder-sdl
+;;;; (and SDL 1.2) installed separately: (ql:quickload "lispbuilder-sdl").
+;;;;
 ;;;; Each file is a single row of 256 glyphs, glyph N (char-code N) at
 ;;;; x = N * char-width: white (#xFFFFFF) where the glyph has a pixel, black
 ;;;; elsewhere. Run from a REPL with lispbuilder-sdl loaded:

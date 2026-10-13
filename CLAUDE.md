@@ -23,6 +23,8 @@ Force-rebuild only this system when checking for warnings (avoid `:force t`, whi
 
 Build must stay at **zero warnings**.
 
+Release executable: `./build.sh` (or `build.bat`) writes `src/cotd`, which locates `data/`/`help/` next to itself and writes saves/options/log under `(uiop:xdg-data-home "cotd/")`. When test-running it, set `XDG_DATA_HOME` to a temp dir so it doesn't touch the user's real `~/.local/share/cotd`, and start it from another directory to exercise the asset lookup.
+
 ### Headless regression harness (`src/headless-test.lisp`)
 
 There is no SDL-free unit test suite; the regression oracle is deterministic, seeded level generation. Compiling proves almost nothing here — always run this before/after a change:

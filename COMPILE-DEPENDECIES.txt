@@ -1,5 +1,5 @@
 City of the Damned depends on the following Common Lisp libraries:
- - LISPBUILDER-SDL
+ - SDL2 (cl-sdl2)
  - BORDEAUX-THREADS
  - CFFI
  - DEFENUM
@@ -8,3 +8,5 @@ City of the Damned depends on the following Common Lisp libraries:
  - LOG4CL
 
 You may download and install them using Quicklisp.
+
+The game also needs the SDL2 runtime library itself (libSDL2 / SDL2.dll), version 2.0.5 or newer - see COMPILING.txt.
