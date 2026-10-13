@@ -8,16 +8,11 @@
    #:update-display #:with-events
 
    ;; surfaces and images
-   #:load-image #:create-surface #:create-path #:fill-surface
-   #:draw-surface-at-* #:set-cell-*
+   #:create-path #:*default-surface*
 
    ;; geometry
-   #:rectangle #:rectangle-from-edges-* #:with-rectangle #:draw-rectangle #:draw-pixel-*
-   #:x #:y #:width #:height
-
-   ;; colours
-   #:color #:*default-surface*
-   #:*white* #:*black* #:*red* #:*yellow* #:*magenta* #:*green* #:*cyan* #:*blue*)
+   #:rectangle #:rectangle-from-edges-* #:with-rectangle
+   #:x #:y #:width #:height)
   (:export
    #:with-init #:init-video #:window #:enable-key-repeat #:enable-unicode
    #:update-display #:with-events
@@ -64,17 +59,72 @@
 to X Y on SURFACE (NIL = the window). SRC's colour key, if any, applies."
   ;; lispbuilder-sdl blits whatever source rectangle ("cell") was last set on
   ;; the source surface; set it every time so no blit depends on an earlier one
-  (set-cell-* src-x src-y src-w src-h :surface src :index 0)
-  (draw-surface-at-* src x y :surface (target-surface surface)))
+  (sdl:set-cell-* src-x src-y src-w src-h :surface src :index 0)
+  (sdl:draw-surface-at-* src x y :surface (target-surface surface)))
 
-(defun packed-rgb (color)
-  "COLOR as an #xRRGGBB integer. Accepts a packed integer already, or a COLOR."
-  (if (integerp color)
-      color
-      (logior (ash (sdl:r color) 16) (ash (sdl:g color) 8) (sdl:b color))))
+;;; ---------------------------------------------------------------------
+;;; Colours.
+;;;
+;;; A colour is a packed #xRRGGBB integer everywhere in CotD (the same
+;;; representation as COTD::PACKED-COLOR). Only this file converts one to the
+;;; backend's own colour object, at the call into the backend.
+;;; ---------------------------------------------------------------------
 
-(defun rgb-color (packed)
-  (sdl:color :r (ldb (byte 8 16) packed) :g (ldb (byte 8 8) packed) :b (ldb (byte 8 0) packed)))
+(declaim (inline color))
+(defun color (&key (r 0) (g 0) (b 0))
+  "The packed #xRRGGBB colour with these components."
+  (declare (type (unsigned-byte 8) r g b))
+  (logior (ash r 16) (ash g 8) b))
+
+;; the same values as lispbuilder-sdl's colours of these names
+(defparameter *black* #x000000)
+(defparameter *white* #xFFFFFF)
+(defparameter *red* #xFF0000)
+(defparameter *green* #x00FF00)
+(defparameter *blue* #x0000FF)
+(defparameter *yellow* #xFFFF00)
+(defparameter *cyan* #x00FFFF)
+(defparameter *magenta* #xFF00FF)
+
+(defvar *sdl-color-cache* (make-hash-table)
+  "packed colour -> lispbuilder-sdl COLOR, so each distinct colour allocates once.")
+
+(defun sdl-color (packed)
+  "The backend colour object for the packed colour PACKED."
+  (declare (type (unsigned-byte 24) packed))
+  (or (gethash packed *sdl-color-cache*)
+      (setf (gethash packed *sdl-color-cache*)
+            (sdl:color :r (ldb (byte 8 16) packed) :g (ldb (byte 8 8) packed) :b (ldb (byte 8 0) packed)))))
+
+(defun convert-color-arg (key args)
+  "ARGS (a keyword argument list) with the colour under KEY, if there is one,
+converted to a backend colour. The converted pair goes in front, and the first
+occurrence of a keyword is the one that counts."
+  (let ((packed (getf args key)))
+    (if packed
+        (list* key (sdl-color packed) args)
+        args)))
+
+(defun fill-surface (color &rest args &key template surface)
+  "Fill SURFACE (NIL = the window), or the TEMPLATE rectangle of it, with COLOR."
+  (declare (ignore template surface))
+  (apply #'sdl:fill-surface (sdl-color color) args))
+
+(defun draw-rectangle (rect &rest args &key color &allow-other-keys)
+  (declare (ignore color))
+  (apply #'sdl:draw-rectangle rect (convert-color-arg :color args)))
+
+(defun draw-pixel-* (x y &rest args &key color &allow-other-keys)
+  (declare (ignore color))
+  (apply #'sdl:draw-pixel-* x y (convert-color-arg :color args)))
+
+(defun create-surface (w h &rest args &key color-key &allow-other-keys)
+  (declare (ignore color-key))
+  (apply #'sdl:create-surface w h (convert-color-arg :color-key args)))
+
+(defun load-image (path &rest args &key color-key &allow-other-keys)
+  (declare (ignore color-key))
+  (apply #'sdl:load-image path (convert-color-arg :color-key args)))
 
 (defun surface-rgb-bytes (surface)
   "SURFACE's pixels as a fresh (UNSIGNED-BYTE 8) vector, 3 bytes (R G B) per
@@ -187,10 +237,10 @@ built the first time this colour is asked for."
                    (w (* 256 (char-width font)))
                    (h (char-height font))
                    ;; any colour but the text colour will do as the key
-                   (key (rgb-color (if (= packed-color 0) #xFFFFFF 0)))
+                   (key (if (= packed-color 0) #xFFFFFF 0))
                    (strip (create-surface w h :color-key key)))
               (fill-surface key :surface strip)
-              (let ((fg (sdl:map-color (rgb-color packed-color) strip)))
+              (let ((fg (sdl:map-color (sdl-color packed-color) strip)))
                 (sdl:with-pixel (pix (sdl:fp strip))
                   (dotimes (y h)
                     (dotimes (x w)
@@ -206,7 +256,7 @@ Only the glyph pixels are written."
   (let* ((surface (target-surface surface))
          (w (char-width font))
          (h (char-height font))
-         (strip (font-strip font (packed-rgb color)))
+         (strip (font-strip font color))
          (start-x (ecase justify
                     (:left x)
                     (:right (- x (* w (length string))))

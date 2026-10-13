@@ -7,18 +7,6 @@
 (defparameter *msg-box-window-height* (* 13 5))
 (defvar *start-logo*)
 
-(defparameter *sdl-color-cache* (make-hash-table :test 'eql)
-  "packed-color -> cotd-render:color, so each distinct colour allocates at most once.")
-
-(defun sdl-color (packed)
-  "The one boundary converting a packed-color to the cotd-render:color the renderer needs."
-  (declare (type packed-color packed) (optimize (speed 3)))
-  (or (gethash packed *sdl-color-cache*)
-      (setf (gethash packed *sdl-color-cache*)
-            (cotd-render:color :r (ldb (byte 8 16) packed)
-                       :g (ldb (byte 8 8) packed)
-                       :b (ldb (byte 8 0) packed)))))
-
 (defparameter *glyph-strip-cache* (make-hash-table :test 'eql)
   "Font strips pre-tinted with a glyph colour, keyed on the packed colour.
 
@@ -58,7 +46,7 @@ of 4000 times a frame."
               (let ((strip (cotd-render:create-surface (cotd-render:width *glyph-front*)
                                                (cotd-render:height *glyph-front*)
                                                :color-key cotd-render:*black*)))
-                (cotd-render:fill-surface (sdl-color front-color) :surface strip)
+                (cotd-render:fill-surface front-color :surface strip)
                 (cotd-render:blit *glyph-front* 0 0 :surface strip)
                 strip))))
 
@@ -74,7 +62,7 @@ of 4000 times a frame."
     (setf (cotd-render:y *temp-rect*) y)
     (setf (cotd-render:width *temp-rect*) *glyph-w*)
     (setf (cotd-render:height *temp-rect*) *glyph-h*)
-    (cotd-render:fill-surface (sdl-color back-color) :surface surface :template *temp-rect*)
+    (cotd-render:fill-surface back-color :surface surface :template *temp-rect*)
 
     ;; the strip holds every glyph already in the right colour; take glyph N
     (cotd-render:blit strip x y :surface surface

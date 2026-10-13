@@ -8,7 +8,10 @@
 ;;       speculative pathing thread
 ;;   3 - glyph-color/back-color slots and the memo array's colour fields are
 ;;       now packed-color integers instead of cotd-render:color objects
-(defparameter *save-version* 3)
+;;   4 - every other colour too: the message boxes' coloured text (in the
+;;       world and level) holds packed-color integers, not lispbuilder-sdl
+;;       COLOR objects, which won't exist once the backend is cl-sdl2
+(defparameter *save-version* 4)
 
 (defenum:defenum save-game-type-enum (:save-game-campaign
                                       :save-game-scenario))

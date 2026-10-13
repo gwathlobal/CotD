@@ -1,11 +1,11 @@
 (in-package :cotd)
 
-;; Glyph/back colours are packed as (unsigned-byte 24) #xRRGGBB rather than
-;; cotd-render:color CLOS objects: nothing in the codebase reads r/g/b components off
-;; a colour, so they only need to be eql-comparable, allocation-free, and
-;; cheap to store in the memo array (100x100x9 cells, two colours each).
-;; sdl-color (windows/window-methods.lisp) is the one place that converts a
-;; packed-color to an cotd-render:color for rendering.
+;; Every colour in CotD is packed as (unsigned-byte 24) #xRRGGBB rather than a
+;; CLOS colour object: nothing in the codebase reads r/g/b components off a
+;; colour, so they only need to be eql-comparable, allocation-free, and cheap
+;; to store in the memo array (100x100x9 cells, two colours each). The
+;; cotd-render colours (cotd-render:color, cotd-render:*white* etc.) are this
+;; same representation; only render.lisp converts to the backend's colour.
 (deftype packed-color () '(unsigned-byte 24))
 
 (declaim (inline rgb))
@@ -926,13 +926,12 @@ hand-written methods this replaces."
 (defparameter *min-imps-number* 10)
 (defparameter *max-imps-number* 26)
 
-;; This one is a message-log colour (print-visible-message/add-message, which
-;; draw to the message box via cotd-render:draw-string-solid-*) - it never reaches a
-;; glyph-color/back-color slot or the memo array, so it stays an cotd-render:color.
+;; A message-log colour (print-visible-message/add-message, which draw to the
+;; message box via cotd-render:draw-string-solid-*).
 (defparameter *shared-mind-msg-color* (cotd-render:color :r 0 :g 128 :b 128))
 
 ;; Colours used per-cell while updating the player's field of view, and
-;; written straight into the memo array - packed-color, not cotd-render:color.
+;; written straight into the memo array.
 (defparameter *fov-deep-water-color* (rgb 0 0 128))
 (defparameter *fov-dim-light-color* (rgb 25 25 112))
 (defparameter *memo-remembered-color* (rgb 50 50 50))
