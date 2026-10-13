@@ -546,25 +546,6 @@ text-based layout.")
 
 (defparameter *golden-level-seeds* '(1 2 3))
 
-(defun surface-rgb-bytes (surface)
-  "SURFACE's pixels as a fresh (UNSIGNED-BYTE 8) vector, 3 bytes (R G B) per
-pixel, row-major. Decoding goes through SDL_GetRGB with the surface's own
-pixel format, so the result is backend-format independent."
-  (let* ((w (cotd-render:width surface))
-         (h (cotd-render:height surface))
-         (bytes (make-array (* w h 3) :element-type '(unsigned-byte 8)))
-         (format (sdl-base::pixel-format (sdl:fp surface))))
-    (cffi:with-foreign-objects ((r :unsigned-char) (g :unsigned-char) (b :unsigned-char))
-      (sdl:with-pixel (pix (sdl:fp surface))
-        (loop for y from 0 below h
-              do (loop for x from 0 below w
-                       for i = (* 3 (+ x (* y w)))
-                       do (sdl-cffi::sdl-get-rgb (sdl:read-pixel pix x y) format r g b)
-                          (setf (aref bytes i) (cffi:mem-ref r :unsigned-char)
-                                (aref bytes (+ i 1)) (cffi:mem-ref g :unsigned-char)
-                                (aref bytes (+ i 2)) (cffi:mem-ref b :unsigned-char))))))
-    (values bytes w h)))
-
 (defun write-ppm (path bytes w h)
   (ensure-directories-exist path)
   (with-open-file (s path :direction :output :if-exists :supersede :element-type '(unsigned-byte 8))
@@ -659,8 +640,13 @@ window doesn't hide the rest."
   (dolist (font *golden-fonts*)
     (with-open-file (s (merge-pathnames "options.cfg" *golden-user-dir*) :direction :output :if-exists :supersede)
       (format s "(font ~(~A~))~%(name \"Golden\")~%" font))
+    ;; *COTD-RELEASE* hides the main menu's debug entries. GENERATE-HEADLESS-LEVEL
+    ;; sets it globally, so without this binding the main menu came out
+    ;; differently depending on whether anything had generated a level earlier
+    ;; in the same process. Bound to T: capture what a player sees.
     (let ((*user-dir* *golden-user-dir*)
-          (*current-window* nil))
+          (*current-window* nil)
+          (*cotd-release* t))
       (cotd-render:with-init ()
         (cotd-init)
         (dolist (spec (golden-screen-specs))
@@ -673,7 +659,7 @@ window doesn't hide the rest."
                   (funcall (cdr spec))
                   ;; lispbuilder-sdl leaves *DEFAULT-SURFACE* NIL and draws to
                   ;; the window (*DEFAULT-DISPLAY*) when a surface argument is NIL
-                  (multiple-value-bind (bytes w h) (surface-rgb-bytes (or cotd-render:*default-surface* sdl:*default-display*))
+                  (multiple-value-bind (bytes w h) (cotd-render:surface-rgb-bytes (or cotd-render:*default-surface* sdl:*default-display*))
                     (funcall fn name bytes w h)))
               (error (c) (funcall fn name c nil nil)))))))))
 

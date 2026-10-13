@@ -36,6 +36,8 @@ no more near-duplicate strips for two equal-but-distinct colour objects.")
 the headless render oracle in headless-test.lisp, which needs these same
 globals but none of COTD-INIT's options/highscores/window-caption setup."
   (setf *glyph-w* 15 *glyph-h* 15)
+  ;; text fonts are loaded from here on first use
+  (setf cotd-render:*font-directory* (merge-pathnames "data/fonts/" *asset-dir*))
   (setf *temp-rect* (cotd-render:rectangle-from-edges-* 0 0 *glyph-w* *glyph-h*))
   (setf *glyph-front* (cotd-render:load-image (cotd-render:create-path "data/font_large.bmp" *asset-dir*)
                                       :color-key cotd-render:*white*))
