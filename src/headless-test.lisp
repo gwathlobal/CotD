@@ -420,9 +420,13 @@ either run is skipped rather than compared - see RUN-HEADLESS-TURNS."
 ;;;
 ;;; Four things that cost real time to find out, kept here so the next person
 ;;; doesn't have to re-discover them:
-;;;  1. SDL_VIDEODRIVER=dummy lets SDL 1.2 initialize with no real display -
-;;;     SDL 1.2's headless video driver, works in CI. Without it SDL:LOAD-IMAGE
-;;;     and surface blits fail outright on a machine with no X server.
+;;;  1. SDL_VIDEODRIVER=dummy lets SDL initialize with no real display - its
+;;;     headless video driver, works in CI; SDL2's gives the window a 32-bit
+;;;     RGB888 surface like a real display. (SDL 1.2's defaulted to an 8-bit
+;;;     palette, which quietly quantized every colour the old baselines held.)
+;;;     The dummy driver never runs the real window system's code, so it can't
+;;;     catch what only happens there - see the float-trap and text-input
+;;;     notes in render.lisp; run the real game for those.
 ;;;  2. UPDATE-MAP-AREA (window-methods.lisp) has no :SURFACE parameter; the
 ;;;     surface only reaches DRAW-GLYPH through COTD-RENDER:*DEFAULT-SURFACE*'s
 ;;;     default, so that special variable is rebound around the call instead
@@ -523,6 +527,14 @@ caught the startup-ordering bug described above."
 ;;; builds: CAPTURE-GOLDEN-SCREENS on the code before a change, then
 ;;; COMPARE-GOLDEN-SCREENS after it. They are written to test/golden/, which
 ;;; is gitignored: baselines are captured locally, never committed.
+;;;
+;;; The baselines the migration ended on are the SDL2 backend's own output,
+;;; accepted only after comparing it with lispbuilder-sdl (SDL 1.2) rendering
+;;; into a 32-bit window: 22 of the 24 screens are byte-identical, and the 2
+;;; main menus differ only inside the logo, a 16-bit (RGB565) BMP, where every
+;;; pixel holds the same 5/6-bit values and only the expansion of the low bits
+;;; to 8 bits differs (SDL2 reaches 255 at full intensity, SDL 1.2 stopped at
+;;; 248).
 ;;;
 ;;; Pixels are stored decoded to 8-bit RGB, not as raw surface values, so the
 ;;; files do not depend on whichever pixel format a backend picks.

@@ -14,7 +14,7 @@
   :description "A roguelike battle of Angels and Demons in the streets of a Human city."  
   :version "2.0.2"  
   :author "Gwathlobal"    
-  :depends-on (lispbuilder-sdl bordeaux-threads cffi defenum cl-store log4cl uiop)
+  :depends-on (sdl2 bordeaux-threads cffi defenum cl-store log4cl uiop)
   :components
     ((:file "render")
      (:file "pathfinding")

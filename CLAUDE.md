@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-City of the Damned (CotD) is a roguelike written in Common Lisp (SBCL) using lispbuilder-sdl 1.2. Dependencies: `lispbuilder-sdl`, `bordeaux-threads`, `cffi`, `defenum`, `cl-store`, `uiop`, `log4cl` (via Quicklisp). ASDF system defined in `src/cotd.asd`.
+City of the Damned (CotD) is a roguelike written in Common Lisp (SBCL) on SDL2 (software rendering into SDL surfaces). Dependencies: `sdl2` (cl-sdl2 - used only to load libSDL2 and for its keycode constants; `src/render.lisp` calls SDL through CFFI directly), `bordeaux-threads`, `cffi`, `defenum`, `cl-store`, `uiop`, `log4cl` (via Quicklisp). ASDF system defined in `src/cotd.asd`.
 
 ## Commands
 
@@ -49,11 +49,16 @@ Pick the right check for what you touched — see the project's `verification-re
 
 Always verify through the **public accessor**, not the underlying structure, so the test survives representation changes.
 
-### `sdl:window` must run before any SDL surface is created
+### Init order: `cotd-render:init-video` before any surface
 
-lispbuilder-sdl requires the video subsystem to be initialized (`sdl:init-video`, or `sdl:window` which calls it) before any `sdl-surface` instance exists - `sdl:load-image`, `sdl:create-surface`, etc. all create one. Violating this raises "ERROR: The SDL library must be initialized prior to use." from inside `handle-errors-to-ui`'s handler, which then tries to render that error in a `display-msg-window` sized from `*window-width*` - unbound if the failure happened before `cotd-init` set it - crashing the error handler itself with an unrelated `UNBOUND-VARIABLE` and hiding the real cause.
+`cotd-init` calls `cotd-render:init-video` before `init-glyph-front` (which loads the tile sheet, i.e. creates a surface). Under lispbuilder-sdl (SDL 1.2) creating a surface first was a hard error, raised inside `handle-errors-to-ui`'s handler, which then crashed on an unbound `*window-width*` and hid the real cause - a refactor did exactly that once: it compiled clean, every headless oracle stayed green (none of them calls `cotd-init` itself), and the real executable crashed on startup. SDL2 no longer requires the order for plain surfaces, but keep it, and run `(run-headless-startup-check)` after touching `cotd-init`'s init sequence - it is the only oracle that runs `cotd-init`.
 
-This has happened once already: a refactor moved `init-glyph-front` (which loads the font strip, i.e. creates a surface) to the top of `cotd-init`, ahead of the `sdl:window` call — compiled clean, every headless oracle stayed green (none of them calls `cotd-init` itself; see the table above), and the real executable crashed on startup. `cotd-init` now calls `sdl:init-video` before `init-glyph-front` to restore the order. Run `(run-headless-startup-check)` after touching `cotd-init`'s init sequence — it is the regression test for this specific ordering.
+### SDL2 backend (`src/render.lisp`) - things only a real display shows
+
+Every headless oracle runs on SDL's `dummy` video driver, which never executes the window system's code. Two bugs in the SDL2 swap passed every headless check and only showed up when running the real game (in a nested `Xephyr :5` X server, driven by XTest key events - see the `real-game-smoke-test` memory):
+- **Float traps.** SBCL enables floating-point traps; SDL's X11 code does float maths that trips them (`SDL_Init` raised `FLOATING-POINT-INVALID-OPERATION`). Calls that reach the video driver are wrapped in `without-fp-traps`; game code is deliberately not, so its own float errors still signal. A new SDL call into the window system needs the wrapper too.
+- **Text input.** SDL2 sends a typed character as a separate `SDL_TEXTINPUT` event behind the `SDL_KEYDOWN`; `next-event` pairs them back into one key-down with `unicode`. The text is NUL-terminated inside a 32-byte array with junk after the NUL - decode only up to it. (Synthetic test events now carry such junk.)
+After any change in `render.lisp`'s window/event code, run the real game, not just the oracles.
 
 ## Line endings (CRLF)
 

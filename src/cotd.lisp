@@ -640,17 +640,9 @@ this falls back to the dev default rather than guessing."
 
 #+clisp
 (defun cotd-exec ()
-  (cffi:define-foreign-library sdl
-    (:darwin (:or (:framework "SDL")
-                 (:default "libSDL")))
-    (:windows "SDL.dll")
-    (:unix (:or "libSDL-1.2.so.0.7.2"
- 	      "libSDL-1.2.so.0"
- 	      "libSDL-1.2.so"
- 	      "libSDL.so"
- 	      "libSDL")))
-  
-  (cffi:use-foreign-library sdl)
+  ;; reopen libSDL2 in the started executable, under cl-sdl2's own library
+  ;; definition (which knows the per-platform file names)
+  (cffi:load-foreign-library 'sdl2::libsdl2)
   ;; *asset-dir* is left at its build-time default (bundled with the build
   ;; tree); clisp has no equivalent of sb-ext:*posix-argv* used below for
   ;; sbcl, so there is no tested way here to locate the executable itself.
@@ -666,17 +658,9 @@ this falls back to the dev default rather than guessing."
 
 #+sbcl
 (defun cotd-exec ()
-  (cffi:define-foreign-library sdl
-    (:darwin (:or (:framework "SDL")
-                 (:default "libSDL")))
-    (:windows "SDL.dll")
-    (:unix (:or "libSDL-1.2.so.0.7.2"
- 	      "libSDL-1.2.so.0"
- 	      "libSDL-1.2.so"
- 	      "libSDL.so"
- 	      "libSDL")))
-
-  (cffi:use-foreign-library sdl)
+  ;; reopen libSDL2 in the started executable, under cl-sdl2's own library
+  ;; definition (which knows the per-platform file names)
+  (cffi:load-foreign-library 'sdl2::libsdl2)
   (setf *asset-dir* (determine-release-asset-dir))
   (setf *user-dir* (uiop:xdg-data-home "cotd/"))
   (ensure-directories-exist *user-dir*)
