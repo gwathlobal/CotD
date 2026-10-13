@@ -55,6 +55,17 @@ jobs:
           fi
           echo "no compiler diagnostics"
 
+      # Before the oracles, so that the game-window check gets a real X display
+      # to open a real window on rather than falling back to SDL's dummy
+      # driver. Xephyr puts its own nested server on top of this later.
+      - name: Start a virtual display
+        run: |
+          set -euo pipefail
+          Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp &
+          for _ in $(seq 1 30); do [ -S /tmp/.X11-unix/X99 ] && break; sleep 1; done
+          [ -S /tmp/.X11-unix/X99 ] || { echo "::error::Xvfb did not come up"; exit 1; }
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+
       - name: Headless oracles
         run: |
           set -euo pipefail
@@ -75,6 +86,13 @@ jobs:
                                 (length entries) expected)
                         (unless (= (length entries) expected)
                           (push "level-gen regression" failed)))
+                      ;; opens a real window, renders the menu into it, presses
+                      ;; a key and leaves through the quit path; signals rather
+                      ;; than returning NIL when any of that does not happen
+                      (multiple-value-bind (ok info)
+                          (run-game-window-check :screenshot-dir #p"../game-window-shots/")
+                        (declare (ignore ok))
+                        (format t "~&game window: ~S~%" info))
                       (when failed
                         (format t "~&FAILED: ~{~A~^, ~}~%" failed)
                         (sb-ext:exit :code 1))
@@ -95,12 +113,7 @@ jobs:
       - name: Smoke test the real game in Xephyr
         run: |
           set -euo pipefail
-          # Xephyr needs a host display to put its window on; a runner has none
-          Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp &
-          for _ in $(seq 1 30); do [ -S /tmp/.X11-unix/X99 ] && break; sleep 1; done
-          [ -S /tmp/.X11-unix/X99 ] || { echo "::error::Xvfb did not come up"; exit 1; }
-          export DISPLAY=:99
-
+          # Xephyr nests its own server inside the Xvfb display started above
           run_smoke () {
             (cd src && sbcl --non-interactive \
                --eval '(asdf:load-system :cotd-smoke-test)' \
@@ -126,6 +139,7 @@ jobs:
           name: linux-checks
           path: |
             /tmp/cotd-smoke-test/screens/
+            game-window-shots/
             level-checksums.txt
           if-no-files-found: ignore
           retention-days: 14
