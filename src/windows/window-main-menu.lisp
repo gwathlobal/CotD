@@ -17,7 +17,7 @@
     
     ;;(cotd-render:draw-string-solid-* "City of the Damned" (truncate *window-width* 2) 10 :justify :center :color cotd-render:*white*)
 
-    (cotd-render:draw-surface-at-* *start-logo* (- (truncate *window-width* 2) (truncate (cotd-render:width *start-logo*) 2)) 10 :surface cotd-render:*default-surface*)
+    (cotd-render:blit *start-logo*(- (truncate *window-width* 2) (truncate (cotd-render:width *start-logo*) 2)) 10 :surface cotd-render:*default-surface*)
     
     (cotd-render:draw-string-solid-* "Whoever wins... We lose" (- *window-width* 20) (+ 10 10 (cotd-render:height *start-logo*)) :justify :right :color cotd-render:*white*)
     

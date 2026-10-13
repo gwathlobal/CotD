@@ -59,18 +59,13 @@ of 4000 times a frame."
                                                (cotd-render:height *glyph-front*)
                                                :color-key cotd-render:*black*)))
                 (cotd-render:fill-surface (sdl-color front-color) :surface strip)
-                (cotd-render:set-cell-* 0 0 (cotd-render:width *glyph-front*) (cotd-render:height *glyph-front*)
-                                :surface *glyph-front* :index 0)
-                (cotd-render:draw-surface-at-* *glyph-front* 0 0 :surface strip)
+                (cotd-render:blit *glyph-front* 0 0 :surface strip)
                 strip))))
 
 (defun draw-glyph (x y n &key (surface cotd-render:*default-surface*) front-color back-color)
   "Drawing a glyph from 'font.bmp' at a certain point of the surface."
   (declare (type fixnum x y n) (type packed-color front-color back-color))
   (let ((strip (colorized-glyph-strip front-color)))
-    ;; select the rectangle holding this glyph, already in the right colour
-    (cotd-render:set-cell-* (* n *glyph-w*) 0 *glyph-w* *glyph-h* :surface strip :index 0)
-
     ;; fill the rectangle on the dst surface with the desired background colour,
     ;; then blit the glyph over it. Black is the strip's colour key, so only the
     ;; glyph itself lands.
@@ -81,7 +76,9 @@ of 4000 times a frame."
     (setf (cotd-render:height *temp-rect*) *glyph-h*)
     (cotd-render:fill-surface (sdl-color back-color) :surface surface :template *temp-rect*)
 
-    (cotd-render:draw-surface-at-* strip x y :surface surface)))
+    ;; the strip holds every glyph already in the right colour; take glyph N
+    (cotd-render:blit strip x y :surface surface
+                                :src-x (* n *glyph-w*) :src-w *glyph-w* :src-h *glyph-h*)))
 
 (defun calculate-start-coord (rel-x rel-y array max-x-view max-y-view)
   "Calculate the top-left corner of the visible area. Used to draw the map and to choose objects on it."

@@ -21,8 +21,7 @@
   (:export
    #:with-init #:init-video #:window #:enable-key-repeat #:enable-unicode
    #:update-display #:with-events
-   #:load-image #:create-surface #:create-path #:fill-surface
-   #:draw-surface-at-* #:set-cell-*
+   #:load-image #:create-surface #:create-path #:fill-surface #:blit
    #:rectangle #:rectangle-from-edges-* #:with-rectangle #:draw-rectangle #:draw-pixel-*
    #:x #:y #:width #:height
    #:draw-string-solid-* #:char-height #:char-width #:get-font-height
@@ -58,6 +57,15 @@
 (defun target-surface (surface)
   "SURFACE, or the window when it is NIL (see the contract above)."
   (or surface sdl:*default-display*))
+
+(defun blit (src x y &key (surface *default-surface*)
+                          (src-x 0) (src-y 0) (src-w (width src)) (src-h (height src)))
+  "Copy the SRC-W x SRC-H area at SRC-X SRC-Y of SRC (by default, all of it)
+to X Y on SURFACE (NIL = the window). SRC's colour key, if any, applies."
+  ;; lispbuilder-sdl blits whatever source rectangle ("cell") was last set on
+  ;; the source surface; set it every time so no blit depends on an earlier one
+  (set-cell-* src-x src-y src-w src-h :surface src :index 0)
+  (draw-surface-at-* src x y :surface (target-surface surface)))
 
 (defun packed-rgb (color)
   "COLOR as an #xRRGGBB integer. Accepts a packed integer already, or a COLOR."
@@ -208,6 +216,5 @@ Only the glyph pixels are written."
           for code = (char-code c)
           do (unless (< code 256)
                (error "COTD-RENDER: ~S has no glyph in the bitmap fonts" c))
-             (set-cell-* (* code w) 0 w h :surface strip :index 0)
-             (draw-surface-at-* strip cx y :surface surface))
+             (blit strip cx y :surface surface :src-x (* code w) :src-w w :src-h h))
     surface))
