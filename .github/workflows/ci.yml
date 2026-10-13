@@ -106,6 +106,9 @@ jobs:
           # rather than the current directory
           (cd "$HOME" && "$GITHUB_WORKSPACE/src/cotd" --version)
           (cd "$HOME" && "$GITHUB_WORKSPACE/src/cotd" --check)
+          # the same window/menu/key/quit check the oracles run from source,
+          # but inside the built image - the artifact people download
+          (cd "$HOME" && "$GITHUB_WORKSPACE/src/cotd" --selftest "$GITHUB_WORKSPACE/game-window-shots/exe")
         env:
           # never touch a real ~/.local/share/cotd
           XDG_DATA_HOME: ${{ runner.temp }}/cotd-data

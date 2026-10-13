@@ -870,6 +870,18 @@ whatever did not happen. Returns a plist of what it observed."
                   :selection (list selection-before selection-after)
                   :renderer (cotd-render:renderer-name))))))))
 
+(defun native-video-available-p ()
+  "True if SDL initializes and opens a window on this machine's own video
+driver. False where there is no display at all - a runner with no desktop
+session, say - which is the only thing that may quietly send this check to the
+dummy driver."
+  (sb-posix:unsetenv "SDL_VIDEODRIVER")
+  (handler-case
+      (cotd-render:with-init ()
+        (cotd-render:window 64 48 :title-caption "cotd video probe")
+        t)
+    (error () nil)))
+
 (defun run-game-window-check (&key (screenshot-dir nil) (driver :auto))
   "Prove the game runs here: open its window, render the main menu into it,
 press the key that moves the menu selection, and leave through the quit path.
@@ -896,10 +908,11 @@ Signals an error naming whatever did not happen."
       (:native (values t (attempt :native)))
       (:dummy (values t (attempt :dummy)))
       (:auto
-       ;; A runner with no desktop session cannot open a window at all, and
-       ;; that is not the game's fault; say so in the result rather than
-       ;; failing, but still play the menu through on the dummy driver.
-       (handler-case (values t (attempt :native))
-         (error (c)
-           (format t "~&RUN-GAME-WINDOW-CHECK: no native video driver here (~A); retrying on the dummy one~%" c)
-           (values t (attempt :dummy))))))))
+       ;; Decided by a probe rather than by catching whatever the full check
+       ;; signals: a machine with no desktop session should quietly fall back,
+       ;; but a missing font or a blank menu is a failure and has to be
+       ;; reported as itself rather than mistaken for a missing display.
+       (let ((which (if (native-video-available-p) :native :dummy)))
+         (when (eq which :dummy)
+           (format t "~&RUN-GAME-WINDOW-CHECK: no video driver opens a window here; using SDL's dummy one~%"))
+         (values t (attempt which)))))))

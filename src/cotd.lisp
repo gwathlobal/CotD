@@ -700,6 +700,9 @@ to have been packaged with its data alongside the executable.")
   (format t "Given no option, the game starts normally.~%~%")
   (format t "  --version   print the version and exit~%")
   (format t "  --check     check that the bundled data files are in place~%")
+  (format t "  --selftest [dir]~%")
+  (format t "              open the window, draw the menu, press a key and quit,~%")
+  (format t "              writing screenshots to dir if one is given~%")
   (format t "  --help      print this message and exit~%"))
 
 (defun check-install ()
@@ -724,6 +727,49 @@ complete, 1 if anything is missing."
            (format t "~%All data files present.~%")
            0))))
 
+;; RUN-GAME-WINDOW-CHECK lives in headless-test.lisp, which is compiled after
+;; this file because it depends on all of it. Declaring it here is what keeps
+;; --selftest's call from being a forward reference the compiler warns about -
+;; the executable carries that file like any other part of the system, so the
+;; shipped image can run the check on itself.
+(declaim (ftype function run-game-window-check))
+
+(defun run-selftest (screenshot-dir)
+  "Prove this executable runs: open its window, render the main menu into it,
+press the key that moves the menu selection, and leave through the quit path.
+Returns the exit code to quit with - the same check the CI oracles run, but
+from inside the built image rather than from a source tree, so what it answers
+for is the binary someone downloads."
+  (print-version)
+  ;; COTD-EXEC configures logging after the options are handled, so without
+  ;; this the game's INFO-level startup chatter lands in the middle of the
+  ;; result. Nothing is lost by dropping it: what went wrong, if anything,
+  ;; comes back as the condition below.
+  (log:config :off)
+  (handler-case
+      (multiple-value-bind (ok info)
+          (run-game-window-check :screenshot-dir (when screenshot-dir
+                                                   (uiop:ensure-directory-pathname screenshot-dir)))
+        (declare (ignore ok))
+        (format t "self-test passed: ~S~%" info)
+        (when screenshot-dir
+          (format t "screenshots: ~A~%" screenshot-dir))
+        0)
+    (error (c)
+      ;; the debugger must never be reached here: in a GUI-subsystem build
+      ;; there is nothing to read from and the process would simply hang
+      (format t "self-test FAILED: ~A~%" c)
+      1)))
+
+(defun argument-after (flag args)
+  "The argument following FLAG in ARGS, if there is one and it is not itself
+an option."
+  (let ((tail (member flag args :test #'string=)))
+    (when (and (rest tail)
+               (plusp (length (second tail)))
+               (char/= #\- (char (second tail) 0)))
+      (second tail))))
+
 #+sbcl
 (defun handle-command-line-args ()
   "Act on a command-line option if the executable was given one. Returns the
@@ -739,6 +785,7 @@ game that refuses to open."
       (cond ((given-p "--help" "-h") (print-usage) 0)
             ((given-p "--version" "-v") (print-version) 0)
             ((given-p "--check") (check-install))
+            ((given-p "--selftest") (run-selftest (argument-after "--selftest" args)))
             (t nil)))))
 
 #+clisp

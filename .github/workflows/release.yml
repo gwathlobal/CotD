@@ -190,6 +190,7 @@ jobs:
       # its data, and the executable finds it from wherever it was installed.
       - name: Verify the archive (Linux, macOS)
         if: runner.os != 'Windows'
+        timeout-minutes: 10
         shell: bash
         run: |
           set -euo pipefail
@@ -205,11 +206,15 @@ jobs:
             *) echo "::error::the binary reports '$reported', not version ${{ steps.version.outputs.version }}"; exit 1 ;;
           esac
           "$exe" --check
+          # and the unpacked binary actually runs: its own window, its own
+          # menu, a key press that moves the selection, a clean quit
+          "$exe" --selftest "$GITHUB_WORKSPACE/game-window-shots/exe"
         env:
           XDG_DATA_HOME: ${{ runner.temp }}/cotd-data
 
       - name: Verify the archive (Windows)
         if: runner.os == 'Windows'
+        timeout-minutes: 10
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
@@ -222,8 +227,8 @@ jobs:
           # waits for one, and it has no console to print to. -Wait -PassThru
           # gets a real exit code, and a redirected handle is inherited even
           # with no console attached.
-          function Invoke-Cotd($argument, $outFile) {
-            $p = Start-Process -FilePath $exe -ArgumentList $argument -Wait -PassThru `
+          function Invoke-Cotd([string[]]$arguments, $outFile) {
+            $p = Start-Process -FilePath $exe -ArgumentList $arguments -Wait -PassThru `
                    -WorkingDirectory $env:USERPROFILE -RedirectStandardOutput $outFile
             Get-Content $outFile | Write-Host
             return $p.ExitCode
@@ -236,6 +241,11 @@ jobs:
           }
           $code = Invoke-Cotd '--check' (Join-Path $env:RUNNER_TEMP 'check.txt')
           if ($code -ne 0) { throw "cotd.exe --check exited with $code (data files missing from the archive)" }
+          # and the unpacked binary actually runs: its own window, its own
+          # menu, a key press that moves the selection, a clean quit
+          $shots = Join-Path $env:GITHUB_WORKSPACE 'game-window-shots\exe'
+          $code = Invoke-Cotd @('--selftest', $shots) (Join-Path $env:RUNNER_TEMP 'selftest.txt')
+          if ($code -ne 0) { throw "cotd.exe --selftest exited with $code" }
         env:
           XDG_DATA_HOME: ${{ runner.temp }}/cotd-data
 
