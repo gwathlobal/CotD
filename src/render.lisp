@@ -12,7 +12,7 @@
    #:draw-surface-at-* #:set-cell-*
 
    ;; geometry
-   #:rectangle #:with-rectangle #:draw-rectangle #:draw-pixel-*
+   #:rectangle #:rectangle-from-edges-* #:with-rectangle #:draw-rectangle #:draw-pixel-*
    #:x #:y #:width #:height
 
    ;; text and fonts
@@ -28,7 +28,7 @@
    #:update-display #:with-events
    #:load-image #:create-surface #:create-path #:fill-surface
    #:draw-surface-at-* #:set-cell-*
-   #:rectangle #:with-rectangle #:draw-rectangle #:draw-pixel-*
+   #:rectangle #:rectangle-from-edges-* #:with-rectangle #:draw-rectangle #:draw-pixel-*
    #:x #:y #:width #:height
    #:draw-string-solid-* #:char-height #:char-width #:get-font-height
    #:initialise-default-font
