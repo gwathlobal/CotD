@@ -125,6 +125,16 @@ jobs:
               exit 1
             fi
             echo "Tag $GITHUB_REF_NAME agrees with cotd.asd"
+            # The release body is the newest CHANGELOG entry, so a tag made
+            # without one would publish the previous version's notes. Caught
+            # here rather than in the publish job, which runs after everything
+            # has been built.
+            newest="$(tr -d '\r' < CHANGELOG.txt | awk '/^-+$/ {n++; next} n == 1 {print; exit}')"
+            case "$newest" in
+              *"v$version"*) echo "CHANGELOG's newest entry is \"$newest\"" ;;
+              *) echo "::error::CHANGELOG.txt's newest entry is \"$newest\", which is not v$version"
+                 exit 1 ;;
+            esac
           fi
 
       # Which SDL this platform actually has. Homebrew's sdl2 is sdl2-compat,
@@ -336,6 +346,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      # for CHANGELOG.txt, which the notes are built from
+      - uses: actions/checkout@v7
+
       - uses: actions/download-artifact@v8
         with:
           path: artifacts
@@ -344,25 +357,18 @@ jobs:
 
       - name: Write the release notes
         run: |
-          version="${GITHUB_REF_NAME#v}"
-          cat > notes.md <<EOF
-          City of the Damned $version
-
-          **Windows** - SDL2.dll ships in the zip, next to cotd.exe. Nothing else to install.
-
-          **Linux** - install your distribution's SDL2 runtime (\`libsdl2-2.0-0\` on Debian and Ubuntu).
-
-          **macOS (Apple silicon)** - SDL2.framework ships in the archive, next to the
-          executable, so there is nothing to install. (Do not \`brew install sdl2\` expecting
-          to help: that is an alias for sdl2-compat, SDL2's API on top of SDL3, which is a
-          different library.) The build is unsigned, so
-          Gatekeeper quarantines it: \`xattr -dr com.apple.quarantine cotd\`. macOS is built and
-          started in CI, but the game itself is untested there.
-
-          Keep \`data/\` and \`help/\` next to the executable. \`cotd --check\` verifies an
-          installation and lists anything missing. Saves, options and the log go to a
-          per-user directory, not into the install, so a read-only install works.
-          EOF
+          set -euo pipefail
+          # The body is the newest entry in CHANGELOG.txt - everything between
+          # the first separator line and the next - so that what a release says
+          # it changed and what the changelog says cannot drift apart. The file
+          # is CRLF, which is why the carriage returns go first: an awk pattern
+          # anchored on $ would never match the separator otherwise.
+          tr -d '\r' < CHANGELOG.txt \
+            | awk '/^-+$/ {n++; if (n == 2) exit; next} n == 1 {print}' > entry.md
+          [ -s entry.md ] || { echo "::error::found no entry in CHANGELOG.txt"; exit 1; }
+          # The per-platform install notes are kept beside this workflow rather
+          # than inline, where indentation rules would turn them into code.
+          { cat entry.md; echo; cat .github/release-install-notes.md; } > notes.md
           cat notes.md
 
       - name: Publish
