@@ -1,5 +1,9 @@
 CITY OF THE DAMNED
 
+[![CI](https://github.com/gwathlobal/CotD/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/gwathlobal/CotD/actions/workflows/ci.yml?query=branch%3Amaster)
+[![Latest release](https://img.shields.io/github/v/release/gwathlobal/CotD)](https://github.com/gwathlobal/CotD/releases/latest)
+[![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue)](https://github.com/gwathlobal/CotD/blob/master/LICENSE)
+
 City of the Damned is a simple fast-paced coffee-break roguelike inspired by a 7DRL entry "City of the Condemned" by Tapio (http://www.roguebasin.com/index.php?title=City_of_the_Condemned). 
 It is written in Common Lisp using SDL.
 
