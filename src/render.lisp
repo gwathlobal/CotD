@@ -21,13 +21,13 @@
 ;;;; Every call CotD makes into SDL - window setup, the event loop,
 ;;;; surfaces/images, geometry, text, colours - goes through this package, and
 ;;;; this file is the only one that talks to SDL itself (key-bindings.lisp
-;;;; holds the matching key constants). The backend is SDL2 with software
-;;;; rendering: everything is drawn into SDL surfaces, the window's own
-;;;; surface among them, and UPDATE-DISPLAY presents it. libSDL2 is declared
-;;;; and opened here (ENSURE-SDL2-LOADED, from WITH-INIT), and the calls below
-;;;; go through CFFI directly with raw pointers rather than through any
-;;;; wrapper layer, because DRAW-GLYPH alone makes thousands of them per
-;;;; frame.
+;;;; holds the matching key constants). The backend is SDL2: all drawing is
+;;;; software, into surfaces of our own, and UPDATE-DISPLAY presents the
+;;;; window's one through an SDL_Renderer, which on a real display is the
+;;;; GPU's (see WINDOW). libSDL2 is declared and opened here
+;;;; (ENSURE-SDL2-LOADED, from WITH-INIT), and the calls below go through CFFI
+;;;; directly with raw pointers rather than through any wrapper layer, because
+;;;; DRAW-GLYPH alone makes thousands of them per frame.
 ;;;;
 ;;;; Contract that is not visible from the symbol list:
 ;;;;  - *DEFAULT-SURFACE* is NIL during normal play, and a NIL surface (the
@@ -478,6 +478,15 @@ result does not depend on which pixel format the backend picked."
 ;;; Steam overlay, which hooks the GPU APIs' present, would never be drawn.
 ;;; SDL falls back to its software renderer where there is no GPU API (the
 ;;; dummy driver the headless checks use).
+;;;
+;;; That fallback is why SDL_CreateRenderer below takes flags 0 rather than
+;;; SDL_RENDERER_ACCELERATED. Flags 0 is not "software" - it asks for the
+;;; first render driver that works, which is the GPU one wherever there is
+;;; one (RENDERER-NAME reports "opengl" on a real X display). Requiring
+;;; acceleration would gain nothing there and make SDL_CreateRenderer fail
+;;; outright where no GPU renderer exists, instead of running on the software
+;;; one: the dummy driver, a remote X display without GLX, a Windows box with
+;;; no working D3D/GL.
 
 (defun destroy-window ()
   "Destroy the window and everything WINDOW made for it, if there is one."
