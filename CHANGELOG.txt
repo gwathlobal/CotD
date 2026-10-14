@@ -1,6 +1,21 @@
 CHANGELOG
 
 --------------------
+October 14, 2026 v2.1.0
+
+The game now draws through SDL2 instead of SDL 1.2, and ships as a standalone executable for Windows, Linux and macOS. Nothing about how it plays has changed.
+
+- The renderer is SDL2 now. SDL 1.2 and lispbuilder-sdl are gone, and so is the cl-sdl2 binding: the game talks to SDL through CFFI itself. To run it you need the SDL2 runtime (2.0.5 or newer); to build it you need no SDL at all.
+- There are release executables, built by build.sh on Linux and macOS and build.bat on Windows. They find data/ and help/ next to themselves, so the game can be installed anywhere and started from anywhere.
+- Windows downloads carry SDL2.dll and macOS downloads carry SDL2.framework, both next to the executable, so neither needs anything installed first. On Linux the system's SDL2 package is still used.
+- Saves, options.cfg, log.txt, the highscores and morgue dumps are written to a per-user directory instead of the game's own, so an install into a read-only location (Program Files, /usr/local) works.
+- A faster turn: the memoized map layer that was taking 46% of a game turn, the per-cell colour allocations in the field-of-view sweep, and the re-tinting of the font strip for every glyph are all gone.
+- Level generation is faster too: connect maps are a flat typed array, terrain lookups are deferred past the early-out, and flood fill claims cells as it pushes them.
+- The pathfinder is an original A* implementation, replacing the third-party one, and it no longer overestimates distances in a way that could return a needlessly long route.
+- The game starts correctly when it is installed under a directory whose name contains [ or *.
+- New flavour texts on the loading screen, and a logo on the main menu.
+
+--------------------
 August 13, 2020 v2.0.2
 
 - Satanists during the Satanist Elimination mission are given 3 disguises and 1 medkit.

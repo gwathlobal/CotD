@@ -12,7 +12,7 @@
 (defsystem cotd  
   :name "The City of the Damned"
   :description "A roguelike battle of Angels and Demons in the streets of a Human city."  
-  :version "2.0.2"  
+  :version "2.1.0"
   :author "Gwathlobal"    
   ;; libSDL2 itself is not here: render.lisp declares it to CFFI and opens it
   ;; when a session starts, so building needs no SDL2 installed.
