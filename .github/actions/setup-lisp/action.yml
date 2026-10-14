@@ -69,7 +69,7 @@ runs:
       run: sbcl --version
 
     - name: Cache Quicklisp and the fasl cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: |
           ~/quicklisp

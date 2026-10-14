@@ -26,7 +26,7 @@ jobs:
       - name: Keep line endings as committed
         run: git config --global core.autocrlf false
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-lisp
         with:
@@ -54,6 +54,19 @@ jobs:
             exit 1
           fi
           echo "no compiler diagnostics"
+
+          # Optimization notes are not warnings and do not fail the build, but
+          # they are not noise either: each one is a place SBCL could not
+          # generate good code, usually because an untyped accessor left it
+          # guessing - which is the repeated cause of this game's slow paths.
+          # Summarized rather than left to scroll past; build.log is kept as an
+          # artifact for the detail.
+          echo
+          echo "SBCL optimization notes by file:"
+          awk '/^; file: /{n = split($3, a, "/"); f = a[n]}
+               /note: /{if (f != "") c[f]++}
+               END {for (k in c) printf "%6d  %s\n", c[k], k}' ../build.log | sort -rn
+          echo "  (total: $(grep -c 'note: ' ../build.log))"
 
       # Before the oracles, so that the game-window check gets a real X display
       # to open a real window on rather than falling back to SDL's dummy
@@ -137,12 +150,13 @@ jobs:
 
       - name: Keep the screenshots and checksums
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: linux-checks
           path: |
             /tmp/cotd-smoke-test/screens/
             game-window-shots/
             level-checksums.txt
+            build.log
           if-no-files-found: ignore
           retention-days: 14

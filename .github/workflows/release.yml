@@ -47,7 +47,7 @@ jobs:
       - name: Keep line endings as committed
         run: git config --global core.autocrlf false
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-lisp
         with:
@@ -137,6 +137,7 @@ jobs:
           set -euo pipefail
           cd src
           sbcl --non-interactive \
+            --eval '(declaim (sb-ext:muffle-conditions sb-ext:compiler-note))' \
             --eval '(asdf:load-system :cotd)' \
             --eval '(in-package :cotd)' \
             --eval '(cotd-render:with-init ()
@@ -153,6 +154,7 @@ jobs:
           # that exercises render.lisp on this platform at all.
           cd src
           sbcl --non-interactive \
+            --eval '(declaim (sb-ext:muffle-conditions sb-ext:compiler-note))' \
             --eval '(asdf:load-system :cotd)' \
             --eval '(in-package :cotd)' \
             --eval '(let ((failed ()))
@@ -182,6 +184,7 @@ jobs:
           set -euo pipefail
           cd src
           sbcl --non-interactive \
+            --eval '(declaim (sb-ext:muffle-conditions sb-ext:compiler-note))' \
             --eval '(asdf:load-system :cotd)' \
             --eval '(in-package :cotd)' \
             --eval '(multiple-value-bind (ok info)
@@ -305,7 +308,7 @@ jobs:
           XDG_DATA_HOME: ${{ runner.temp }}/cotd-data
 
       - name: Upload the archive
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.package.outputs.name }}
           path: ${{ steps.package.outputs.archive }}
@@ -316,7 +319,7 @@ jobs:
       # doubt: they show what that machine actually drew.
       - name: Upload this platform's checks
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: checks-${{ matrix.platform }}
           path: |
@@ -333,7 +336,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: artifacts
           pattern: cotd-*
