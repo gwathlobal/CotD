@@ -36,3 +36,4 @@
 - Optimize connectivity map creation
 - Recalculate connectivity after terrain destruction
 - Scout's artillery strike ignites appropriate affected tiles
+- Deaths resolve inline, mid-action (see the two momentum/damaging-terrain bugs above). There are 31 (make-dead ...) call sites, 14 of them in base-methods.lisp, with the slave-mob cascade copy-pasted about six times. One proposed fix was a *pending-deaths* list plus a (resolve-pending-deaths) called at the end of move-mob, the end of inflict-damage and the end of each mob's turn - safe in principle, because check-dead is purely (<= (cur-hp mob) 0), independent of make-dead, and game-loop already skips dead mobs, so deferring make-dead cannot change any check-dead answer. Rejected for now: it leaves a corpse-to-be occupying its tile until the boundary, and a deferral list is not really the action queue the problem calls for. Revisit with a proper action/event queue in mind.
