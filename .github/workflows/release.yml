@@ -132,12 +132,20 @@ jobs:
           # its process (the startup check did SDL_Init/SDL_Quit first), and it
           # pushes only after a renderer exists - SDL dispatches every pushed
           # event to the watcher SDL_CreateRenderer installs.
+          # Output captured rather than streamed: SBCL's banner, the warnings
+          # and the fault report interleave with the progress lines and make
+          # the cases impossible to tell apart in the log.
           probe () {
-            echo "--- $1"
-            sbcl --non-interactive \
-              --eval '(asdf:load-system :cotd)' \
-              --eval '(in-package :cotd)' \
-              --eval "$2" || echo "  FAULTED (exit $?)"
+            if out=$(sbcl --non-interactive \
+                       --eval '(asdf:load-system :cotd)' \
+                       --eval '(in-package :cotd)' \
+                       --eval "$2" 2>&1); then
+              echo "PASS  $1"
+            else
+              echo "FAIL  $1"
+              echo "        got as far as: $(printf '%s' "$out" | grep -aoE '^  ok: [A-Z0-9-]+$' | tail -1 | sed 's/.*ok: //')"
+              printf '%s' "$out" | grep -aE "Memory fault|CORRUPTION|error" | head -2 | sed 's/^/        /'
+            fi
           }
 
           # Keywords rather than strings in the probe forms: they travel
@@ -198,6 +206,31 @@ jobs:
                          (setf (cffi:mem-aref text :uint8 0) 97
                                (cffi:mem-aref text :uint8 1) 0))))
                    (note :pushed-handwritten-textinput)))"
+
+            # The discriminator: the same 32-byte fill, but on a key-up event,
+            # whose type SDL leaves enabled. If this faults it is the writing
+            # that is wrong and the event type is innocent; if it passes while
+            # the text ones fault, it is the type - and SDL disables TEXTINPUT
+            # and TEXTEDITING at SDL_StartEventLoop, enabling them only when
+            # SDL_StartTextInput is called.
+            probe "key-up push (an enabled type) with the same 32-byte fill" \
+              "(flet ($note)
+                 (cotd-render:with-init ()
+                   (cotd-render::push-event
+                     (lambda (e)
+                       (setf (cffi:mem-ref e :uint32 0) 769)
+                       (let ((text (cffi:inc-pointer e 12)))
+                         (dotimes (i 32) (setf (cffi:mem-aref text :uint8 i) #xFF)))))
+                   (note :pushed-filled-keyup)))"
+
+            probe "text-input push after SDL_StartTextInput (ENABLE-UNICODE)" \
+              "(flet ($note)
+                 (cotd-render:with-init ()
+                   (cotd-render:window 10 10)
+                   (cotd-render:enable-unicode)
+                   (note :text-input-started)
+                   (cotd-render:push-key-down-event 97 :unicode 97)
+                   (note :pushed-after-start-text-input)))"
 
             probe "text-input push: exactly what PUSH-KEY-DOWN-EVENT does" \
               "(flet ($note)
