@@ -148,25 +148,62 @@ jobs:
                   (cotd-render:push-key-down-event 97) (note :push-key)
                   (cotd-render:push-key-down-event 97 :unicode 97) (note :push-key-with-unicode)'
 
+          # The fault is in the text-input push, with no window and no renderer
+          # in the process, so it is neither the renderer's watcher nor state
+          # left over from a previous session. What is left is the one thing
+          # only that push does: writing a string into the event. These take it
+          # apart - CFFI alone first, with no SDL anywhere near it.
+
+          probe "cffi:lisp-string-to-foreign into a plain buffer, no SDL at all" \
+            "(flet ($note)
+               (cffi:with-foreign-object (buf :uint8 32)
+                 (dotimes (i 32) (setf (cffi:mem-aref buf :uint8 i) #xFF))
+                 (note :filled)
+                 (cffi:lisp-string-to-foreign (string (code-char 97)) buf 32 :encoding :utf-8)
+                 (note :string-written)))"
+
           for driver in dummy native; do
             echo "=== video driver: $driver ==="
             if [ "$driver" = dummy ]; then export SDL_VIDEODRIVER=dummy; else unset SDL_VIDEODRIVER; fi
 
-            probe "one session, no window (so no renderer, so no event watcher)" \
+            probe "the pushes that already work, for a baseline" \
               "(flet ($note)
                  (cotd-render:with-init () (note :sdl-init) $pushes))"
 
-            probe "one session, with a window" \
+            probe "text-input push: type field only" \
               "(flet ($note)
                  (cotd-render:with-init ()
-                   (note :sdl-init) (cotd-render:window 10 10) (note :window) $pushes))"
+                   (cotd-render::push-event
+                     (lambda (e) (setf (cffi:mem-ref e :uint32 0) cotd-render::+sdl-textinput+)))
+                   (note :pushed-bare-textinput)))"
 
-            probe "second session, with a window - what the event check does" \
+            probe "text-input push: type plus the 0xFF fill" \
               "(flet ($note)
-                 (cotd-render:with-init () (cotd-render:window 10 10))
-                 (note :first-session-torn-down)
                  (cotd-render:with-init ()
-                   (note :second-sdl-init) (cotd-render:window 10 10) (note :window) $pushes))"
+                   (cotd-render::push-event
+                     (lambda (e)
+                       (setf (cffi:mem-ref e :uint32 0) cotd-render::+sdl-textinput+)
+                       (let ((text (cffi:inc-pointer e 12)))
+                         (dotimes (i 32) (setf (cffi:mem-aref text :uint8 i) #xFF)))))
+                   (note :pushed-filled-textinput)))"
+
+            probe "text-input push: type, fill, and the bytes written by hand" \
+              "(flet ($note)
+                 (cotd-render:with-init ()
+                   (cotd-render::push-event
+                     (lambda (e)
+                       (setf (cffi:mem-ref e :uint32 0) cotd-render::+sdl-textinput+)
+                       (let ((text (cffi:inc-pointer e 12)))
+                         (dotimes (i 32) (setf (cffi:mem-aref text :uint8 i) #xFF))
+                         (setf (cffi:mem-aref text :uint8 0) 97
+                               (cffi:mem-aref text :uint8 1) 0))))
+                   (note :pushed-handwritten-textinput)))"
+
+            probe "text-input push: exactly what PUSH-KEY-DOWN-EVENT does" \
+              "(flet ($note)
+                 (cotd-render:with-init ()
+                   (cotd-render:push-key-down-event 97 :unicode 97)
+                   (note :pushed-via-push-key-down-event)))"
           done
 
       - name: Headless oracles
