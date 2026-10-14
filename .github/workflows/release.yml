@@ -112,7 +112,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          version="$(grep -oE ':version "[^"]+"' src/cotd.asd | head -1 | sed 's/.*"\(.*\)"/\1/')"
+          # grep -m1 and shell trimming rather than a grep | head | sed
+          # pipeline: under `pipefail` a reader that stops early kills the
+          # writer with SIGPIPE and fails the whole step. That is what broke
+          # the v2.1.1 tag - see the CHANGELOG reader below, which lost the
+          # same race on macOS while Linux and Windows won it.
+          version="$(grep -m1 -oE ':version "[^"]+"' src/cotd.asd)"
+          version="${version#:version \"}"
+          version="${version%\"}"
           [ -n "$version" ] || { echo "::error::no :version in src/cotd.asd"; exit 1; }
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "Version from src/cotd.asd: $version"
@@ -132,11 +139,19 @@ jobs:
             # the file collects changes that have no version yet and is skipped
             # by the same rule the publish job uses - cutting a release means
             # giving that section its date and version.
-            newest="$(tr -d '\r' < CHANGELOG.txt | awk '
+            # AWK reads the file itself and drops the CR per line. Piping
+            # `tr -d '\r'` into it, as this used to, races: AWK reaches its
+            # EXIT four lines in and closes the pipe, TR dies of SIGPIPE on
+            # its next write, and `pipefail` turns that into a failed step.
+            # Whether TR gets the whole 35KB file out first is luck - Linux
+            # and Windows managed it, macOS did not, and the v2.1.1 build
+            # failed here with everything about the tag correct.
+            newest="$(awk '
+              { sub(/\r$/, "") }
               /^-+$/ { hdr = 1; next }
               hdr    { hdr = 0
                        if ($0 ~ /^Unreleased[[:space:]]*$/) next
-                       print; exit }')"
+                       print; exit }' CHANGELOG.txt)"
             case "$newest" in
               *"v$version"*) echo "CHANGELOG's newest entry is \"$newest\"" ;;
               *) echo "::error::CHANGELOG.txt's newest entry is \"$newest\", which is not v$version"
@@ -370,14 +385,19 @@ jobs:
           # it changed and what the changelog says cannot drift apart. The
           # "Unreleased" section the file opens with has no version yet, so it
           # is skipped; the build job's tag check skips it by the same rule.
-          # The file is CRLF, which is why the carriage returns go first: an awk
-          # pattern anchored on $ would never match the separator otherwise.
-          tr -d '\r' < CHANGELOG.txt | awk '
+          # The file is CRLF, so each line's CR is dropped before anything is
+          # matched - a pattern anchored on $ would never match the separator
+          # otherwise. AWK reads the file directly instead of being fed by
+          # `tr -d '\r'`: the EXIT below would close that pipe early and kill
+          # TR with SIGPIPE, which under `pipefail` fails the step. The same
+          # race broke the build job on macOS when v2.1.1 was tagged.
+          awk '
+            { sub(/\r$/, "") }
             /^-+$/   { if (printing) exit; hdr = 1; next }
             hdr      { hdr = 0
                        if ($0 ~ /^Unreleased[[:space:]]*$/) next
                        printing = 1 }
-            printing { print }' > entry.md
+            printing { print }' CHANGELOG.txt > entry.md
           [ -s entry.md ] || { echo "::error::found no entry in CHANGELOG.txt"; exit 1; }
           # The per-platform install notes are kept beside this workflow rather
           # than inline, where indentation rules would turn them into code.
