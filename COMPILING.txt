@@ -159,7 +159,7 @@ build.lisp loads the cotd system and calls (cotd:make-exec). It is shared by bot
 
 All the Lisp libraries from the "Install dependencies" step above have to be installed first, since the build loads the whole system. SDL2 itself is not needed to build - the build never opens the library, only the finished game does - so a build machine does not have to have SDL2.dll or libSDL2 at all.
 
-The executable loads the SDL2 library when it starts, so wherever the game is run, SDL2 has to be present: on Windows put SDL2.dll next to cotd.exe (when you hand the game to someone else, ship SDL2.dll with it); on Linux the system's SDL2 package (e.g. libsdl2-2.0-0 on Debian/Ubuntu) has to be installed.
+The executable loads the SDL2 library when it starts, so wherever the game is run, SDL2 has to be present: on Windows put SDL2.dll next to cotd.exe (when you hand the game to someone else, ship SDL2.dll with it); on macOS put SDL2.framework next to the executable, which a release build searches before the system framework directories (there is no system SDL2 on macOS, and brew's sdl2 is sdl2-compat - see the macOS notes below); on Linux the system's SDL2 package (e.g. libsdl2-2.0-0 on Debian/Ubuntu) has to be installed.
 
 If sbcl is not on PATH - the Emacs and SLIME setup above does not put it there, it only tells Emacs where SBCL lives - point the SBCL variable at it before running the script:
 

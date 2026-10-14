@@ -219,6 +219,13 @@ jobs:
             echo "archive=dist/$name.zip" >> "$GITHUB_OUTPUT"
           else
             cp src/cotd "dist/$name/"
+            if [ "${RUNNER_OS}" = "macOS" ]; then
+              # Bundled for the same reason SDL2.dll is on Windows: there is no
+              # system SDL2 to count on, and the obvious "brew install sdl2"
+              # installs sdl2-compat instead. cp -R, not -RL: a framework is
+              # held together by symlinks.
+              cp -R /Library/Frameworks/SDL2.framework "dist/$name/"
+            fi
             (cd dist && tar -czf "$name.tar.gz" "$name")
             echo "archive=dist/$name.tar.gz" >> "$GITHUB_OUTPUT"
           fi
@@ -228,6 +235,14 @@ jobs:
       # Unpacking the archive somewhere else and running --check from a third
       # directory is what proves the thing that matters: the archive carries
       # its data, and the executable finds it from wherever it was installed.
+      # Otherwise the verification below would just find the framework this job
+      # installed for the oracles, and the bundled copy would go untested -
+      # which is the whole point of bundling it. Everything that needed the
+      # system one has already run.
+      - name: Take the system SDL2 away before verifying (macOS)
+        if: runner.os == 'macOS'
+        run: sudo rm -rf /Library/Frameworks/SDL2.framework
+
       - name: Verify the archive (Linux, macOS)
         if: runner.os != 'Windows'
         timeout-minutes: 10
@@ -334,10 +349,10 @@ jobs:
 
           **Linux** - install your distribution's SDL2 runtime (\`libsdl2-2.0-0\` on Debian and Ubuntu).
 
-          **macOS (Apple silicon)** - install SDL2 first, but *not* with \`brew install sdl2\`:
-          that is an alias for sdl2-compat, SDL2's API on top of SDL3. Take SDL2-2.x.y.dmg from
-          https://github.com/libsdl-org/SDL/releases and copy SDL2.framework into
-          /Library/Frameworks. The build is unsigned, so
+          **macOS (Apple silicon)** - SDL2.framework ships in the archive, next to the
+          executable, so there is nothing to install. (Do not \`brew install sdl2\` expecting
+          to help: that is an alias for sdl2-compat, SDL2's API on top of SDL3, which is a
+          different library.) The build is unsigned, so
           Gatekeeper quarantines it: \`xattr -dr com.apple.quarantine cotd\`. macOS is built and
           started in CI, but the game itself is untested there.
 

@@ -806,6 +806,15 @@ game that refuses to open."
 #+sbcl
 (defun cotd-exec ()
   (setf *asset-dir* (determine-release-asset-dir))
+  ;; A macOS release ships SDL2.framework beside the executable: macOS has no
+  ;; system SDL2 to rely on, and "brew install sdl2" installs sdl2-compat,
+  ;; which is SDL2's API on top of SDL3 and not the same library. Putting the
+  ;; executable's own directory first in CFFI's framework search is what makes
+  ;; the bundled one win - CFFI looks for <directory>/SDL2.framework/SDL2 in
+  ;; each entry, and render.lisp's library definition tries the framework
+  ;; before anything else on darwin.
+  #+darwin
+  (pushnew *asset-dir* cffi:*darwin-framework-directories* :test #'equal)
   ;; An option is answered before libSDL2 is so much as opened, so that
   ;; --version and --check still work where there is no display and no SDL2
   ;; installed - which is exactly where a build gets checked.
