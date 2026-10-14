@@ -721,18 +721,49 @@ for looking at."
   "Our :KEY-x id bound to backend key value KEY, via KEY=."
   (car (find-if (lambda (binding) (key= key (car binding))) *key-bindings*)))
 
+(defparameter *push-synthetic-text-input* t
+  "Whether this check may push SDL_TEXTINPUT events of its own.
+
+Set this to NIL when running against **sdl2-compat** - SDL2's API
+reimplemented on top of SDL3, which is what `brew install sdl2` installs,
+since Homebrew's sdl2 is an alias for it. There, SDL faults inside
+SDL_PushEvent on any event of that type, even one carrying nothing but its
+type with the rest of the event zeroed, while the identical 32-byte payload on
+an SDL_KEYUP goes through and so does every other type we push. It is the
+type, not what we write, and it happens on the dummy and the native video
+driver alike. The likely reason is that SDL3's SDL_TextInputEvent carries a
+const char * where SDL2's has an inline char[32], so a fabricated SDL2 text
+event has to be translated into that, and the translation is what dies.
+
+Real SDL2 - what Linux distributions package, what libsdl-org ships for
+Windows, and the SDL2.framework in their macOS .dmg - handles these fine.
+COTD-RENDER:SDL-VERSION reports which one is actually loaded.
+
+With this NIL, what goes untested is NEXT-EVENT's pairing of a key-down with
+the SDL_TEXTINPUT behind it. That logic is ours and is identical everywhere.
+Nothing in the game pushes text events - only this check does - so a player on
+sdl2-compat is not affected by any of this.")
+
 (defun push-headless-key (name &key shift ctrl char)
   (cotd-render:push-key-down-event (cdr (assoc name *key-bindings*))
                                    :mod (key-mod-bits :shift shift :ctrl ctrl)
-                                   :unicode (if char (char-code char) 0)))
+                                   :unicode (if (and char *push-synthetic-text-input*)
+                                                (char-code char)
+                                                0)))
 
-(defparameter *headless-event-expected-trace*
-  '((:key :key-a nil nil 97 0) (:key :key-b t nil 66 0) (:expose 0)
-    (:idle 1)
-    (:quit 1) (:key :key-c nil t 0 1)
-    (:idle 2)
-    (:key :key-escape nil nil 27 2) (:quit 2) (:key :key-d nil nil 100 2) (:expose 2)
-    :return-from :key-q :then (:key :key-w)))
+(defun headless-event-expected-trace ()
+  "The trace RUN-HEADLESS-EVENT-CHECK must produce. A function rather than a
+constant because it depends on *PUSH-SYNTHETIC-TEXT-INPUT*: with no text event
+behind a key-down, the key arrives carrying no character. Binding that to NIL
+on a platform that does support them is how the macOS path gets tested
+anywhere."
+  (flet ((unicode (code) (if *push-synthetic-text-input* code 0)))
+    `((:key :key-a nil nil ,(unicode 97) 0) (:key :key-b t nil ,(unicode 66) 0) (:expose 0)
+      (:idle 1)
+      (:quit 1) (:key :key-c nil t 0 1)
+      (:idle 2)
+      (:key :key-escape nil nil ,(unicode 27) 2) (:quit 2) (:key :key-d nil nil ,(unicode 100) 2) (:expose 2)
+      :return-from :key-q :then (:key :key-w))))
 
 (defun run-headless-event-check ()
   "Drive COTD-RENDER:WITH-EVENTS with the scripted events above under
@@ -783,8 +814,9 @@ the actual trace."
         (:key-down-event (:key key) (push (list :key (headless-key-name key)) trace))
         (:idle () (cotd-render:push-quit-event)))
       (let ((trace (nreverse trace)))
-        (unless (equal trace *headless-event-expected-trace*)
-          (error "RUN-HEADLESS-EVENT-CHECK: expected~%  ~S~%got~%  ~S" *headless-event-expected-trace* trace))
+        (unless (equal trace (headless-event-expected-trace))
+          (error "RUN-HEADLESS-EVENT-CHECK: expected~%  ~S~%got~%  ~S"
+                 (headless-event-expected-trace) trace))
         t))))
 
 ;;; ---------------------------------------------------------------------
@@ -866,9 +898,12 @@ whatever did not happen. Returns a plist of what it observed."
             (when (equalp menu-bytes after-bytes)
               (error "RUN-GAME-WINDOW-CHECK: the menu selection moved from ~D to ~D without the window changing"
                      selection-before selection-after))
-            (list :window-size (list w h)
-                  :selection (list selection-before selection-after)
-                  :renderer (cotd-render:renderer-name))))))))
+            (multiple-value-bind (version revision) (cotd-render:sdl-version)
+              (list :window-size (list w h)
+                    :selection (list selection-before selection-after)
+                    :renderer (cotd-render:renderer-name)
+                    :sdl version
+                    :sdl-revision revision))))))))
 
 (defun native-video-available-p ()
   "True if SDL initializes and opens a window on this machine's own video

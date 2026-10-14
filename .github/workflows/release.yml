@@ -73,9 +73,23 @@ jobs:
           [ -S /tmp/.X11-unix/X99 ] || { echo "::error::Xvfb did not come up"; exit 1; }
           echo "DISPLAY=:99" >> "$GITHUB_ENV"
 
+      # Not "brew install sdl2": that is an alias for sdl2-compat, which is
+      # SDL2's API reimplemented on top of SDL3, and it does not behave the
+      # same - a synthetic SDL_TEXTINPUT event faults inside SDL_PushEvent
+      # there. This is the real SDL2, as libsdl-org ships it for macOS: a
+      # universal SDL2.framework, which is the first thing render.lisp's
+      # library definition looks for on darwin.
       - name: Install SDL2 (macOS)
         if: runner.os == 'macOS'
-        run: brew install sdl2
+        run: |
+          set -euo pipefail
+          curl -fsSL --retry 5 --retry-delay 4 -o SDL2.dmg \
+            "https://github.com/libsdl-org/SDL/releases/download/release-${SDL2_VERSION}/SDL2-${SDL2_VERSION}.dmg"
+          hdiutil attach -quiet -nobrowse -mountpoint /Volumes/SDL2 SDL2.dmg
+          sudo cp -R /Volumes/SDL2/SDL2.framework /Library/Frameworks/
+          hdiutil detach -quiet /Volumes/SDL2
+          rm SDL2.dmg
+          ls /Library/Frameworks/SDL2.framework
 
       - name: Install SDL2 (Windows)
         if: runner.os == 'Windows'
@@ -113,131 +127,23 @@ jobs:
             echo "Tag $GITHUB_REF_NAME agrees with cotd.asd"
           fi
 
-      # SDL_PushEvent faulted at address 0x8 on the macOS runner, and the
-      # backtrace cannot say which push did it: WITH-EVENTS expands inline, so
-      # every push in the event check reports as the same frame. This pushes
-      # one event at a time and prints after each, on both video drivers, so
-      # the log names the call that dies. It is a diagnostic, not a gate.
-      - name: Probe SDL's event queue
-        continue-on-error: true
+      # Which SDL this platform actually has. Homebrew's sdl2 is sdl2-compat,
+      # SDL2's API on top of SDL3, which does not behave identically - it is
+      # why a synthetic SDL_TEXTINPUT event faults on macOS and not elsewhere.
+      - name: Report the SDL build
         timeout-minutes: 5
         shell: bash
         run: |
-          set -uo pipefail
+          set -euo pipefail
           cd src
-
-          # Each case runs in its own SBCL, so a fault in one still leaves the
-          # others to report. The cases differ in what happened before the
-          # push: the event check that crashed is the *second* SDL session in
-          # its process (the startup check did SDL_Init/SDL_Quit first), and it
-          # pushes only after a renderer exists - SDL dispatches every pushed
-          # event to the watcher SDL_CreateRenderer installs.
-          # Output captured rather than streamed: SBCL's banner, the warnings
-          # and the fault report interleave with the progress lines and make
-          # the cases impossible to tell apart in the log.
-          probe () {
-            if out=$(sbcl --non-interactive \
-                       --eval '(asdf:load-system :cotd)' \
-                       --eval '(in-package :cotd)' \
-                       --eval "$2" 2>&1); then
-              echo "PASS  $1"
-            else
-              echo "FAIL  $1"
-              echo "        got as far as: $(printf '%s' "$out" | grep -aoE '^  ok: [A-Z0-9-]+$' | tail -1 | sed 's/.*ok: //')"
-              printf '%s' "$out" | grep -aE "Memory fault|CORRUPTION|error" | head -2 | sed 's/^/        /'
-            fi
-          }
-
-          # Keywords rather than strings in the probe forms: they travel
-          # through the shell without quoting trouble.
-          note='(note (what) (format t "  ok: ~A~%" what) (finish-output))'
-          pushes='(cotd-render:push-quit-event) (note :push-quit)
-                  (cotd-render:push-expose-event) (note :push-expose)
-                  (cotd-render:push-key-down-event 97) (note :push-key)
-                  (cotd-render:push-key-down-event 97 :unicode 97) (note :push-key-with-unicode)'
-
-          # The fault is in the text-input push, with no window and no renderer
-          # in the process, so it is neither the renderer's watcher nor state
-          # left over from a previous session. What is left is the one thing
-          # only that push does: writing a string into the event. These take it
-          # apart - CFFI alone first, with no SDL anywhere near it.
-
-          probe "cffi:lisp-string-to-foreign into a plain buffer, no SDL at all" \
-            "(flet ($note)
-               (cffi:with-foreign-object (buf :uint8 32)
-                 (dotimes (i 32) (setf (cffi:mem-aref buf :uint8 i) #xFF))
-                 (note :filled)
-                 (cffi:lisp-string-to-foreign (string (code-char 97)) buf 32 :encoding :utf-8)
-                 (note :string-written)))"
-
-          for driver in dummy native; do
-            echo "=== video driver: $driver ==="
-            if [ "$driver" = dummy ]; then export SDL_VIDEODRIVER=dummy; else unset SDL_VIDEODRIVER; fi
-
-            probe "the pushes that already work, for a baseline" \
-              "(flet ($note)
-                 (cotd-render:with-init () (note :sdl-init) $pushes))"
-
-            probe "text-input push: type field only" \
-              "(flet ($note)
-                 (cotd-render:with-init ()
-                   (cotd-render::push-event
-                     (lambda (e) (setf (cffi:mem-ref e :uint32 0) cotd-render::+sdl-textinput+)))
-                   (note :pushed-bare-textinput)))"
-
-            probe "text-input push: type plus the 0xFF fill" \
-              "(flet ($note)
-                 (cotd-render:with-init ()
-                   (cotd-render::push-event
-                     (lambda (e)
-                       (setf (cffi:mem-ref e :uint32 0) cotd-render::+sdl-textinput+)
-                       (let ((text (cffi:inc-pointer e 12)))
-                         (dotimes (i 32) (setf (cffi:mem-aref text :uint8 i) #xFF)))))
-                   (note :pushed-filled-textinput)))"
-
-            probe "text-input push: type, fill, and the bytes written by hand" \
-              "(flet ($note)
-                 (cotd-render:with-init ()
-                   (cotd-render::push-event
-                     (lambda (e)
-                       (setf (cffi:mem-ref e :uint32 0) cotd-render::+sdl-textinput+)
-                       (let ((text (cffi:inc-pointer e 12)))
-                         (dotimes (i 32) (setf (cffi:mem-aref text :uint8 i) #xFF))
-                         (setf (cffi:mem-aref text :uint8 0) 97
-                               (cffi:mem-aref text :uint8 1) 0))))
-                   (note :pushed-handwritten-textinput)))"
-
-            # The discriminator: the same 32-byte fill, but on a key-up event,
-            # whose type SDL leaves enabled. If this faults it is the writing
-            # that is wrong and the event type is innocent; if it passes while
-            # the text ones fault, it is the type - and SDL disables TEXTINPUT
-            # and TEXTEDITING at SDL_StartEventLoop, enabling them only when
-            # SDL_StartTextInput is called.
-            probe "key-up push (an enabled type) with the same 32-byte fill" \
-              "(flet ($note)
-                 (cotd-render:with-init ()
-                   (cotd-render::push-event
-                     (lambda (e)
-                       (setf (cffi:mem-ref e :uint32 0) 769)
-                       (let ((text (cffi:inc-pointer e 12)))
-                         (dotimes (i 32) (setf (cffi:mem-aref text :uint8 i) #xFF)))))
-                   (note :pushed-filled-keyup)))"
-
-            probe "text-input push after SDL_StartTextInput (ENABLE-UNICODE)" \
-              "(flet ($note)
-                 (cotd-render:with-init ()
-                   (cotd-render:window 10 10)
-                   (cotd-render:enable-unicode)
-                   (note :text-input-started)
-                   (cotd-render:push-key-down-event 97 :unicode 97)
-                   (note :pushed-after-start-text-input)))"
-
-            probe "text-input push: exactly what PUSH-KEY-DOWN-EVENT does" \
-              "(flet ($note)
-                 (cotd-render:with-init ()
-                   (cotd-render:push-key-down-event 97 :unicode 97)
-                   (note :pushed-via-push-key-down-event)))"
-          done
+          sbcl --non-interactive \
+            --eval '(asdf:load-system :cotd)' \
+            --eval '(in-package :cotd)' \
+            --eval '(cotd-render:with-init ()
+                      (multiple-value-bind (version revision) (cotd-render:sdl-version)
+                        (format t "~&SDL ~A, revision ~A~%" version revision)))'
+        env:
+          SDL_VIDEODRIVER: dummy
 
       - name: Headless oracles
         shell: bash
@@ -428,7 +334,10 @@ jobs:
 
           **Linux** - install your distribution's SDL2 runtime (\`libsdl2-2.0-0\` on Debian and Ubuntu).
 
-          **macOS (Apple silicon)** - \`brew install sdl2\` first. The build is unsigned, so
+          **macOS (Apple silicon)** - install SDL2 first, but *not* with \`brew install sdl2\`:
+          that is an alias for sdl2-compat, SDL2's API on top of SDL3. Take SDL2-2.x.y.dmg from
+          https://github.com/libsdl-org/SDL/releases and copy SDL2.framework into
+          /Library/Frameworks. The build is unsigned, so
           Gatekeeper quarantines it: \`xattr -dr com.apple.quarantine cotd\`. macOS is built and
           started in CI, but the game itself is untested there.
 

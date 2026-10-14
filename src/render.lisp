@@ -14,7 +14,7 @@
    #:*default-font* #:*font-6x13* #:*font-8x13* #:*font-6x13o* #:*font-8x13o*
    #:color #:*default-surface*
    #:*white* #:*black* #:*red* #:*yellow* #:*magenta* #:*green* #:*cyan* #:*blue*
-   #:surface-rgb-bytes #:window-surface #:renderer-name))
+   #:surface-rgb-bytes #:window-surface #:renderer-name #:sdl-version))
 
 ;;;; The render backend boundary.
 ;;;;
@@ -169,6 +169,20 @@ point traps are masked during the call unless NAME is one of
   (:unix (:or "libSDL2-2.0.so.0" "libSDL2.so.0.2" "libSDL2"))
   (:windows "SDL2.dll")
   (t (:default "libSDL2")))
+
+(defun sdl-version ()
+  "The libSDL2 this process is running against: its version as a string, and
+its revision as the second value. Worth having in a bug report, and worth
+looking at when a platform misbehaves - sdl2-compat, which reimplements SDL2's
+API on top of SDL3, announces itself in the revision, and does not behave
+identically to SDL2 in every corner."
+  (cffi:with-foreign-object (v :uint8 3)
+    (sdl-call "SDL_GetVersion" :pointer v :void)
+    (values (format nil "~D.~D.~D"
+                    (cffi:mem-aref v :uint8 0)
+                    (cffi:mem-aref v :uint8 1)
+                    (cffi:mem-aref v :uint8 2))
+            (sdl-call "SDL_GetRevision" :string))))
 
 (defun ensure-sdl2-loaded ()
   "Open libSDL2, unless this image already has it open."
