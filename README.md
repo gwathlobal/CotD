@@ -9,15 +9,7 @@ It is written in Common Lisp using SDL.
 
 LATEST RELEASE
 
-August 13, 2020 v2.0.2
-
-- Satanists during the Satanist Elimination mission are given 3 disguises and 1 medkit.
-- When delayed, it now takes angels, demons, and military around 90 turns to arrive.
-- It is necessary to gather 300 pts of flesh now (up from 200) during the Demonic Raid mission.
-- Fix the issue when campaign mode was saved as if the player was inside a mission and not on a campaign map.
-- Fix the bug when the game crashed after a player's mission happened in a corrupted district a second time.
-
-
+See the [Releases](https://github.com/gwathlobal/CotD/releases/latest) page for the newest version and what changed in it.
 
 CURRENT CHANGELOG
 
