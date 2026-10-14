@@ -286,6 +286,22 @@
   ;(list glyph-idx glyph-color back-color visibility revealed light)
   )
 
+(defmacro do-memo-cells ((single-memo level) &body body)
+  "Run BODY once per memo cell of LEVEL, with SINGLE-MEMO bound to the cell.
+
+For the sweeps in los-fov.lisp that have to look at the whole level - a
+90,000-cell array - this reads (MEMO LEVEL) once instead of once per cell.
+Reached through GET-MEMO-* in a nested loop, that slot read is a generic
+accessor call, and at 90,000 calls a sweep it cost more than everything the
+sweeps actually do. The visiting order is the same one the nested loops
+walked, X-major; nothing relies on it."
+  (let ((memo-array (gensym "MEMO-ARRAY"))
+        (index (gensym "INDEX")))
+    `(let ((,memo-array (the (simple-array t (* * *)) (memo ,level))))
+       (dotimes (,index (array-total-size ,memo-array))
+         (let ((,single-memo (the simple-vector (row-major-aref ,memo-array ,index))))
+           ,@body)))))
+
 ;; A single memo is the simple-vector built by create-single-memo.
 (declaim (inline get-single-memo-glyph-idx get-single-memo-glyph-color get-single-memo-back-color get-single-memo-visibility get-single-memo-revealed get-single-memo-light get-single-memo-player))
 
@@ -316,6 +332,34 @@
 (defun get-single-memo-player (single-memo)
   (declare (type simple-vector single-memo) (optimize (speed 3)))
   (svref single-memo 6))
+
+;; Writing a field of a memo cell you already have in hand. SET-SINGLE-MEMO-*
+;; below is the usual way in, but it looks the cell up from its coordinates,
+;; which is wasted work inside DO-MEMO-CELLS - and these keep the field
+;; offsets in this file with the readers above.
+(declaim (inline (setf get-single-memo-glyph-color) (setf get-single-memo-back-color) (setf get-single-memo-visibility) (setf get-single-memo-light)))
+
+(defun (setf get-single-memo-glyph-color) (value single-memo)
+  (declare (type simple-vector single-memo) (optimize (speed 3)))
+  (setf (svref single-memo 1) value))
+
+(defun (setf get-single-memo-back-color) (value single-memo)
+  (declare (type simple-vector single-memo) (optimize (speed 3)))
+  (setf (svref single-memo 2) value))
+
+(defun (setf get-single-memo-visibility) (value single-memo)
+  (declare (type simple-vector single-memo) (optimize (speed 3)))
+  (setf (svref single-memo 3) value))
+
+(defun (setf get-single-memo-light) (value single-memo)
+  (declare (type simple-vector single-memo) (optimize (speed 3)))
+  (setf (svref single-memo 5) value))
+
+;; Inline: every one of the nine call sites passes constant keywords, so the
+;; expansion is the lookup plus one SVREF store per field actually supplied -
+;; no keyword parsing at run time. That matters because two of those sites
+;; (the memo sweeps in los-fov.lisp) run once per cell of the whole level.
+(declaim (inline set-single-memo-*))
 
 (defun set-single-memo-* (level x y z &key (glyph-idx nil glyph-idx-p)
                                            (glyph-color nil glyph-color-p)

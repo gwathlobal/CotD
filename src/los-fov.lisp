@@ -120,51 +120,87 @@ fixed order the callers have always seen: QX ascending, and QY within it."
             (setf result (append result (aref quadrants x y)))))))
     result))
 
+;; Deliberately NOT declaimed inline, though it looks like a candidate: every
+;; call site passes constant :CHECK-... flags, so inlining does fold each one
+;; down to the checks it asked for and measured ~8% off a player's vision
+;; update. But folding a constant flag away makes the code after it
+;; unreachable at six of the call sites, and SBCL rightly says so - and this
+;; build is kept at zero compiler notes (see commit 379afe7), which is worth
+;; more than the 8%.
 (defun check-LOS-propagate (dx dy dz prev-cell &key (check-move nil) (check-vision nil) (check-projectile nil) (player-reveal-cell nil) (check-sound nil))
-  ;(declare (optimize (speed 3)))
-  (let ((terrain))
-    (when (or (< dx 0) (>= dx (array-dimension (terrain (level *world*)) 0))
-              (< dy 0) (>= dy (array-dimension (terrain (level *world*)) 1))
-              (< dz 0) (>= dz (array-dimension (terrain (level *world*)) 2)))
-      (return-from check-LOS-propagate nil))
-    
+  ;; This runs once per cell of every ray every LOS-using system traces -
+  ;; vision, light, sound, projectiles, AI movement checks - so it is the
+  ;; innermost function in the game. (LEVEL *WORLD*) is read once into a
+  ;; local: it was being called eight times per cell here, and through the
+  ;; generic accessor each of those is a real call.
+  (declare (type fixnum dx dy dz) (type list prev-cell) (optimize (speed 3)))
+  (let ((level (level *world*))
+        (terrain))
+    (let ((terrain-array (the (simple-array fixnum (* * *)) (terrain level))))
+      (when (or (< dx 0) (>= dx (array-dimension terrain-array 0))
+                (< dy 0) (>= dy (array-dimension terrain-array 1))
+                (< dz 0) (>= dz (array-dimension terrain-array 2)))
+        (return-from check-LOS-propagate nil)))
+
     ;; check if LOS propagates vertically through floors (depending on the type of LOS)
     (when (and prev-cell
-               (/= (- (third prev-cell) dz) 0))
-      (loop for (check trait) in `((,check-move ,+terrain-trait-blocks-move-floor+) (,check-vision ,+terrain-trait-blocks-vision-floor+) (,check-projectile ,+terrain-trait-blocks-projectiles-floor+))
-            when check do
-              (if (> (- (third prev-cell) dz) 0)
-                ;; prev is up, the tile above current has trait & the prev tile has trait
-                (when (and (get-terrain-* (level *world*) dx dy (third prev-cell))
-                           (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (third prev-cell)) trait) t)
-                               (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy (third prev-cell)) trait) 100))
-                           (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell)) trait) t)
-                               (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) (third prev-cell)) trait) 100)))
-                  (return-from check-LOS-propagate nil))
-                ;; prev is down
-                (when (and (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz)
-                           (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz) trait) t)
-                               (eq (get-terrain-type-trait (get-terrain-* (level *world*) (first prev-cell) (second prev-cell) dz) trait) 100))
-                           (get-terrain-* (level *world*) dx dy dz)
-                           (or (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-blocks-move-floor+) t)
-                               (eq (get-terrain-type-trait (get-terrain-* (level *world*) dx dy dz) +terrain-trait-blocks-move-floor+) 100)))
-                  (return-from check-LOS-propagate nil)))))
-    
+               (/= (- (the fixnum (third prev-cell)) dz) 0))
+      (let ((prev-x (the fixnum (first prev-cell)))
+            (prev-y (the fixnum (second prev-cell)))
+            (prev-z (the fixnum (third prev-cell))))
+        (declare (type fixnum prev-x prev-y prev-z))
+        ;; One FLET rather than a LOOP over a freshly consed list of
+        ;; (flag trait) pairs: the list was allocated on every floor
+        ;; crossing, and only the trait differs between the three checks.
+        (flet ((floor-blocks-p (trait)
+                 (if (> (- prev-z dz) 0)
+                   ;; prev is up, the tile above current has trait & the prev tile has trait
+                   (and (get-terrain-* level dx dy prev-z)
+                        (or (eq (get-terrain-type-trait (get-terrain-* level dx dy prev-z) trait) t)
+                            (eq (get-terrain-type-trait (get-terrain-* level dx dy prev-z) trait) 100))
+                        (or (eq (get-terrain-type-trait (get-terrain-* level prev-x prev-y prev-z) trait) t)
+                            (eq (get-terrain-type-trait (get-terrain-* level prev-x prev-y prev-z) trait) 100)))
+                   ;; prev is down
+                   ;; NB the second half of this test asks for
+                   ;; +TERRAIN-TRAIT-BLOCKS-MOVE-FLOOR+ rather than TRAIT, so
+                   ;; looking up through a floor consults the move trait
+                   ;; whichever kind of LOS is being traced. Kept exactly as
+                   ;; it was - this is a speed change, not a rules change.
+                   (and (get-terrain-* level prev-x prev-y dz)
+                        (or (eq (get-terrain-type-trait (get-terrain-* level prev-x prev-y dz) trait) t)
+                            (eq (get-terrain-type-trait (get-terrain-* level prev-x prev-y dz) trait) 100))
+                        (get-terrain-* level dx dy dz)
+                        (or (eq (get-terrain-type-trait (get-terrain-* level dx dy dz) +terrain-trait-blocks-move-floor+) t)
+                            (eq (get-terrain-type-trait (get-terrain-* level dx dy dz) +terrain-trait-blocks-move-floor+) 100))))))
+          (when (and check-move (floor-blocks-p +terrain-trait-blocks-move-floor+))
+            (return-from check-LOS-propagate nil))
+          (when (and check-vision (floor-blocks-p +terrain-trait-blocks-vision-floor+))
+            (return-from check-LOS-propagate nil))
+          (when (and check-projectile (floor-blocks-p +terrain-trait-blocks-projectiles-floor+))
+            (return-from check-LOS-propagate nil)))))
+
     (when player-reveal-cell
-      (when (and (<= (abs (- (x *player*) dx)) 5)
-                 (<= (abs (- (y *player*) dy)) 5)
-                 (/= (z *player*) dz))
-        (pushnew dz (visible-z-list *player*)))
+      ;; the player's own coordinates named once, with their type: read
+      ;; straight through the generic accessors they are only known to be
+      ;; NUMBER, which leaves these three comparisons generic
+      (let ((player-x (the fixnum (x *player*)))
+            (player-y (the fixnum (y *player*)))
+            (player-z (the fixnum (z *player*))))
+        (declare (type fixnum player-x player-y player-z))
+        (when (and (<= (abs (- player-x dx)) 5)
+                   (<= (abs (- player-y dy)) 5)
+                   (/= player-z dz))
+          (pushnew dz (visible-z-list *player*))))
       (let ((key (vision-cache-key dx dy dz)))
         (unless (and *revealed-cell-cache* (gethash key *revealed-cell-cache*))
           (when *revealed-cell-cache*
             (setf (gethash key *revealed-cell-cache*) t))
-          (reveal-cell-on-map (level *world*) dx dy dz :reveal-mob (if (or (null (get-mob-* (level *world*) dx dy dz))
-                                                                           (eq (get-mob-* (level *world*) dx dy dz) *player*))
-                                                                     t
-                                                                     (check-mob-visible (get-mob-* (level *world*) dx dy dz) :observer *player*))))))
-    
-    (setf terrain (get-terrain-* (level *world*) dx dy dz))
+          (reveal-cell-on-map level dx dy dz :reveal-mob (if (or (null (get-mob-* level dx dy dz))
+                                                                 (eq (get-mob-* level dx dy dz) *player*))
+                                                           t
+                                                           (check-mob-visible (get-mob-* level dx dy dz) :observer *player*))))))
+
+    (setf terrain (get-terrain-* level dx dy dz))
     (unless terrain
       (return-from check-LOS-propagate nil))
 
@@ -182,7 +218,7 @@ fixed order the callers have always seen: QX ascending, and QY within it."
       (return-from check-LOS-propagate nil))
 
     (when check-vision
-      (return-from check-LOS-propagate (vision-block-power-of-cell (level *world*) dx dy dz)))
+      (return-from check-LOS-propagate (vision-block-power-of-cell level dx dy dz)))
 
     t))
 
@@ -194,12 +230,20 @@ fixed order the callers have always seen: QX ascending, and QY within it."
                           (nearby-light-mobs *player*)
                           (mob-id-list level))
           for tmob of-type mob = (get-mob-by-id mob-id)
-          for light-power of-type fixnum = (* *light-power-faloff* (abs (cur-light tmob)))
-          for vision-pwr of-type fixnum = (abs (cur-light tmob))
-          for vision-power of-type fixnum = (abs (cur-light tmob))
+          ;; TMOB's light and position named once per mob instead of being
+          ;; re-read through the generic accessors four times here and, for
+          ;; CUR-LIGHT, once more per cell of the ray below
+          for tmob-light of-type fixnum = (cur-light tmob)
+          for light-abs of-type fixnum = (abs tmob-light)
+          for tmob-x of-type fixnum = (x tmob)
+          for tmob-y of-type fixnum = (y tmob)
+          for tmob-z of-type fixnum = (z tmob)
+          for light-power of-type fixnum = (* *light-power-faloff* light-abs)
+          for vision-pwr of-type fixnum = light-abs
+          for vision-power of-type fixnum = light-abs
           do
-            (when (< (get-distance-3d (x tmob) (y tmob) (z tmob) x y z) (abs (cur-light tmob)))
-               (line-of-sight (x tmob) (y tmob) (z tmob) x y z
+            (when (< (get-distance-3d tmob-x tmob-y tmob-z x y z) light-abs)
+               (line-of-sight tmob-x tmob-y tmob-z x y z
                               #'(lambda (dx dy dz prev-cell)
                                   (declare (type fixnum dx dy dz))
                                   (let* ((exit-result t) (pwr-decrease 0)) 
@@ -211,8 +255,8 @@ fixed order the callers have always seen: QX ascending, and QY within it."
                                         (return))
                                       (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
                                       (decf vision-pwr)
-                                      
-                                      (if (> (cur-light tmob) 0)
+
+                                      (if (> tmob-light 0)
                                         (progn
                                           ;; if the light emitted by a mob is positive - increase brightness
                                           (when (and (= x dx) (= y dy) (= z dz)
@@ -300,26 +344,43 @@ fixed order the callers have always seen: QX ascending, and QY within it."
 (defun calc-lit-tiles-for-player (mob)
   (log:info "CALC-LIT-TILES: ~A [~A]" (name mob) (id mob))
 
-  (dotimes (x1 (array-dimension (memo (level *world*)) 0))
-    (declare (type fixnum x1))
-    (dotimes (y1 (array-dimension (memo (level *world*)) 1))
-      (declare (type fixnum y1))
-      (dotimes (z1 (array-dimension (memo (level *world*)) 2))
-        (declare (type fixnum z1))
-        (set-single-memo-* (level *world*) x1 y1 z1 :light 0)
-        )))
+  ;; Clear every cell's remembered light, then compute it afresh for the cube
+  ;; around MOB below. The clearing pass walks all ~90,000 cells of the level
+  ;; but only *writes* the ones that aren't already 0 - at most the (2*sight+1)^3
+  ;; cube the previous call filled in, i.e. a few thousand. Reading a cell and
+  ;; leaving it alone is much cheaper than storing the 0 it already holds, and
+  ;; the state this loop leaves behind is the same either way.
+  ;;
+  (do-memo-cells (single-memo (level *world*))
+    (unless (eql (get-single-memo-light single-memo) 0)
+      (setf (get-single-memo-light single-memo) 0)))
 
-  (loop for tx of-type fixnum from (- (x mob) (cur-sight mob)) to (+ (x mob) (cur-sight mob)) do
-    (loop for ty of-type fixnum from (- (y mob) (cur-sight mob)) to (+ (y mob) (cur-sight mob)) do
-      (loop for tz of-type fixnum from (- (z mob) (cur-sight mob)) to (+ (z mob) (cur-sight mob))
-            with brightness of-type fixnum = 0
-            when (and (>= tx 0) (< tx (array-dimension (terrain (level *world*)) 0))
-                      (>= ty 0) (< ty (array-dimension (terrain (level *world*)) 1))
-                      (>= tz 0) (< tz (array-dimension (terrain (level *world*)) 2)))
-              do
-               (setf brightness (calculate-single-tile-brightness (level *world*) tx ty tz :calc-for-player t))
-               (when (> brightness (get-single-memo-light (get-memo-* (level *world*) tx ty tz)))
-                 (set-single-memo-* (level *world*) tx ty tz :light brightness)))))
+  ;; MOB stays put while its lit tiles are worked out, so its position, its
+  ;; sight radius, the level and the level's bounds are all read once rather
+  ;; than once per cell of the cube below - several thousand cells, each of
+  ;; which was going through the generic accessors for every one of them.
+  (let* ((level (level *world*))
+         (terrain-array (the (simple-array fixnum (* * *)) (terrain level)))
+         (max-x (array-dimension terrain-array 0))
+         (max-y (array-dimension terrain-array 1))
+         (max-z (array-dimension terrain-array 2))
+         (mob-x (the fixnum (x mob)))
+         (mob-y (the fixnum (y mob)))
+         (mob-z (the fixnum (z mob)))
+         (sight (the fixnum (cur-sight mob))))
+    (declare (type fixnum max-x max-y max-z mob-x mob-y mob-z sight))
+    (loop for tx of-type fixnum from (- mob-x sight) to (+ mob-x sight) do
+      (loop for ty of-type fixnum from (- mob-y sight) to (+ mob-y sight) do
+        (loop for tz of-type fixnum from (- mob-z sight) to (+ mob-z sight)
+              with brightness of-type fixnum = 0
+              when (and (>= tx 0) (< tx max-x)
+                        (>= ty 0) (< ty max-y)
+                        (>= tz 0) (< tz max-z))
+                do
+                 (setf brightness (calculate-single-tile-brightness level tx ty tz :calc-for-player t))
+                 (let ((single-memo (get-memo-* level tx ty tz)))
+                   (when (> brightness (the fixnum (get-single-memo-light single-memo)))
+                     (setf (get-single-memo-light single-memo) brightness)))))))
   )
 
 (defun update-visible-mobs-normal (mob)
@@ -899,13 +960,24 @@ fixed order the callers have always seen: QX ascending, and QY within it."
 
 (defun update-visible-area (level x y z &key (no-z nil))
   ;; make the the whole level invisible
-  (dotimes (x1 (array-dimension (memo (level *world*)) 0))
-    (dotimes (y1 (array-dimension (memo (level *world*)) 1))
-      (dotimes (z1 (array-dimension (memo (level *world*)) 2))
-        (if (get-single-memo-revealed (get-memo-* level x1 y1 z1))
-          (set-single-memo-* level x1 y1 z1 :glyph-color *memo-remembered-color* :back-color +color-black+ :visibility nil)
-          (set-single-memo-* level x1 y1 z1 :visibility nil))
-      )))
+  ;;
+  ;; Same shape as the clearing pass in CALC-LIT-TILES-FOR-PLAYER: every cell
+  ;; is inspected, but only a cell that would actually change is written. Of a
+  ;; level's ~90,000 memo cells only a thousand or so are visible at any one
+  ;; moment; the rest already hold exactly what this loop would store, because
+  ;; a revealed cell was given the remembered colours by this very loop on the
+  ;; turn it stopped being visible, and an unrevealed one has never been
+  ;; written at all. The field-by-field guards keep that true without relying
+  ;; on the argument: whatever a cell holds, it ends up with the values the
+  ;; unconditional version would have left it.
+  (do-memo-cells (single-memo level)
+    (when (get-single-memo-visibility single-memo)
+      (setf (get-single-memo-visibility single-memo) nil))
+    (when (get-single-memo-revealed single-memo)
+      (unless (eql (get-single-memo-glyph-color single-memo) *memo-remembered-color*)
+        (setf (get-single-memo-glyph-color single-memo) *memo-remembered-color*))
+      (unless (eql (get-single-memo-back-color single-memo) +color-black+)
+        (setf (get-single-memo-back-color single-memo) +color-black+))))
 
   (setf (visible-mobs *player*) nil)
   (setf (proper-visible-mobs *player*) nil)
@@ -991,12 +1063,21 @@ fixed order the callers have always seen: QX ascending, and QY within it."
          (i dm))
     (declare (type fixnum dx dy dz sx sy sz dm i))
     (setf x1 (truncate dm 2) y1 (truncate dm 2) z1 (truncate dm 2))
+    ;; PREV-CELL is handed to FUNC and read there (NULL, FIRST/SECOND/THIRD,
+    ;; or passed straight on to CHECK-LOS-PROPAGATE, which does the same) and
+    ;; never kept, so one list per ray is refilled in place instead of consing
+    ;; a fresh one per cell. A single player action traces on the order of a
+    ;; thousand rays, which was a megabyte of garbage per keypress.
     (loop with prev-cell = nil
+          with scratch-cell of-type list = (list 0 0 0)
           while (and (not (< i 0))
                      (not (eq (funcall func x0 y0 z0 prev-cell) 'exit)))
           do
              (decf i)
-             (setf prev-cell (list x0 y0 z0))
+             (setf (first scratch-cell) x0
+                   (second scratch-cell) y0
+                   (third scratch-cell) z0)
+             (setf prev-cell scratch-cell)
              (decf x1 dx) (decf y1 dy) (decf z1 dz)
              (when (< x1 0)
                (incf x1 dm)
