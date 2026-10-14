@@ -1,6 +1,11 @@
 CHANGELOG
 
 --------------------
+Unreleased
+
+- City parks and ruined parks place small birch trees again. Of the four sizes a park can plant, the smallest could never be chosen: two of the branches tested the same roll.
+
+--------------------
 October 14, 2026 v2.1.0
 
 The game now draws through SDL2 instead of SDL 1.2, and ships as a standalone executable for Windows, Linux and macOS. Nothing about how it plays has changed.

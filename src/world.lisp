@@ -362,6 +362,21 @@ asked for. set-single-memo-* was 45.9% of a game turn before this."
               :element-type 'fixnum
               :initial-element +connect-room-none+))
 
+;; The CONNECT-MAP slot is the fixed six-element simple-vector made with the
+;; LEVEL, indexed by mob size. Read it as (AREF (CONNECT-MAP LEVEL) SIZE) and
+;; SBCL only knows the generic accessor returns T, so the read compiles to a
+;; runtime dispatch on the array's element type; naming the type in this one
+;; place gets every caller an inline SVREF instead.
+(declaim (inline get-level-connect-map (setf get-level-connect-map)))
+
+(defun get-level-connect-map (level map-size)
+  (declare (type fixnum map-size) (optimize (speed 3)))
+  (svref (the simple-vector (connect-map level)) map-size))
+
+(defun (setf get-level-connect-map) (value level map-size)
+  (declare (type fixnum map-size) (optimize (speed 3)))
+  (setf (svref (the simple-vector (connect-map level)) map-size) value))
+
 (declaim (inline get-connect-map-value set-connect-map-value))
 
 (defun get-connect-map-value (connect-map x y z move-mode)
@@ -379,7 +394,7 @@ asked for. set-single-memo-* was 45.9% of a game turn before this."
   (when (or (zerop map-size)
             (evenp map-size))
     (error "GET-CONNECT-MAP-SIZE: Map size should be an odd number"))
-  (let ((connect-map (aref (connect-map level) map-size)))
+  (let ((connect-map (get-level-connect-map level map-size)))
     (if connect-map
       (aref (the connect-map connect-map) x y z move-mode)
       +connect-room-none+)))

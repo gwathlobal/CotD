@@ -18,7 +18,10 @@
       ((and (< a -67.5) (>= a -112.5)) (setf result 2))
       ((and (< a -112.5) (>= a -157.5)) (setf result 3))
       ((or (> a 157.5) (< a -157.5)) (setf result 6))
-      ((or (> a -22.5) (<= a 22.5)) (setf result 4)))
+      ;; Everything left over is the -22.5..22.5 wedge: each of the clauses
+      ;; above already claims every angle outside it, so spelling the bound
+      ;; out again here would just be unreachable code.
+      (t (setf result 4)))
     result))
 
 (defun propagate-sound-from-location (target sx sy sz sound-power sound-str-func &key (force-sound nil) (source nil))

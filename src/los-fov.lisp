@@ -78,6 +78,48 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
   (declare (type fixnum sx sy sz tx ty tz))
   (sqrt (+ (* (- sx tx) (- sx tx)) (* (- sy ty) (- sy ty)) (* (- sz tz) (- sz tz)))))
 
+;; "Is this closer than that radius" is the single most common thing done with
+;; the two functions above, and written as (< (get-distance-3d ...) radius) it
+;; compares a float against an integer, which SBCL cannot open-code: it has to
+;; convert the float to a rational first. Converting the radius to a float
+;; instead gives the same answer - these radii are sight ranges and light
+;; radii, orders of magnitude below the 2^24 where a single-float stops being
+;; able to hold an integer exactly - and compares two floats.
+(declaim (inline distance-under-p distance-3d-under-p))
+
+(defun distance-under-p (sx sy tx ty limit)
+  "True when <SX, SY> is strictly nearer than LIMIT to <TX, TY>."
+  (declare (type fixnum sx sy tx ty limit) (optimize (speed 3)))
+  (< (get-distance sx sy tx ty) (coerce limit 'single-float)))
+
+(defun distance-3d-under-p (sx sy sz tx ty tz limit)
+  "True when <SX, SY, SZ> is strictly nearer than LIMIT to <TX, TY, TZ>."
+  (declare (type fixnum sx sy sz tx ty tz limit) (optimize (speed 3)))
+  (< (get-distance-3d sx sy sz tx ty tz) (coerce limit 'single-float)))
+
+;; The light, mob and item quadrant maps are all scanned the same way: take
+;; everything bucketed in the nine quadrants around the one the mob stands in.
+;; Written out at each call site, the neighbour offsets are only known to be
+;; fixnums, so adding them to the quadrant index needs a bignum-capable add;
+;; here their real range is named once and the whole scan stays in fixnums.
+(defun quadrant-neighbours (quadrants quad-x quad-y)
+  "Everything in the nine quadrant buckets around <QUAD-X, QUAD-Y>, in the
+fixed order the callers have always seen: QX ascending, and QY within it."
+  (declare (type (simple-array t (* *)) quadrants)
+           (type (signed-byte 30) quad-x quad-y)
+           (optimize (speed 3)))
+  (let ((result ()))
+    (dotimes (i 3)
+      (dotimes (j 3)
+        (let ((x (+ quad-x i -1))
+              (y (+ quad-y j -1)))
+          (declare (type fixnum x y))
+          (when (and (>= x 0) (>= y 0)
+                     (< x (array-dimension quadrants 0))
+                     (< y (array-dimension quadrants 1)))
+            (setf result (append result (aref quadrants x y)))))))
+    result))
+
 (defun check-LOS-propagate (dx dy dz prev-cell &key (check-move nil) (check-vision nil) (check-projectile nil) (player-reveal-cell nil) (check-sound nil))
   ;(declare (optimize (speed 3)))
   (let ((terrain))
@@ -289,28 +331,35 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
     (setf (nearby-light-mobs *player*) nil)
     (setf (nearby-light-sources *player*) nil))
 
-  (let ((quad-x (truncate (x mob) 10))
-        (quad-y (truncate (y mob) 10)))
-    (declare (type fixnum quad-x quad-y))
+  ;; MOB does not move while its own field of view is computed, so its
+  ;; position and sight radius are read once into typed locals. Through the
+  ;; generic slot accessors they are only known to be T, and this function
+  ;; does arithmetic with them once per cell of every line of sight it traces
+  ;; - which is where the (SPEED 3) above is supposed to pay off.
+  (let* ((mob-x (the fixnum (x mob)))
+         (mob-y (the fixnum (y mob)))
+         (mob-z (the fixnum (z mob)))
+         ;; narrower than FIXNUM where a product or a sum of two of these has
+         ;; to stay in one
+         (sight (the (unsigned-byte 30) (cur-sight mob)))
+         (quad-x (truncate mob-x 10))
+         (quad-y (truncate mob-y 10)))
+    (declare (type fixnum mob-x mob-y mob-z)
+             (type (unsigned-byte 30) sight)
+             (type (signed-byte 30) quad-x quad-y))
     ;; check through all stationary light sources
-  (loop with light-list = (loop with result = ()
-                                for (qx qy) of-type (fixnum fixnum) in '((-1 -1) (-1 0) (-1 1) (0 -1) (0 0) (0 1) (1 -1) (1 0) (1 1))
-                                when (and (>= (+ quad-x qx) 0) (>= (+ quad-y qy) 0)
-                                          (< (+ quad-x qx) (array-dimension (light-quadrant-map (level *world*)) 0))
-                                          (< (+ quad-y qy) (array-dimension (light-quadrant-map (level *world*)) 1)))
-                                  do
-                                     (setf result (append result (aref (light-quadrant-map (level *world*)) (+ quad-x qx) (+ quad-y qy))))
-                                finally (return result))
-        for (x y z light-radius) of-type (fixnum fixnum fixnum fixnum) in light-list
-        for i of-type fixnum from 0 below (length light-list)
-        for light-power of-type fixnum = (* *light-power-faloff* light-radius) 
-        for vision-pwr of-type fixnum = light-radius
-        for vision-power of-type fixnum = light-radius
+  (loop for (x y z light-radius) of-type (fixnum fixnum fixnum fixnum)
+          in (quadrant-neighbours (the (simple-array t (* *)) (light-quadrant-map (level *world*)))
+                                  quad-x quad-y)
+        for radius of-type (unsigned-byte 30) = light-radius
+        for light-power of-type fixnum = (* *light-power-faloff* radius)
+        for vision-pwr of-type fixnum = radius
+        for vision-power of-type (unsigned-byte 30) = radius
         do
            ;; set up mob brightness
-           (when (and (not (zerop light-radius))
-                      (< (get-distance-3d x y z (x mob) (y mob) (z mob)) light-radius))
-               (line-of-sight x y z (x mob) (y mob) (z mob)
+           (when (and (not (zerop radius))
+                      (distance-3d-under-p x y z mob-x mob-y mob-z radius))
+               (line-of-sight x y z mob-x mob-y mob-z
                             #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
                                 
@@ -321,12 +370,15 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                                     (unless pwr-decrease
                                       (setf exit-result 'exit)
                                       (return))
-                                    (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                                    ;; with :CHECK-VISION, CHECK-LOS-PROPAGATE returns
+                                    ;; either NIL (ruled out just above) or the cell's
+                                    ;; vision-block power, an integer.
+                                    (decf vision-pwr (truncate (* vision-power (the (unsigned-byte 30) pwr-decrease)) 100))
                                     (decf vision-pwr)
 
                                     (when (and (get-mob-* (level *world*) dx dy dz) 
                                                (eq (get-mob-* (level *world*) dx dy dz) mob)
-                                               (> light-power (brightness mob)))
+                                               (> light-power (the fixnum (brightness mob))))
                                       (setf (brightness mob) light-power))
                                     (decf light-power *light-power-faloff*)
 
@@ -337,7 +389,7 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                                   exit-result))))
            ;; set up nearby stationary light sources for player
            (when (and (eq mob *player*)
-                      (< (get-distance-3d x y z (x mob) (y mob) (z mob)) (+ light-radius (cur-sight mob))))
+                      (distance-3d-under-p x y z mob-x mob-y mob-z (+ radius sight)))
              (push (list x y z light-radius) (nearby-light-sources *player*)))
         )
 
@@ -345,20 +397,21 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
           with nearest-good = nil
           for mob-id of-type fixnum in (if (mob-ability-p mob +mob-abil-shared-minds+)
                                          (mob-id-list (level *world*))
-                                         (loop with result = ()
-                                           for (qx qy) of-type (fixnum fixnum) in '((-1 -1) (-1 0) (-1 1) (0 -1) (0 0) (0 1) (1 -1) (1 0) (1 1))
-                                           when (and (>= (+ quad-x qx) 0) (>= (+ quad-y qy) 0)
-                                                     (< (+ quad-x qx) (array-dimension (mob-quadrant-map (level *world*)) 0))
-                                                     (< (+ quad-y qy) (array-dimension (mob-quadrant-map (level *world*)) 1)))
-                                             do
-                                                (setf result (append result (aref (mob-quadrant-map (level *world*)) (+ quad-x qx) (+ quad-y qy))))
-                                           finally (return result)))
+                                         (quadrant-neighbours (the (simple-array t (* *)) (mob-quadrant-map (level *world*)))
+                                                              quad-x quad-y))
           for tmob of-type mob = (get-mob-by-id mob-id)
-          for vision-pwr of-type fixnum = (cur-sight mob)
-          for vision-power of-type fixnum = (cur-sight mob)
-          for light-power of-type fixnum = (* *light-power-faloff* (abs (cur-light tmob)))
-          for light-pwr of-type fixnum = (abs (cur-light tmob))
-          for light-power-base of-type fixnum = (abs (cur-light tmob))
+          ;; the same reason as for MOB's own coordinates above: read each of
+          ;; TMOB's once per iteration, with its type named
+          for tmob-x of-type fixnum = (x tmob)
+          for tmob-y of-type fixnum = (y tmob)
+          for tmob-z of-type fixnum = (z tmob)
+          for tmob-light of-type (signed-byte 30) = (cur-light tmob)
+          for light-abs of-type (unsigned-byte 30) = (abs tmob-light)
+          for vision-pwr of-type fixnum = sight
+          for vision-power of-type (unsigned-byte 30) = sight
+          for light-power of-type fixnum = (* *light-power-faloff* light-abs)
+          for light-pwr of-type fixnum = light-abs
+          for light-power-base of-type (unsigned-byte 30) = light-abs
           
           do
              ;; find nearest evil mob
@@ -366,8 +419,8 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                         (mob-ability-p tmob +mob-abil-demon+)
                         (not (eq tmob mob)))
                (unless nearest-evil (setf nearest-evil tmob))
-               (when (< (get-distance (x mob) (y mob) (x tmob) (y tmob))
-                        (get-distance (x mob) (y mob) (x nearest-evil) (y nearest-evil)))
+               (when (< (get-distance mob-x mob-y tmob-x tmob-y)
+                        (get-distance mob-x mob-y (the fixnum (x nearest-evil)) (the fixnum (y nearest-evil))))
                  (setf nearest-evil tmob)))
 
              ;; find nearest good mob
@@ -375,8 +428,8 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                         (mob-ability-p tmob +mob-abil-angel+)
                         (not (eq tmob mob)))
                (unless nearest-good (setf nearest-good tmob))
-               (when (< (get-distance (x mob) (y mob) (x tmob) (y tmob))
-                        (get-distance (x mob) (y mob) (x nearest-good) (y nearest-good)))
+               (when (< (get-distance mob-x mob-y tmob-x tmob-y)
+                        (get-distance mob-x mob-y (the fixnum (x nearest-good)) (the fixnum (y nearest-good))))
                  (setf nearest-good tmob)))
              
              ;; if you share minds with your faction - add all your faction mobs and all mobs that they see
@@ -384,12 +437,12 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
              (when (and (not (eq mob tmob))
                         (mob-ability-p mob +mob-abil-shared-minds+)
                         (mob-ability-p tmob +mob-abil-shared-minds+)
-                        (= (faction mob) (faction tmob))
+                        (= (the fixnum (faction mob)) (the fixnum (faction tmob)))
                         (or (and (not (mob-ability-p mob +mob-abil-trinity-mimic+))
                                  (not (mob-ability-p tmob +mob-abil-trinity-mimic+)))
                             (and (mob-ability-p mob +mob-abil-trinity-mimic+)
                                  (mob-ability-p tmob +mob-abil-trinity-mimic+)
-                                 (find (id mob) (mimic-id-list tmob)))))
+                                 (find (the fixnum (id mob)) (the list (mimic-id-list tmob))))))
                (pushnew mob-id (shared-visible-mobs mob))
                ;(format t "~A [~A] sees ~A~%" (name tmob) (id tmob) (visible-mobs tmob))
                (loop for vmob-id in (proper-visible-mobs tmob)
@@ -408,10 +461,10 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                (setf (shared-visible-mobs mob) (remove (id mob) (shared-visible-mobs mob))))
 
              ;; set up mob brightness
-             (when (and (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (abs (cur-light tmob)))
+             (when (and (distance-3d-under-p tmob-x tmob-y tmob-z mob-x mob-y mob-z light-abs)
                       ;(not (eq mob tmob))
                         )
-               (line-of-sight (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)
+               (line-of-sight tmob-x tmob-y tmob-z mob-x mob-y mob-z
                               #'(lambda (dx dy dz prev-cell)
                                   (declare (type fixnum dx dy dz))
                                   (let* ((exit-result t) (pwr-decrease 0)) 
@@ -421,22 +474,25 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                                       (unless pwr-decrease
                                         (setf exit-result 'exit)
                                         (return))
-                                      (decf light-pwr (truncate (* light-power-base pwr-decrease) 100))
+                                      ;; with :CHECK-VISION, CHECK-LOS-PROPAGATE returns
+                                      ;; either NIL (ruled out just above) or the cell's
+                                      ;; vision-block power, an integer.
+                                      (decf light-pwr (truncate (* light-power-base (the (unsigned-byte 30) pwr-decrease)) 100))
                                       (decf light-pwr)
                                       
-                                      (if (> (cur-light tmob) 0)
+                                      (if (> tmob-light 0)
                                         (progn
                                           ;; if the light emitted by a mob is positive - increase brightness
                                           (when (and (get-mob-* (level *world*) dx dy dz) 
                                                      (eq (get-mob-* (level *world*) dx dy dz) mob)
-                                                     (> light-power (brightness mob)))
+                                                     (> light-power (the fixnum (brightness mob))))
                                             (setf (brightness mob) light-power))
                                           (decf light-power *light-power-faloff*))
                                         (progn
                                           ;; if the light emitted by a mob is positive - increase darkness
                                           (when (and (get-mob-* (level *world*) dx dy dz) 
                                                      (eq (get-mob-* (level *world*) dx dy dz) mob)
-                                                     (> light-power (darkness mob)))
+                                                     (> light-power (the fixnum (darkness mob))))
                                             (setf (darkness mob) light-power))
                                           (decf light-power *dark-power-faloff*)))
                                       
@@ -448,8 +504,8 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
              
              ;; set up visible mobs
              (when (and (not (eq mob tmob))
-                        (< (get-distance-3d (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)) (cur-sight mob)))
-               (line-of-sight (x mob) (y mob) (z mob) (x tmob) (y tmob) (z tmob)
+                        (distance-3d-under-p mob-x mob-y mob-z tmob-x tmob-y tmob-z sight))
+               (line-of-sight mob-x mob-y mob-z tmob-x tmob-y tmob-z
                               #'(lambda (dx dy dz prev-cell)
                                   (declare (type fixnum dx dy dz))
                                   (let* ((exit-result t) (mob-id 0) (pwr-decrease 0)) 
@@ -461,7 +517,10 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                                       (unless pwr-decrease
                                         (setf exit-result 'exit)
                                         (return))
-                                      (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                                      ;; with :CHECK-VISION, CHECK-LOS-PROPAGATE returns
+                                      ;; either NIL (ruled out just above) or the cell's
+                                      ;; vision-block power, an integer.
+                                      (decf vision-pwr (truncate (* vision-power (the (unsigned-byte 30) pwr-decrease)) 100))
                                       (decf vision-pwr)
 
                                       (when (and (get-mob-* (level *world*) dx dy dz) 
@@ -480,13 +539,13 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
              
              ;; set up nearby mobs that are light sources for player
              (when (and (eq mob *player*)
-                        (not (zerop (cur-light tmob)))
-                        (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) (+ (cur-light tmob) (cur-sight mob))))
+                        (not (zerop tmob-light))
+                        (distance-3d-under-p tmob-x tmob-y tmob-z mob-x mob-y mob-z (+ tmob-light sight)))
                (push (id tmob) (nearby-light-mobs *player*)))
              
              ;; set up mobs that potentially hear you
              (when (and (not (eq mob tmob))
-                        (< (get-distance-3d (x tmob) (y tmob) (z tmob) (x mob) (y mob) (z mob)) *max-hearing-range*))
+                        (distance-3d-under-p tmob-x tmob-y tmob-z mob-x mob-y mob-z *max-hearing-range*))
                (pushnew mob-id (hear-range-mobs mob)))
           finally
              (if (and nearest-evil
@@ -498,34 +557,39 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                (setf (sense-good-id mob) (id nearest-good))
                (setf (sense-good-id mob) nil))
           )
-    )
+
   (when (eq mob *player*)
     (calc-lit-tiles-for-player *player*))
   
-  (incf (brightness mob) (get-outdoor-light-* (level *world*) (x mob) (y mob) (z mob)))
-  (decf (brightness mob) (darkness mob))
+  ;; written out rather than INCF/DECF: those re-read the place, and through
+  ;; the generic accessor that read is only known to be a NUMBER
+  (setf (brightness mob) (+ (the (signed-byte 30) (brightness mob))
+                            (the (signed-byte 30) (get-outdoor-light-* (level *world*) mob-x mob-y mob-z))))
+  (setf (brightness mob) (- (the (signed-byte 30) (brightness mob)) (the (signed-byte 30) (darkness mob))))
 
   ;; find nearby mobs that are casting shadows and check if the tile in question is the tile they are casting shadows to
-  (when (>= (brightness mob) *mob-visibility-threshold*)
-    (check-surroundings (x mob) (y mob) nil #'(lambda (dx dy)
-                                                (when (and (>= dx 0) (< dx (array-dimension (terrain (level *world*)) 0))
-                                                           (>= dy 0) (< dy (array-dimension (terrain (level *world*)) 1))
-                                                           (get-mob-* (level *world*) dx dy (z mob))
-                                                           (mob-effect-p (get-mob-* (level *world*) dx dy (z mob)) +mob-effect-casting-shadow+))
-                                                  (let ((effect (get-effect-by-id (mob-effect-p (get-mob-* (level *world*) dx dy (z mob)) +mob-effect-casting-shadow+))))
-                                                    (when (and (= (+ dx (first (param1 effect))) (x mob))
-                                                               (= (+ dy (second (param1 effect))) (y mob)))
-                                                      (setf (brightness mob) (- *mob-visibility-threshold* 10))))))))
+  (when (>= (the fixnum (brightness mob)) *mob-visibility-threshold*)
+    (let ((terrain (the (simple-array fixnum (* * *)) (terrain (level *world*)))))
+      (check-surroundings mob-x mob-y nil #'(lambda (dx dy)
+                                                (declare (type fixnum dx dy))
+                                                (when (and (>= dx 0) (< dx (array-dimension terrain 0))
+                                                           (>= dy 0) (< dy (array-dimension terrain 1))
+                                                           (get-mob-* (level *world*) dx dy mob-z)
+                                                           (mob-effect-p (get-mob-* (level *world*) dx dy mob-z) +mob-effect-casting-shadow+))
+                                                  (let ((effect (get-effect-by-id (mob-effect-p (get-mob-* (level *world*) dx dy mob-z) +mob-effect-casting-shadow+))))
+                                                    (when (and (= (+ dx (the fixnum (first (param1 effect)))) mob-x)
+                                                               (= (+ dy (the fixnum (second (param1 effect)))) mob-y))
+                                                      (setf (brightness mob) (- *mob-visibility-threshold* 10)))))))))
 
   ;; if the mob is glowing - increase its brightness by 100
   (when (mob-effect-p mob +mob-effect-glowing+)
-    (incf (brightness mob) 100))
+    (setf (brightness mob) (+ (the (signed-byte 30) (brightness mob)) 100)))
   
-  (when (< (brightness mob) 0)
+  (when (< (the fixnum (brightness mob)) 0)
     (setf (brightness mob) 0))
   
   (setf (visible-mobs mob) (append (proper-visible-mobs mob) (shared-visible-mobs mob)))
-  (setf (visible-mobs mob) (remove-duplicates (visible-mobs mob)))))
+  (setf (visible-mobs mob) (remove-duplicates (visible-mobs mob))))))
 
 (defun update-visible-mobs-fov (mob)
   (declare (optimize (speed 3)))
@@ -534,10 +598,13 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                                                         (let* ((exit-result t) (mob-id 0) (cur-sight (cur-sight mob)) (cur-sight-1 (1+ cur-sight))
                                                                (dist (get-distance-3d (x mob) (y mob) (z mob) dx dy dz)))
                                                           (declare (type fixnum mob-id cur-sight cur-sight-1)
-                                                                   (type float dist))
+                                                                   (type single-float dist))
                                                           (block nil
 
-                                                            (when (> dist cur-sight-1)
+                                                            ;; CUR-SIGHT-1 is a small integer radius, so
+                                                            ;; converting it is exact and this is the same
+                                                            ;; comparison - see DISTANCE-3D-UNDER-P.
+                                                            (when (> dist (coerce cur-sight-1 'single-float))
                                                               (setf exit-result 'exit)
                                                               (return))
                                                            
@@ -584,21 +651,32 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
   (with-vision-block-cache ()
   (setf (visible-items mob) nil)
 
-  (loop for item-id in (loop with result = ()
-                             for (qx qy) of-type (fixnum fixnum) in '((-1 -1) (-1 0) (-1 1) (0 -1) (0 0) (0 1) (1 -1) (1 0) (1 1))
-                             when (and (>= (+ (truncate (x mob) 10) qx) 0) (>= (+ (truncate (y mob) 10) qy) 0)
-                                       (< (+ (truncate (x mob) 10) qx) (array-dimension (item-quadrant-map (level *world*)) 0))
-                                       (< (+ (truncate (y mob) 10) qy) (array-dimension (item-quadrant-map (level *world*)) 1)))
-                               do
-                                  (setf result (append result (aref (item-quadrant-map (level *world*)) (+ (truncate (x mob) 10) qx) (+ (truncate (y mob) 10) qy))))
-                             finally (return result))
+  ;; MOB does not move while its field of view is computed, so its position and
+  ;; sight radius are read once into typed locals: through the generic slot
+  ;; accessors they come back as T, which would put every comparison and every
+  ;; quadrant index below through generic arithmetic.
+  (let ((mob-x (the fixnum (x mob)))
+        (mob-y (the fixnum (y mob)))
+        (mob-z (the fixnum (z mob)))
+        (sight (the (unsigned-byte 30) (cur-sight mob)))
+        (quadrants (the (simple-array t (* *)) (item-quadrant-map (level *world*)))))
+    (declare (type fixnum mob-x mob-y mob-z)
+             ;; narrower than FIXNUM so that the VISION-POWER x PWR-DECREASE
+             ;; product below is known to stay in one
+             (type (unsigned-byte 30) sight))
+    (let ((quad-x (truncate mob-x 10))
+          (quad-y (truncate mob-y 10)))
+      ;; narrower than FIXNUM so the neighbour offsets below stay in one
+      (declare (type (signed-byte 30) quad-x quad-y))
+
+  (loop for item-id of-type fixnum in (quadrant-neighbours quadrants quad-x quad-y)
         for item = (get-item-by-id item-id)
-        for vision-pwr = (cur-sight mob)
-        for vision-power = (cur-sight mob)
-        when (< (get-distance-3d (x mob) (y mob) (z mob) (x item) (y item) (z item)) (cur-sight mob))
+        for vision-pwr of-type fixnum = sight
+        for vision-power of-type (unsigned-byte 30) = sight
+        when (distance-3d-under-p mob-x mob-y mob-z (the fixnum (x item)) (the fixnum (y item)) (the fixnum (z item)) sight)
           do
              ;; set up visible mobs
-             (line-of-sight (x mob) (y mob) (z mob) (x item) (y item) (z item)
+             (line-of-sight mob-x mob-y mob-z (x item) (y item) (z item)
                             #'(lambda (dx dy dz prev-cell)
                                 (declare (type fixnum dx dy dz))
                                 (let* ((exit-result t) (pwr-decrease 0)) 
@@ -608,7 +686,10 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                                     (unless pwr-decrease
                                       (setf exit-result 'exit)
                                       (return))
-                                    (decf vision-pwr (truncate (* vision-power pwr-decrease) 100))
+                                    ;; with :CHECK-VISION, CHECK-LOS-PROPAGATE returns
+                                    ;; either NIL (ruled out just above) or the cell's
+                                    ;; vision-block power, an integer.
+                                    (decf vision-pwr (truncate (* vision-power (the (unsigned-byte 30) pwr-decrease)) 100))
                                     (decf vision-pwr)
                                     
                                     ;(unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
@@ -616,7 +697,7 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                                     ;  (return))
                                     
                                     (when (get-items-* (level *world*) dx dy dz) 
-                                      (loop for n-item-id in (get-items-* (level *world*) dx dy dz)
+                                      (loop for n-item-id of-type fixnum in (get-items-* (level *world*) dx dy dz)
                                             when (= item-id n-item-id)
                                               do
                                                  (pushnew n-item-id (visible-items mob))))
@@ -625,7 +706,7 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                                       (setf exit-result 'exit)
                                       (return))
                                     )
-                                  exit-result))))
+                                  exit-result))))))
   (log:info "~A [~A] sees ~A" (name mob) (id mob) (visible-items mob))))
 
 (defun update-visible-items-player ()
@@ -844,10 +925,11 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
   (declare (type fixnum cx cy cz r)
            (type function func LOS-start-func))
   (with-vision-block-cache ()
-  (let ((target-cells nil)
+  (let* ((target-cells nil)
+        (max-level-z (array-dimension (the (simple-array fixnum (* * *)) (terrain (level *world*))) 2))
         (max-z (if limit-z
-                 (if (>= (+ cz r) (array-dimension (terrain (level *world*)) 2))
-                   (1- (array-dimension (terrain (level *world*)) 2))
+                 (if (>= (+ cz r) max-level-z)
+                   (1- max-level-z)
                    (+ cz r))
                  (+ cz r)))
         (min-z (if limit-z
@@ -855,7 +937,7 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                    0
                    (- cz r))
                  (- cz r))))
-    (declare (type fixnum max-z min-z))
+    (declare (type fixnum max-z min-z max-level-z))
     (when no-z
       (setf min-z cz max-z cz))
     
@@ -895,21 +977,6 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
 
     )))
 
-(defun draw-fov-old (cx cy cz r func)
-  (declare (optimize (speed 3)))
-  (declare (type fixnum cx cy cz r)
-           (type function func))
-  (let ((target-cells nil))
-    (loop for i of-type fixnum from 0 to 360 by 1
-          for tx of-type fixnum = (+ cx (round (* r (cos (* i (/ pi 180))))))
-          for ty of-type fixnum = (- cy (round (* r (sin (* i (/ pi 180 ))))))
-          do
-             (unless (find (cons tx ty) target-cells :test #'equal)
-               (push (cons tx ty) target-cells)))
-    (loop for (tx . ty) in target-cells do
-      (line-of-sight cx cy cz tx ty cz func))
-    ))
-
 (defun line-of-sight (x0 y0 z0 x1 y1 z1 func)
   (declare (optimize (speed 3))
            (type fixnum x0 x1 y0 y1 z0 z1)
@@ -942,275 +1009,4 @@ Assumes the cell exists -- callers check that via GET-TERRAIN-* first."
                (incf z0 sz))
           ))
   )
-
-(defun update-visible-mobs-cube (mob)
-  (let ((max-x (if (>= (+ (x mob) (cur-sight mob)) (array-dimension (terrain (level *world*)) 0))
-                   (1- (array-dimension (terrain (level *world*)) 0))
-                   (+ (x mob) (cur-sight mob))))
-        (min-x (if (< (- (x mob) (cur-sight mob)) 0)
-                   0
-                   (- (x mob) (cur-sight mob))))
-        (max-y (if (>= (+ (y mob) (cur-sight mob)) (array-dimension (terrain (level *world*)) 1))
-                   (1- (array-dimension (terrain (level *world*)) 1))
-                   (+ (y mob) (cur-sight mob))))
-        (min-y (if (< (- (y mob) (cur-sight mob)) 0)
-                   0
-                   (- (y mob) (cur-sight mob))))
-        (max-z (if (>= (+ (z mob) (cur-sight mob)) (array-dimension (terrain (level *world*)) 2))
-                   (1- (array-dimension (terrain (level *world*)) 2))
-                   (+ (z mob) (cur-sight mob))))
-        (min-z (if (< (- (z mob) (cur-sight mob)) 0)
-                   0
-                   (- (z mob) (cur-sight mob)))))
-  (loop for dx from min-x to max-x do
-    (loop for dy from min-y to max-y do
-      (loop for dz from min-z to max-z
-            do
-               (block nil
-                 ;(when (or (< dx 0) (< dy 0) (< dz 0) (>= dx (array-dimension (terrain (level *world*)) 0)) (>= dy (array-dimension (terrain (level *world*)) 1)) (>= dz (array-dimension (terrain (level *world*)) 2)))
-                 ;  (return))
-
-                 (when (get-mob-* (level *world*) dx dy dz)
-                   (line-of-sight (x mob) (y mob) (z mob) dx dy dz
-                                  #'(lambda (dx dy dz prev-cell)
-                                      (declare (type fixnum dx dy dz))
-                                      (let* ((exit-result t) (mob-id 0) (cur-sight (cur-sight mob)) (cur-sight-1 (1+ cur-sight))
-                                             (dist (get-distance-3d (x mob) (y mob) (z mob) dx dy dz)))
-                                        (declare (type fixnum mob-id cur-sight cur-sight-1)
-                                                 (type float dist))
-                                        (block nil
-                                          
-                                          (when (> dist cur-sight-1)
-                                            (setf exit-result 'exit)
-                                            (return))
-                                          
-                                          (unless (check-LOS-propagate dx dy dz prev-cell :check-vision t)
-                                            (setf exit-result 'exit)
-                                            (return))
-                                          
-                                          (when (and (get-mob-* (level *world*) dx dy dz) 
-                                                     (not (eq (get-mob-* (level *world*) dx dy dz) mob)))
-                                            (setf mob-id (id (get-mob-* (level *world*) dx dy dz)))
-                                            (pushnew mob-id (visible-mobs mob)))
-                                          
-                                          )
-                                        exit-result))))
-                 ))))))
-
-(defun fov-shadow-casting (cx cy r opaque-func vis-func)
-  (funcall vis-func cx cy)
-  (labels ((compute (octant sx sy r x top bottom)
-             (loop for x1 from x to r
-                   with top-y
-                   with bottom-y
-                   with was-opaque 
-                   do
-                      (setf top-y (if (= (car top) 1)
-                                    x1
-                                    (truncate (+ (* (1+ (* x1 2))
-                                                    (cdr top))
-                                                 (car top)
-                                                 -1)
-                                              (* 2 (car top)))))
-                      (setf bottom-y (if (= (cdr bottom) 0)
-                                       0
-                                       (truncate (+ (* (- (* 2 x1) 1)
-                                                       (cdr bottom))
-                                                    (car bottom))
-                                                 (* 2 (car bottom)))))
-                      (setf was-opaque -1) ;; 0:false, 1:true, -1:not applicable
-
-                      ;(format t "LOOP 1: x1 ~A was-opaque ~A~%" x1 was-opaque)
-                      
-                      (loop for y1 from top-y downto bottom-y
-                            with tx
-                            with ty
-                            with in-range
-                            with is-opaque
-                            do
-                               
-                               (setf tx sx)
-                               (setf ty sy)
-                               (cond
-                                 ((= octant 0) (incf tx x1) (decf ty y1))
-                                 ((= octant 1) (incf tx y1) (decf ty x1))
-                                 ((= octant 2) (decf tx y1) (decf ty x1))
-                                 ((= octant 3) (decf tx x1) (decf ty y1))
-                                 ((= octant 4) (decf tx x1) (incf ty y1))
-                                 ((= octant 5) (decf tx y1) (incf ty x1))
-                                 ((= octant 6) (incf tx y1) (incf ty x1))
-                                 ((= octant 7) (incf tx x1) (incf ty y1))
-                                 )
-                               (setf in-range (< (get-distance sx sy tx ty) r))
-                               
-                               (when (and in-range
-                                          (or (/= y1 top-y)
-                                              (>= (* (cdr top) x1)
-                                                  (* (car top) y1)))
-                                          (or (/= y1 bottom-y)
-                                              (<= (* (cdr bottom) x1)
-                                                  (* (car bottom) y1)))
-                                          )
-                                 (funcall vis-func tx ty))
-                               
-
-                               (setf is-opaque (or (not in-range)
-                                                   (funcall opaque-func tx ty)))
-
-                               ;(format t "LOOP 2: tx ~A, ty ~A, was-opaque ~A, is-opaque ~A, octant ~A~%" tx ty was-opaque is-opaque octant)
-                               
-                               (when (/= x1 r)
-                                 (if is-opaque
-                                   (progn
-                                     (when (= was-opaque 0)
-                                       (if (or (not in-range)
-                                               (= y1 bottom-y))
-                                         (progn
-                                           (setf bottom (cons (- (* x1 2) 1) (1+ (* y1 2)) ))
-                                           
-                                           (loop-finish)) 
-                                         (progn
-                                           ;(format t "LOOP: tx ~A, ty ~A, opaque ~A, was-opaque ~A, dist ~A vs r ~A~%" tx ty is-opaque was-opaque (get-distance sx sy tx ty) r)
-                                           (compute octant sx sy r (1+ x1) top (cons (- (* x1 2) 1) (1+ (* y1 2))))))
-                                       )
-                                     (setf was-opaque 1))
-                                   (progn
-                                     (when (> was-opaque 0) (setf top (cons (1+ (* x1 2)) (1+ (* y1 2)) )))
-                                     (setf was-opaque 0))))
-                            )
-                      (when (/= was-opaque 0) (loop-finish))
-                   )))
-    
-    (loop for octant from 0 below 8 do
-      (compute octant cx cy r 1 (cons 1 1) (cons 1 0)))
-    
-    )
-  )
-
-(defun fov-milazzo-algorithm (cx cy r opaque-func vis-func)
-  (declare (optimize (speed 3)))
-  (declare (type fixnum cx cy r)
-           (type function opaque-func vis-func))
-  (funcall vis-func cx cy)
-  (labels ((>-slope (slope x y) (declare (type fixnum x y) (type cons slope)) (return-from >-slope (> (* (cdr slope) x) (* (car slope) y))))
-           (>=-slope (slope x y) (declare (type fixnum x y) (type cons slope)) (return-from >=-slope (>= (* (cdr slope) x) (* (car slope) y))))
-           (<-slope (slope x y) (declare (type fixnum x y) (type cons slope)) (return-from <-slope (< (* (cdr slope) x) (* (car slope) y))))
-           (<=-slope (slope x y) (declare (type fixnum x y) (type cons slope)) (return-from <=-slope (<= (* (cdr slope) x) (* (car slope) y))))
-           (blocks-light (x y octant sx sy)
-             (declare (type fixnum x y octant sx sy))
-             (let ((nx sx)
-                   (ny sy))
-               (cond
-                 ((= octant 0) (incf nx x) (decf ny y))
-                 ((= octant 1) (incf nx y) (decf ny x))
-                 ((= octant 2) (decf nx y) (decf ny x))
-                 ((= octant 3) (decf nx x) (decf ny y))
-                 ((= octant 4) (decf nx x) (incf ny y))
-                 ((= octant 5) (decf nx y) (incf ny x))
-                 ((= octant 6) (incf nx y) (incf ny x))
-                 ((= octant 7) (incf nx x) (incf ny y)))
-               (funcall opaque-func nx ny)))
-           (set-visible (x y octant sx sy)
-             (declare (type fixnum x y octant sx sy))
-             (let ((nx sx)
-                   (ny sy))
-               (cond
-                 ((= octant 0) (incf nx x) (decf ny y))
-                 ((= octant 1) (incf nx y) (decf ny x))
-                 ((= octant 2) (decf nx y) (decf ny x))
-                 ((= octant 3) (decf nx x) (decf ny y))
-                 ((= octant 4) (decf nx x) (incf ny y))
-                 ((= octant 5) (decf nx y) (incf ny x))
-                 ((= octant 6) (incf nx y) (incf ny x))
-                 ((= octant 7) (incf nx x) (incf ny y)))
-               (funcall vis-func nx ny)))
-           (compute (octant sx sy r x top bottom)
-             (declare (type fixnum sx sy r x)
-                      (type cons top bottom))
-             (loop for x1 from x to r
-                   with top-y of-type fixnum
-                   with ax of-type fixnum
-                   with bottom-y of-type fixnum
-                   with was-opaque of-type fixnum
-                   do
-                      (if (= (cdr top) 1)
-                        (setf top-y x1)
-                        (progn 
-                          (setf top-y (truncate (+ (* (- (* x1 2) 1)
-                                                      (cdr top))
-                                                   (car top))
-                                                (* 2 (car top))))
-                          (if (blocks-light x1 top-y octant sx sy)
-                            (progn
-                              (when (and (>=-slope top (* x1 2) (1+ (* top-y 2)))
-                                         (not (blocks-light x1 (1+ top-y) octant sx sy)))
-                                (incf top-y)))
-                            (progn
-                              (setf ax (* x1 2))
-                              (when (blocks-light (1+ x1) (1+ top-y) octant sx sy) (incf ax))
-                              (when (>-slope top ax (1+ (* top-y 2))) (incf top-y))))))
-                      (if (= (cdr bottom) 0)
-                        (setf bottom-y 0)
-                        (progn 
-                          (setf bottom-y (truncate (+ (* (- (* x1 2) 1)
-                                                      (cdr bottom))
-                                                   (car bottom))
-                                                   (* 2 (car bottom))))
-                          (when (and (>=-slope bottom (* x1 2) (1+ (* bottom-y 2)))
-                                     (blocks-light x1 bottom-y octant sx sy)
-                                     (not (blocks-light x1 (1+ bottom-y) octant sx sy)))
-                            (incf bottom-y))))
-                      (setf was-opaque -1) ;;0:false, 1:true, -1:not applicable
-                      (loop for y1 from top-y downto bottom-y
-                            with is-opaque of-type boolean
-                            with is-visible of-type boolean
-                            with nx of-type fixnum
-                            with ny of-type fixnum
-                            do
-                               (when (< (get-distance 0 0 x1 y1) r)
-                                 (setf is-opaque (blocks-light x1 y1 octant sx sy))
-                                 (setf is-visible (or is-opaque
-                                                      (and (or (/= y1 top-y)
-                                                               (>=-slope top x1 y1))
-                                                           (or (/= y1 bottom-y)
-                                                               (<=-slope bottom x1 y1)))))
-                                 ;(setf is-visible (or is-opaque
-                                 ;                     (and (or (/= y1 top-y)
-                                 ;                              (>-slope top (1+ (* x1 7)) (- (* y1 7) 1)))
-                                 ;                          (or (/= y1 bottom-y)
-                                 ;                              (<-slope bottom (- (* x1 7) 1) (+ (* y1 7) 1))))))
-                                 (when is-visible (set-visible x1 y1 octant sx sy))
-                                 (when (/= x1 r)
-                                   (if is-opaque
-                                     (progn
-                                       (when (= was-opaque 0)
-                                         (setf nx (* x1 2))
-                                         (setf ny (1+ (* y1 2)))
-                                         (when (blocks-light x1 (1+ y1) octant sx sy) (decf nx))
-                                         (if (>-slope top nx ny)
-                                           (if (= y1 bottom-y)
-                                             (progn
-                                               (setf bottom (cons nx ny))
-                                               (loop-finish))
-                                             (compute octant sx sy r (1+ x1) top (cons nx ny)))
-                                           (when (= y1 bottom-y)
-                                             (return-from compute nil))))
-                                       (setf was-opaque 1))
-                                     (progn
-                                       (when (> was-opaque 0)
-                                         (setf nx (* x1 2))
-                                         (setf ny (1+ (* y1 2)))
-                                         (when (blocks-light (1+ x1) (1+ y1) octant sx sy) (incf nx))
-                                         (when (>=-slope bottom nx ny) (return-from compute nil))
-                                         (setf top (cons nx ny)))
-                                       (setf was-opaque 0))))))
-                      (when (/= was-opaque 0) (loop-finish))
-                      
-                   )))
-    
-    (loop for octant from 0 below 8 do
-      (compute octant cx cy r 1 (cons 1 1) (cons 1 0)))
-    
-    ))
-
 

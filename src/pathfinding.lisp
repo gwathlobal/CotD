@@ -15,9 +15,20 @@
 ;;;;    on the frontier is handled by inserting a second, cheaper entry for it;
 ;;;;    the stale entry is discarded when it surfaces, because its cell is
 ;;;;    already marked expanded by then.
-;;;;  - Step costs are kept as exact rationals (the callers build them out of
-;;;;    terrain factors divided by +NORMAL-AP+), so priorities are compared with
-;;;;    generic < rather than coerced to floats.
+;;;;  - Step costs are whatever the caller's COST-FN returns, and priorities
+;;;;    are compared with generic < rather than coerced to floats. The AI's
+;;;;    cost-fn (ai-common.lisp) divides a terrain factor by +NORMAL-AP+, which
+;;;;    is an exact ratio for every terrain but water, whose factor is itself a
+;;;;    float (*WATER-MOVE-FACTOR*) - so a priority is a ratio on land and a
+;;;;    single-float in water.
+;;;;
+;;;; That last point is why the three functions below ask the compiler not to
+;;;; report its optimization notes: at (SPEED 3) SBCL quite correctly points
+;;;; out that it cannot open-code arithmetic on a value that is sometimes a
+;;;; rational and sometimes a float, and there is nothing to fix short of
+;;;; giving up either the exactness of the land costs or the fractional water
+;;;; cost. The muffling is per-function on purpose, so a new note anywhere else
+;;;; in the file still gets reported.
 
 (in-package :cotd)
 
@@ -85,7 +96,9 @@ distance would charge up to 3 for one diagonal step and so over-estimate."
   "Add KEY to QUEUE under priority RANK, then float it up to its place."
   (declare (optimize (speed 3) (safety 0))
            (type cell-queue queue)
-           (type fixnum key))
+           (type fixnum key)
+           ;; priorities are rational-or-float: see the note at the top
+           #+sbcl (sb-ext:muffle-conditions sb-ext:compiler-note))
   (when (= (cell-queue-size queue) (length (cell-queue-keys queue)))
     (cell-queue-expand queue))
   (let ((keys (cell-queue-keys queue))
@@ -108,7 +121,9 @@ distance would charge up to 3 for one diagonal step and so over-estimate."
 (defun cell-queue-take (queue)
   "Remove and return the key of QUEUE's cheapest entry. QUEUE must not be empty."
   (declare (optimize (speed 3) (safety 0))
-           (type cell-queue queue))
+           (type cell-queue queue)
+           ;; priorities are rational-or-float: see the note at the top
+           #+sbcl (sb-ext:muffle-conditions sb-ext:compiler-note))
   (let* ((keys (cell-queue-keys queue))
          (ranks (cell-queue-ranks queue))
          (cheapest (aref keys 0))
@@ -171,7 +186,9 @@ as long as COST-FN stays at or above 1 per step, so the first route to reach
 GOAL is a cheapest one. A COST-FN that can dip below 1 still terminates and
 still returns a route, just not necessarily the cheapest."
   (declare (optimize (speed 3) (safety 0))
-           (type function passable-fn cost-fn))
+           (type function passable-fn cost-fn)
+           ;; costs are rational-or-float: see the note at the top
+           #+sbcl (sb-ext:muffle-conditions sb-ext:compiler-note))
   (let* ((frontier (make-cell-queue))
          (cheapest (make-hash-table :test 'eql))  ; cell -> best cost known to reach it
          (came-from (make-hash-table :test 'eql)) ; cell -> cell it was reached from

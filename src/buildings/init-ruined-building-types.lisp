@@ -458,7 +458,7 @@
                                                 ((= r 4) (level-place-birch-mature-4 template-level (+ dx x) (+ dy y) z))
                                                 ((= r 3) (level-place-birch-mature-3 template-level (+ dx x) (+ dy y) z))
                                                 ((= r 2) (level-place-birch-mature-2 template-level (+ dx x) (+ dy y) z))
-                                                ((= r 2) (level-place-birch-mature-1 template-level (+ dx x) (+ dy y) z))
+                                                ((= r 1) (level-place-birch-mature-1 template-level (+ dx x) (+ dy y) z))
                                                 (t nil))
                                               )
                                             

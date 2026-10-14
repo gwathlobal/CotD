@@ -309,12 +309,16 @@ Marking on pop measured 433,031 pops for 101,341 distinct cells on one level -
 (defun create-connect-map-walk (level mob-size)
   (declare (optimize (speed 3))
            (type fixnum mob-size))
-  (let* ((max-x (array-dimension (terrain level) 0))
-         (max-y (array-dimension (terrain level) 1))
-         (max-z (array-dimension (terrain level) 2))
-         (connect-map (if (aref (connect-map level) mob-size)
-                        (aref (connect-map level) mob-size)
-                        (make-connect-map max-x max-y max-z)))
+  ;; Naming the terrain array's type, and reading the connect map through the
+  ;; typed accessor, keeps the dimension reads and every AREF below open-coded
+  ;; rather than dispatching on the element type at runtime.
+  (let* ((terrain (the (simple-array fixnum (* * *)) (terrain level)))
+         (max-x (array-dimension terrain 0))
+         (max-y (array-dimension terrain 1))
+         (max-z (array-dimension terrain 2))
+         (connect-map (the connect-map
+                           (or (get-level-connect-map level mob-size)
+                               (make-connect-map max-x max-y max-z))))
          (room-id 0)
          ;; mob-size is fixed for the whole map, so compute this once rather
          ;; than on every check-func call
@@ -481,18 +485,22 @@ Marking on pop measured 433,031 pops for 101,341 distinct cells on one level -
             (flood-fill (list x y z) :max-x max-x :max-y max-y :max-z max-z :check-func check-func :make-func make-func)
             (incf room-id))
               )))
-    (setf (aref (connect-map level) mob-size) connect-map)
+    (setf (get-level-connect-map level mob-size) connect-map)
     ))
 
 (defun create-connect-map-climb (level mob-size)
   (declare (optimize (speed 3))
            (type fixnum mob-size))
-  (let* ((max-x (array-dimension (terrain level) 0))
-         (max-y (array-dimension (terrain level) 1))
-         (max-z (array-dimension (terrain level) 2))
-         (connect-map (if (aref (connect-map level) mob-size)
-                        (aref (connect-map level) mob-size)
-                        (make-connect-map max-x max-y max-z)))
+  ;; Naming the terrain array's type, and reading the connect map through the
+  ;; typed accessor, keeps the dimension reads and every AREF below open-coded
+  ;; rather than dispatching on the element type at runtime.
+  (let* ((terrain (the (simple-array fixnum (* * *)) (terrain level)))
+         (max-x (array-dimension terrain 0))
+         (max-y (array-dimension terrain 1))
+         (max-z (array-dimension terrain 2))
+         (connect-map (the connect-map
+                           (or (get-level-connect-map level mob-size)
+                               (make-connect-map max-x max-y max-z))))
          (room-id 0)
          ;; mob-size is fixed for the whole map, so compute this once rather
          ;; than on every check-func call
@@ -597,22 +605,24 @@ Marking on pop measured 433,031 pops for 101,341 distinct cells on one level -
                                                                                          (= nx cx)
                                                                                          (= ny cy)))
                                                                                 (check-move-along-z cx cy cz nx ny z)
-                                                                                (funcall #'(lambda ()
-                                                                                             (let ((result nil))
-                                                                                               (block surround
-                                                                                                 (check-surroundings nx ny nil
-                                                                                                                     #'(lambda (mx my)
-                                                                                                                         ;; one lookup instead of four, and against the LEVEL
-                                                                                                                         ;; we were handed rather than (level *world*) - the
-                                                                                                                         ;; same object, but this runs in a worker thread
-                                                                                                                         (let ((terrain-m (get-terrain-* level mx my z)))
-                                                                                                                           (when (and terrain-m
-                                                                                                                                      (not (get-terrain-type-trait terrain-m +terrain-trait-not-climable+))
-                                                                                                                                      (or (get-terrain-type-trait terrain-m +terrain-trait-blocks-move-floor+)
-                                                                                                                                          (get-terrain-type-trait terrain-m +terrain-trait-blocks-move+)))
-                                                                                                                             (setf result t)
-                                                                                                                             (return-from surround))))))
-                                                                                               result))))
+                                                                                (block surround
+                                                                                  ;; CHECK-SURROUNDINGS only calls this while it
+                                                                                  ;; runs, so saying so lets the RETURN-FROM below
+                                                                                  ;; compile to a plain exit instead of a heap-
+                                                                                  ;; allocated value cell per cell scanned.
+                                                                                  (flet ((climbable-neighbour-p (mx my)
+                                                                                           ;; one lookup instead of four, and against the LEVEL
+                                                                                           ;; we were handed rather than (level *world*) - the
+                                                                                           ;; same object, but this runs in a worker thread
+                                                                                           (let ((terrain-m (get-terrain-* level mx my z)))
+                                                                                             (when (and terrain-m
+                                                                                                        (not (get-terrain-type-trait terrain-m +terrain-trait-not-climable+))
+                                                                                                        (or (get-terrain-type-trait terrain-m +terrain-trait-blocks-move-floor+)
+                                                                                                            (get-terrain-type-trait terrain-m +terrain-trait-blocks-move+)))
+                                                                                               (return-from surround t)))))
+                                                                                    (declare (dynamic-extent #'climbable-neighbour-p))
+                                                                                    (check-surroundings nx ny nil #'climbable-neighbour-p))
+                                                                                  nil))
                                                                        (setf result t))
 
                                                                      ;; if you are large, you can move only if all you tiles have opaque floor
@@ -642,17 +652,21 @@ Marking on pop measured 433,031 pops for 101,341 distinct cells on one level -
             (incf room-id))
               )))
     
-    (setf (aref (connect-map level) mob-size) connect-map)))
+    (setf (get-level-connect-map level mob-size) connect-map)))
 
 (defun create-connect-map-fly (level mob-size)
   (declare (optimize (speed 3))
            (type fixnum mob-size))
-  (let* ((max-x (array-dimension (terrain level) 0))
-         (max-y (array-dimension (terrain level) 1))
-         (max-z (array-dimension (terrain level) 2))
-         (connect-map (if (aref (connect-map level) mob-size)
-                        (aref (connect-map level) mob-size)
-                        (make-connect-map max-x max-y max-z)))
+  ;; Naming the terrain array's type, and reading the connect map through the
+  ;; typed accessor, keeps the dimension reads and every AREF below open-coded
+  ;; rather than dispatching on the element type at runtime.
+  (let* ((terrain (the (simple-array fixnum (* * *)) (terrain level)))
+         (max-x (array-dimension terrain 0))
+         (max-y (array-dimension terrain 1))
+         (max-z (array-dimension terrain 2))
+         (connect-map (the connect-map
+                           (or (get-level-connect-map level mob-size)
+                               (make-connect-map max-x max-y max-z))))
          (room-id 0)
          ;; mob-size is fixed for the whole map, so compute this once rather
          ;; than on every check-func call
@@ -796,7 +810,7 @@ Marking on pop measured 433,031 pops for 101,341 distinct cells on one level -
             (incf room-id))
               )))
     
-    (setf (aref (connect-map level) mob-size) connect-map)))
+    (setf (get-level-connect-map level mob-size) connect-map)))
 
 (defun create-connect-map-aux (level)
   ;; make auxiliary links

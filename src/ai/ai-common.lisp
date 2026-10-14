@@ -9,11 +9,19 @@
   (declare (optimize (speed 3))
            (type fixnum dx dy dz cx cy cz))
   
+  ;; TERRAIN and the three DST-* are hoisted out of the loops below purely so
+  ;; their types can be named: the generic slot read and the list CARs come
+  ;; back as T otherwise, which turns each bounds check and each comparison
+  ;; against the final destination into a full call.
   (let ((sx 0) (sy 0) (move-result nil)
+        (terrain (the (simple-array fixnum (* * *)) (terrain (level *world*))))
+        (dst-x (if final-dst (the fixnum (first final-dst)) 0))
+        (dst-y (if final-dst (the fixnum (second final-dst)) 0))
+        (dst-z (if final-dst (the fixnum (third final-dst)) 0))
         (map-size (if (riding-mob-id mob)
                     (map-size (get-mob-by-id (riding-mob-id mob)))
                     (map-size mob))))
-    (declare (type fixnum sx sy map-size))
+    (declare (type fixnum sx sy map-size dst-x dst-y dst-z))
     ;; calculate the coords of the mob's NE corner
     (setf sx (- dx (truncate (1- map-size) 2)))
     (setf sy (- dy (truncate (1- map-size) 2)))
@@ -21,7 +29,7 @@
     (loop for nx of-type fixnum from sx below (+ sx map-size) do
       (loop for ny of-type fixnum from sy below (+ sy map-size) do
         ;; cant move beyond level borders 
-        (when (or (< nx 0) (< ny 0) (< dz 0) (>= nx (array-dimension (terrain (level *world*)) 0)) (>= ny (array-dimension (terrain (level *world*)) 1)) (>= dz (array-dimension (terrain (level *world*)) 2)))
+        (when (or (< nx 0) (< ny 0) (< dz 0) (>= nx (array-dimension terrain 0)) (>= ny (array-dimension terrain 1)) (>= dz (array-dimension terrain 2)))
           (return-from check-move-for-ai nil))
 
         (setf move-result nil)
@@ -100,14 +108,14 @@
                   (and (= (- dz cz) 0)
                        final-dst
                        (get-terrain-type-trait (get-terrain-* (level *world*) nx ny dz) +terrain-trait-blocks-move-floor+)
-                       (not (and (= nx (first final-dst))
-                                 (= ny (second final-dst))
-                                 (= dz (third final-dst)))))
+                       (not (and (= nx dst-x)
+                                 (= ny dst-y)
+                                 (= dz dst-z))))
                   (and (= (- dz cz) 0)
                        final-dst
-                       (and (= nx (first final-dst))
-                            (= ny (second final-dst))
-                            (= dz (third final-dst)))))
+                       (and (= nx dst-x)
+                            (= ny dst-y)
+                            (= dz dst-z))))
           (setf move-result t))
 
         ;; you can go anywhere horizontaly or directly up/down if you are climbing and there is a wall or floor next to you
@@ -143,7 +151,7 @@
 
         (when (and (not move-result)
                    (mob-effect-p mob +mob-effect-flying+)
-                   (> (map-size mob) 1)
+                   (> (the fixnum (map-size mob)) 1)
                    (/= (- cz dz) 0)
                    (check-move-along-z nx ny cz nx ny dz)
                    )

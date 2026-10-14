@@ -311,7 +311,10 @@
       ((and (< a -67.5) (>= a -112.5)) (setf result "S"))
       ((and (< a -112.5) (>= a -157.5)) (setf result "SE"))
       ((or (> a 157.5) (< a -157.5)) (setf result "E"))
-      ((or (> a -22.5) (<= a 22.5)) (setf result "W")))
+      ;; Everything left over is the -22.5..22.5 wedge: each of the clauses
+      ;; above already claims every angle outside it, so spelling the bound
+      ;; out again here would just be unreachable code.
+      (t (setf result "W")))
     result))
 
 (defun draw-visible-mob-func (x y target-mob origin-mob color)

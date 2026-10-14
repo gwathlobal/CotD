@@ -125,11 +125,18 @@ jobs:
               exit 1
             fi
             echo "Tag $GITHUB_REF_NAME agrees with cotd.asd"
-            # The release body is the newest CHANGELOG entry, so a tag made
-            # without one would publish the previous version's notes. Caught
-            # here rather than in the publish job, which runs after everything
-            # has been built.
-            newest="$(tr -d '\r' < CHANGELOG.txt | awk '/^-+$/ {n++; next} n == 1 {print; exit}')"
+            # The release body is the newest released CHANGELOG entry, so a tag
+            # made without one would publish the previous version's notes.
+            # Caught here rather than in the publish job, which runs after
+            # everything has been built. The "Unreleased" section at the top of
+            # the file collects changes that have no version yet and is skipped
+            # by the same rule the publish job uses - cutting a release means
+            # giving that section its date and version.
+            newest="$(tr -d '\r' < CHANGELOG.txt | awk '
+              /^-+$/ { hdr = 1; next }
+              hdr    { hdr = 0
+                       if ($0 ~ /^Unreleased[[:space:]]*$/) next
+                       print; exit }')"
             case "$newest" in
               *"v$version"*) echo "CHANGELOG's newest entry is \"$newest\"" ;;
               *) echo "::error::CHANGELOG.txt's newest entry is \"$newest\", which is not v$version"
@@ -358,13 +365,19 @@ jobs:
       - name: Write the release notes
         run: |
           set -euo pipefail
-          # The body is the newest entry in CHANGELOG.txt - everything between
-          # the first separator line and the next - so that what a release says
-          # it changed and what the changelog says cannot drift apart. The file
-          # is CRLF, which is why the carriage returns go first: an awk pattern
-          # anchored on $ would never match the separator otherwise.
-          tr -d '\r' < CHANGELOG.txt \
-            | awk '/^-+$/ {n++; if (n == 2) exit; next} n == 1 {print}' > entry.md
+          # The body is the newest released entry in CHANGELOG.txt - everything
+          # from its header to the next separator - so that what a release says
+          # it changed and what the changelog says cannot drift apart. The
+          # "Unreleased" section the file opens with has no version yet, so it
+          # is skipped; the build job's tag check skips it by the same rule.
+          # The file is CRLF, which is why the carriage returns go first: an awk
+          # pattern anchored on $ would never match the separator otherwise.
+          tr -d '\r' < CHANGELOG.txt | awk '
+            /^-+$/   { if (printing) exit; hdr = 1; next }
+            hdr      { hdr = 0
+                       if ($0 ~ /^Unreleased[[:space:]]*$/) next
+                       printing = 1 }
+            printing { print }' > entry.md
           [ -s entry.md ] || { echo "::error::found no entry in CHANGELOG.txt"; exit 1; }
           # The per-platform install notes are kept beside this workflow rather
           # than inline, where indentation rules would turn them into code.

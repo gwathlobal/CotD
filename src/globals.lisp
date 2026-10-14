@@ -891,6 +891,15 @@ hand-written methods this replaces."
 (defparameter *max-mob-sight* 10)
 (defparameter *base-mob-sight* 8)
 
+;; The light/vision maths in los-fov.lisp runs at (speed 3) over every cell of
+;; a field of view, so these four need their type named: an undeclaimed special
+;; reads as T and drags the whole expression around it into generic arithmetic.
+;; The bound is well under FIXNUM on purpose - these are small tuning
+;; constants, and saying so is what lets sums and products of them stay in a
+;; fixnum rather than being boxed back into an integer.
+(declaim (type (integer 0 1000000) *light-power-faloff* *dark-power-faloff*
+               *mob-visibility-threshold* *max-hearing-range*))
+
 (defparameter *base-light-radius* 6)
 (defparameter *light-power-faloff* 17)
 (defparameter *dark-power-faloff* 12)

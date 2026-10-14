@@ -86,12 +86,25 @@ of 4000 times a frame."
 (defun update-map-area (start-x start-y &key (rel-x (x *player*)) (rel-y (y *player*)) (rel-z (z *player*)) (array (memo (level *world*))) (max-x-view *max-x-view*) (max-y-view *max-y-view*)
                              (post-func #'(lambda (x y x1 y1) (declare (ignore x y x1 y1)) nil)))
   (declare (optimize (speed 3)))
+  ;; ARRAY is the level's memo array for every caller; naming its type (and
+  ;; POST-FUNC's) is what keeps the AREF below open-coded instead of
+  ;; dispatching on the element type once per glyph drawn.
+  ;;
+  ;; The pixel coordinates are declared with their real bounds rather than
+  ;; just FIXNUM, because a FIXNUM times a FIXNUM can overflow a fixnum and
+  ;; SBCL would otherwise have to work out each glyph's position with generic
+  ;; arithmetic. The bounds are a glyph cell's size and the map area's extent
+  ;; in cells; anything near them is a bug, which safety then catches.
+  (declare (type (integer 0 65536) start-x start-y)
+           (type (simple-array t (* * *)) array)
+           (type function post-func))
   ;; draw the level
    (let* ((x1 0) (y1 0) (glyph-w *glyph-w*) (glyph-h *glyph-h*) (single-memo))
-     (declare (type fixnum x1 y1 rel-x rel-y glyph-w glyph-h))
+     (declare (type fixnum x1 y1 rel-x rel-y)
+              (type (integer 0 256) glyph-w glyph-h))
 
      (multiple-value-bind (sx sy max-x max-y) (calculate-start-coord rel-x rel-y array max-x-view max-y-view)
-       (declare (type fixnum sx sy max-x max-y))
+       (declare (type (integer 0 4096) sx sy max-x max-y))
        (dotimes (x max-x)
 	 (declare (type fixnum x))
 	 (dotimes (y max-y)
